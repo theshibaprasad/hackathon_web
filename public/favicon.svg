@@ -1,0 +1,22 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="16" cy="16" r="16" fill="#4F46E5"/>
+  
+  <!-- Code brackets -->
+  <path d="M8 10L6 12L8 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M24 10L26 12L24 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Central coding symbol -->
+  <rect x="12" y="12" width="8" height="8" rx="2" fill="white" opacity="0.9"/>
+  
+  <!-- Code lines inside -->
+  <rect x="13" y="14" width="4" height="1" fill="#4F46E5"/>
+  <rect x="13" y="16" width="6" height="1" fill="#4F46E5"/>
+  <rect x="13" y="18" width="3" height="1" fill="#4F46E5"/>
+  
+  <!-- Small accent dots -->
+  <circle cx="10" cy="8" r="1" fill="#10B981"/>
+  <circle cx="22" cy="8" r="1" fill="#F59E0B"/>
+  <circle cx="10" cy="24" r="1" fill="#EF4444"/>
+  <circle cx="22" cy="24" r="1" fill="#8B5CF6"/>
+</svg>
