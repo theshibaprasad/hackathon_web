@@ -18,6 +18,7 @@ export default function RegisterPage() {
     firstName: '',
     lastName: '',
     email: '',
+    phoneNumber: '',
     password: '',
     confirmPassword: ''
   });
@@ -39,6 +40,45 @@ export default function RegisterPage() {
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+    
+    // Remove all non-digit characters
+    const digits = value.replace(/\D/g, '');
+    
+    // Handle different input formats
+    if (digits.length <= 10) {
+      // If user enters just digits (up to 10), keep as is
+      setFormData({
+        ...formData,
+        phoneNumber: digits
+      });
+    } else if (digits.length === 11 && digits.startsWith('91')) {
+      // If user enters 91 followed by 10 digits, format as +91
+      setFormData({
+        ...formData,
+        phoneNumber: '+91' + digits.slice(2)
+      });
+    } else if (digits.length === 12 && digits.startsWith('91')) {
+      // If user enters 91 followed by 10 digits with extra, format as +91
+      setFormData({
+        ...formData,
+        phoneNumber: '+91' + digits.slice(2, 12)
+      });
+    } else if (digits.length > 10) {
+      // If more than 10 digits, take only the last 10
+      setFormData({
+        ...formData,
+        phoneNumber: digits.slice(-10)
+      });
+    } else {
+      setFormData({
+        ...formData,
+        phoneNumber: digits
+      });
+    }
   };
 
   const handleGoogleLogin = async () => {
@@ -101,13 +141,13 @@ export default function RegisterPage() {
         setIsRedirecting(true);
         toast({
           title: "Account Created Successfully!",
-          description: "Welcome to our platform! Your account has been verified and created. Redirecting to dashboard...",
+          description: "Welcome to our platform! Your account has been verified and created. Redirecting to onboarding...",
           variant: "default",
         });
         
         // Small delay to ensure cookie is set before redirect
         setTimeout(() => {
-          router.push('/dashboard');
+          router.push('/onboarding');
         }, 1000);
       } else {
         toast({
@@ -203,6 +243,33 @@ export default function RegisterPage() {
       return;
     }
 
+    // Phone number validation and formatting
+    let phoneNumber = formData.phoneNumber;
+    
+    // If it's just 10 digits, add +91
+    if (/^\d{10}$/.test(phoneNumber)) {
+      phoneNumber = '+91' + phoneNumber;
+    }
+    // If it starts with 91 and has 10 more digits, add +
+    else if (/^91\d{10}$/.test(phoneNumber)) {
+      phoneNumber = '+' + phoneNumber;
+    }
+    // If it starts with 0 and has 10 digits, remove 0 and add +91
+    else if (/^0\d{9}$/.test(phoneNumber)) {
+      phoneNumber = '+91' + phoneNumber.slice(1);
+    }
+    
+    const phoneRegex = /^\+91[6-9]\d{9}$/;
+    if (!phoneRegex.test(phoneNumber)) {
+      toast({
+        title: "Invalid Phone Number",
+        description: "Please enter a valid 10-digit Indian mobile number",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
@@ -213,6 +280,7 @@ export default function RegisterPage() {
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
+          phoneNumber: formData.phoneNumber,
           password: formData.password
         }),
       });
@@ -374,7 +442,7 @@ export default function RegisterPage() {
     <div className="min-h-screen flex flex-col lg:flex-row gap-0">
       {/* Left side - Register Form */}
       <motion.div 
-        className="w-full lg:w-1/2 flex items-center justify-center lg:justify-end px-4 lg:pr-14 py-8 lg:py-0"
+        className="w-full lg:w-1/2 flex items-center justify-center lg:justify-end px-4 lg:pr-14 py-4 lg:py-0"
         initial={{ x: 0, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 1.2, ease: [0.25, 0.1, 0.25, 1] }}
@@ -386,13 +454,13 @@ export default function RegisterPage() {
           transition={{ duration: 1.2, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
         >
           <motion.div 
-            className="text-center mb-6 lg:mb-8"
+            className="text-center mb-4"
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <h1 className="text-2xl lg:text-3xl font-bold text-foreground mb-2">Create Account</h1>
-            <p className="text-sm lg:text-base text-muted-foreground">Join our community and start your journey</p>
+            <h1 className="text-xl lg:text-2xl font-bold text-foreground mb-1">Create Account</h1>
+            <p className="text-sm text-muted-foreground">Join our community and start your journey</p>
           </motion.div>
           
           <motion.div
@@ -403,12 +471,12 @@ export default function RegisterPage() {
             <Card className="shadow-2xl border-0 bg-card/80 backdrop-blur-sm rounded-2xl">
               <CardHeader className="space-y-1">
               </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
+              <CardContent className="p-4">
+                <form onSubmit={handleSubmit} className="space-y-3">
                   
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="firstName">First Name</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <Label htmlFor="firstName" className="text-sm">First Name</Label>
                       <Input
                         id="firstName"
                         name="firstName"
@@ -417,11 +485,11 @@ export default function RegisterPage() {
                         value={formData.firstName}
                         onChange={handleChange}
                         required
-                        className="h-12 rounded-lg border-2 focus:border-primary hover:border-primary/70 transition-colors bg-background/50 hover:bg-background/80"
+                        className="h-10 rounded-lg border-2 focus:border-primary hover:border-primary/70 transition-colors bg-background/50 hover:bg-background/80"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="lastName">Last Name</Label>
+                    <div className="space-y-1">
+                      <Label htmlFor="lastName" className="text-sm">Last Name</Label>
                       <Input
                         id="lastName"
                         name="lastName"
@@ -430,13 +498,13 @@ export default function RegisterPage() {
                         value={formData.lastName}
                         onChange={handleChange}
                         required
-                        className="h-12 rounded-lg border-2 focus:border-primary hover:border-primary/70 transition-colors bg-background/50 hover:bg-background/80"
+                        className="h-10 rounded-lg border-2 focus:border-primary hover:border-primary/70 transition-colors bg-background/50 hover:bg-background/80"
                       />
                     </div>
                   </div>
                   
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                  <div className="space-y-1">
+                    <Label htmlFor="email" className="text-sm">Email</Label>
                     <Input
                       id="email"
                       name="email"
@@ -445,12 +513,29 @@ export default function RegisterPage() {
                       value={formData.email}
                       onChange={handleChange}
                       required
-                      className="h-12 rounded-lg border-2 focus:border-primary transition-colors bg-background/50"
+                      className="h-10 rounded-lg border-2 focus:border-primary transition-colors bg-background/50"
                     />
                   </div>
                   
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
+                  <div className="space-y-1">
+                    <Label htmlFor="phoneNumber" className="text-sm">Phone Number</Label>
+                    <Input
+                      id="phoneNumber"
+                      name="phoneNumber"
+                      type="tel"
+                      placeholder="+91 0123456789"
+                      value={formData.phoneNumber}
+                      onChange={handlePhoneChange}
+                      required
+                      className="h-10 rounded-lg border-2 focus:border-primary hover:border-primary/70 transition-colors bg-background/50 hover:bg-background/80"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Enter 10-digit mobile number
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <Label htmlFor="password" className="text-sm">Password</Label>
                     <div className="relative">
                       <Input
                         id="password"
@@ -460,13 +545,13 @@ export default function RegisterPage() {
                         value={formData.password}
                         onChange={handleChange}
                         required
-                        className="h-12 rounded-lg border-2 focus:border-primary hover:border-primary/70 transition-colors bg-background/50 hover:bg-background/80 pr-10"
+                        className="h-10 rounded-lg border-2 focus:border-primary hover:border-primary/70 transition-colors bg-background/50 hover:bg-background/80 pr-10"
                       />
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="absolute right-0 top-0 h-12 px-3 py-2 hover:bg-primary/10 hover:text-primary transition-colors"
+                        className="absolute right-0 top-0 h-10 px-3 py-2 hover:bg-primary/10 hover:text-primary transition-colors"
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         {showPassword ? (
@@ -478,8 +563,8 @@ export default function RegisterPage() {
                     </div>
                   </div>
                   
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <div className="space-y-1">
+                    <Label htmlFor="confirmPassword" className="text-sm">Confirm Password</Label>
                     <div className="relative">
                       <Input
                         id="confirmPassword"
@@ -489,13 +574,13 @@ export default function RegisterPage() {
                         value={formData.confirmPassword}
                         onChange={handleChange}
                         required
-                        className="h-12 rounded-lg border-2 focus:border-primary hover:border-primary/70 transition-colors bg-background/50 hover:bg-background/80 pr-10"
+                        className="h-10 rounded-lg border-2 focus:border-primary hover:border-primary/70 transition-colors bg-background/50 hover:bg-background/80 pr-10"
                       />
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="absolute right-0 top-0 h-12 px-3 py-2 hover:bg-primary/10 hover:text-primary transition-colors"
+                        className="absolute right-0 top-0 h-10 px-3 py-2 hover:bg-primary/10 hover:text-primary transition-colors"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       >
                         {showConfirmPassword ? (
@@ -508,7 +593,7 @@ export default function RegisterPage() {
                   </div>
                   
                   {/* Privacy Policy Agreement */}
-                  <div className="flex items-start space-x-3">
+                  <div className="flex items-start space-x-2">
                     <Checkbox
                       id="terms"
                       checked={agreeToTerms}
@@ -517,7 +602,7 @@ export default function RegisterPage() {
                     />
                     <label
                       htmlFor="terms"
-                      className="text-sm text-muted-foreground leading-relaxed cursor-pointer select-none"
+                      className="text-xs text-muted-foreground leading-relaxed cursor-pointer select-none"
                     >
                       I agree to the{' '}
                       <a href="#" className="text-primary hover:text-primary/80 hover:underline transition-colors font-medium">
@@ -532,7 +617,7 @@ export default function RegisterPage() {
                   
                   <Button
                     type="submit"
-                    className="w-full h-12 rounded-lg font-medium transition-all duration-200 hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/25"
+                    className="w-full h-10 rounded-lg font-medium transition-all duration-200 hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/25"
                     disabled={isLoading || !agreeToTerms}
                   >
                     {isLoading ? (
@@ -541,7 +626,7 @@ export default function RegisterPage() {
                         Creating account...
                       </>
                     ) : (
-                      'Submit'
+                      'Create Account'
                     )}
                   </Button>
                   

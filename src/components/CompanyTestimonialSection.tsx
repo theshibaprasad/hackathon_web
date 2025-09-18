@@ -22,7 +22,7 @@ export const CompanyTestimonialSection = () => {
             <h2 className="text-4xl md:text-5xl font-bold leading-tight text-devfolio-orange">
               InOut connected me to awesome developers & made me feel inclusive.{" "}
               <span className="text-primary">
-                CompanyName has been doing an amazing job in keeping the community intact.
+                Novothon has been doing an amazing job in keeping the community intact.
               </span>
             </h2>
             

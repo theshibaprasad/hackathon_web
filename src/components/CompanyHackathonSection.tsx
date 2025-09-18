@@ -8,7 +8,7 @@ import { Calendar, MapPin, Users, Trophy, Clock, Code } from "lucide-react";
 
 const hackathons = [
   {
-    title: "HackCommit 1.0",
+    title: "Novothon",
     date: "Nov 15, 2025",
     location: "Odisha",
     color: "bg-devfolio-purple",

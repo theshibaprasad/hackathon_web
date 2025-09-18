@@ -4,12 +4,12 @@ import User from '@/models/User';
 
 export async function POST(request: NextRequest) {
   try {
-    const { clerkId, email, firstName, lastName } = await request.json();
+    const { email, firstName, lastName } = await request.json();
     
     await connectDB();
     
     // Check if user already exists
-    const existingUser = await User.findOne({ clerkId });
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
       return NextResponse.json({
         message: 'User already exists',
@@ -19,7 +19,6 @@ export async function POST(request: NextRequest) {
     
     // Create new user
     const user = new User({
-      clerkId: clerkId || 'test-clerk-id-' + Date.now(),
       email: email || 'test@example.com',
       firstName: firstName || 'Test',
       lastName: lastName || 'User',

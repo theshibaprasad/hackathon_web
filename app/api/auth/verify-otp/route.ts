@@ -69,12 +69,24 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user already exists (double-check)
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    const existingUser = await User.findOne({ 
+      $or: [
+        { email: email.toLowerCase() },
+        { phoneNumber: otpData.phoneNumber }
+      ]
+    });
     if (existingUser) {
-      return NextResponse.json(
-        { error: 'User with this email already exists' },
-        { status: 400 }
-      );
+      if (existingUser.email === email.toLowerCase()) {
+        return NextResponse.json(
+          { error: 'User with this email already exists' },
+          { status: 400 }
+        );
+      } else {
+        return NextResponse.json(
+          { error: 'User with this phone number already exists' },
+          { status: 400 }
+        );
+      }
     }
 
     // Create the actual user account
@@ -82,6 +94,7 @@ export async function POST(request: NextRequest) {
       firstName: otpData.firstName,
       lastName: otpData.lastName,
       email: otpData.email,
+      phoneNumber: otpData.phoneNumber,
       password: otpData.password
     });
 
@@ -91,7 +104,12 @@ export async function POST(request: NextRequest) {
     const token = jwt.sign(
       { 
         userId: user._id,
-        email: user.email
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phoneNumber: user.phoneNumber,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
       },
       process.env.JWT_SECRET!,
       { expiresIn: '7d' }
@@ -102,7 +120,8 @@ export async function POST(request: NextRequest) {
       id: user._id,
       email: user.email,
       firstName: user.firstName,
-      lastName: user.lastName
+      lastName: user.lastName,
+      phoneNumber: user.phoneNumber
     };
 
     // Create response with user data

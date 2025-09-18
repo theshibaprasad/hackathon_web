@@ -122,7 +122,7 @@ export const CompanyCompanySection = () => {
           transition={{ duration: 0.8 }}
           className="text-4xl md:text-6xl font-bold text-white mb-8"
         >
-          CompanyName for companies
+          Novothon for companies
         </motion.h2>
         
         <motion.p 

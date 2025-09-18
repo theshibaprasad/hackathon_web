@@ -5,6 +5,7 @@ export interface OTPData {
   email: string;
   firstName: string;
   lastName: string;
+  phoneNumber: string;
   password: string;
   otp: string;
   createdAt: number;
@@ -83,6 +84,7 @@ class JWTOTPService {
         email: decoded.email,
         firstName: decoded.firstName,
         lastName: decoded.lastName,
+        phoneNumber: decoded.phoneNumber,
         password: decoded.password,
         otp: newOTP,
         createdAt: now

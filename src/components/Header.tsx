@@ -49,10 +49,27 @@ export const Header = () => {
         method: 'POST',
         credentials: 'include',
       });
+      
+      // Clear user state
       setUser(null);
-      router.push('/');
+      
+      // Clear any local storage
+      if (typeof window !== 'undefined') {
+        localStorage.clear();
+        sessionStorage.clear();
+      }
+      
+      // Force reload to clear any cached state
+      window.location.href = '/';
     } catch (error) {
       console.error('Logout error:', error);
+      // Even if API call fails, clear local state and redirect
+      setUser(null);
+      if (typeof window !== 'undefined') {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = '/';
+      }
     }
   };
 
@@ -63,7 +80,7 @@ export const Header = () => {
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-lg">C</span>
           </div>
-          <span className="text-2xl font-bold text-primary">CompanyName</span>
+          <span className="text-2xl font-bold text-primary">Novothon</span>
         </div>
         
         <nav className="hidden md:flex items-center space-x-8">

@@ -7,7 +7,7 @@ import { CheckCircle, XCircle, AlertCircle, Info } from "lucide-react";
 export function Toaster() {
   const { toasts } = useToast();
 
-  const getIcon = (variant?: string) => {
+  const getIcon = (variant?: string | null) => {
     switch (variant) {
       case "destructive":
         return <XCircle className="h-5 w-5 text-destructive-foreground" />;

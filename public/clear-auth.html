@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Authentication Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        button:hover {
+            background: #c82333;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .info {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Clear Authentication Data</h1>
+        <p>This page will help you clear all authentication-related data from your browser.</p>
+        
+        <div class="info">
+            <h3>What this will clear:</h3>
+            <ul>
+                <li>All cookies (including Clerk cookies)</li>
+                <li>Local storage data</li>
+                <li>Session storage data</li>
+                <li>IndexedDB data</li>
+            </ul>
+        </div>
+        
+        <button onclick="clearAllAuthData()">Clear All Authentication Data</button>
+        
+        <div id="result"></div>
+        
+        <script>
+            async function clearAllAuthData() {
+                let cleared = [];
+                
+                try {
+                    // Call API to clear server-side cookies
+                    const response = await fetch('/api/clear-auth', {
+                        method: 'POST',
+                        credentials: 'include'
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        cleared.push("Server-side Cookies");
+                        console.log('Server cleared cookies:', data.cleared);
+                    }
+                } catch (error) {
+                    console.error('Error clearing server cookies:', error);
+                }
+                
+                // Clear client-side cookies
+                document.cookie.split(";").forEach(function(c) { 
+                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+                });
+                cleared.push("Client-side Cookies");
+                
+                // Clear localStorage
+                localStorage.clear();
+                cleared.push("Local Storage");
+                
+                // Clear sessionStorage
+                sessionStorage.clear();
+                cleared.push("Session Storage");
+                
+                // Clear IndexedDB
+                if ('indexedDB' in window) {
+                    try {
+                        const databases = await indexedDB.databases();
+                        databases.forEach(db => {
+                            indexedDB.deleteDatabase(db.name);
+                        });
+                        cleared.push("IndexedDB");
+                    } catch (error) {
+                        console.error('Error clearing IndexedDB:', error);
+                    }
+                }
+                
+                // Show result
+                document.getElementById('result').innerHTML = 
+                    '<div class="success">✅ Successfully cleared: ' + cleared.join(', ') + '</div>' +
+                    '<p>You can now close this tab and try accessing /dashboard again.</p>' +
+                    '<p><a href="/dashboard" style="color: #007bff;">Test Dashboard Access</a></p>';
+            }
+            
+            // Check current auth cookies on page load
+            async function checkAuthCookies() {
+                try {
+                    const response = await fetch('/api/clear-auth', {
+                        method: 'GET',
+                        credentials: 'include'
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.authCookiesCount > 0) {
+                            document.getElementById('result').innerHTML = 
+                                '<div style="background: #fff3cd; padding: 15px; border-radius: 4px; margin: 20px 0;">' +
+                                '<strong>Found ' + data.authCookiesCount + ' authentication cookies:</strong><br>' +
+                                data.cookies.map(c => c.name + ' (' + (c.hasValue ? 'has value' : 'empty') + ')').join('<br>') +
+                                '</div>';
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error checking cookies:', error);
+                }
+            }
+            
+            // Check cookies when page loads
+            window.onload = checkAuthCookies;
+        </script>
+    </div>
+</body>
+</html>

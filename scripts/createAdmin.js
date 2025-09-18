@@ -61,18 +61,18 @@ async function createAdmin() {
 
     // Create admin
     const admin = new Admin({
-      username: 'hackathon',
+      username: 'admin',
       password: hashedPassword,
-      email: 'admin@hackathon.com',
+      email: 'admin@novothon.com',
       role: 'super_admin',
       isActive: true
     });
 
     await admin.save();
     console.log('Admin created successfully!');
-    console.log('Username: hackathon');
-    console.log('Password: hackshiba@9988');
-    console.log('Email: admin@hackathon.com');
+    console.log('Username: admin');
+    console.log('Password: novoshiba@9988');
+    console.log('Email: admin@novothon.com');
     console.log('Role: super_admin');
 
   } catch (error) {

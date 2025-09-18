@@ -46,8 +46,8 @@ interface HackathonData {
 }
 
 const hackathonData: HackathonData = {
-  id: "hackcommit-1.0",
-  title: "HackCommit 1.0",
+  id: "novothon-1.0",
+  title: "Novothon",
   description: "Join the most innovative hackathon in Odisha! Build amazing projects, learn new technologies, and compete for exciting prizes. This is your chance to showcase your skills and network with fellow developers.",
   date: "November 15, 2025",
   time: "9:00 AM - 6:00 PM",
@@ -166,7 +166,7 @@ export const HackathonDetails = () => {
         
         setRegistrationStatus({
           type: 'success',
-          message: 'Successfully registered for HackCommit 1.0! You can now access team management and project submission.'
+          message: 'Successfully registered for Novothon! You can now access team management and project submission.'
         });
       } else {
         setRegistrationStatus({

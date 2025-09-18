@@ -25,7 +25,7 @@ export const CompanyFooter = () => {
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <span className="text-primary-foreground font-bold text-lg">C</span>
               </div>
-              <span className="text-2xl font-bold text-primary">CompanyName</span>
+              <span className="text-2xl font-bold text-primary">Novothon</span>
             </div>
             <p className="text-muted-foreground mb-6 max-w-md">
               We love{" "}
@@ -125,7 +125,7 @@ export const CompanyFooter = () => {
         >
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-muted-foreground text-sm">
-              © 2024 CompanyName. All rights reserved. ❤️ & 💻 from India by Polygon Devs.
+              © 2024 Novothon. All rights reserved. ❤️ & 💻 from India by Polygon Devs.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <motion.a

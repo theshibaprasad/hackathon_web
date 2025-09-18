@@ -30,7 +30,7 @@ export const CompanyHeader = () => {
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-lg">H</span>
           </div>
-          <span className="text-2xl font-bold text-primary">HackName</span>
+          <span className="text-2xl font-bold text-primary">Novothon</span>
         </motion.div>
         
         <nav className="hidden md:flex items-center space-x-8">
@@ -65,9 +65,11 @@ export const CompanyHeader = () => {
         </nav>
 
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="sm" onClick={handleSignIn}>
-            Sign in
-          </Button>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button variant="outline" size="sm" onClick={handleSignIn} className="border-primary text-primary hover:bg-primary/10 hover:text-primary transition-all duration-200">
+              Sign in
+            </Button>
+          </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button size="sm" className="bg-primary hover:bg-primary/90" onClick={handleSignUp}>
               Signup

@@ -7,12 +7,37 @@ export async function POST() {
       { status: 200 }
     );
 
-    // Clear the auth token cookie
-    response.cookies.set('auth-token', '', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 0 // Expire immediately
+    // Clear all possible auth-related cookies
+    const cookiesToClear = [
+      'auth-token',
+      'session',
+      'sessionid',
+      'connect.sid',
+      'jwt',
+      'token',
+      'user-token',
+      'access-token',
+      'refresh-token'
+    ];
+
+    cookiesToClear.forEach(cookieName => {
+      // Clear cookie for current domain
+      response.cookies.set(cookieName, '', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 0,
+        path: '/'
+      });
+      
+      // Also clear for root path
+      response.cookies.set(cookieName, '', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 0,
+        path: '/'
+      });
     });
 
     return response;

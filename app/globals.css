@@ -4,6 +4,79 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Crackers explosion animations */
+@keyframes explodeUp {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+  50% { transform: translate(-50%, -100%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -200%) scale(0.8); opacity: 0; }
+}
+
+@keyframes explodeUpRight {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+  50% { transform: translate(0%, -100%) scale(1); opacity: 1; }
+  100% { transform: translate(100%, -200%) scale(0.8); opacity: 0; }
+}
+
+@keyframes explodeUpLeft {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+  50% { transform: translate(-100%, -100%) scale(1); opacity: 1; }
+  100% { transform: translate(-200%, -200%) scale(0.8); opacity: 0; }
+}
+
+@keyframes explodeRight {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+  50% { transform: translate(50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(200%, -50%) scale(0.8); opacity: 0; }
+}
+
+@keyframes explodeRightUp {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+  50% { transform: translate(25%, -75%) scale(1); opacity: 1; }
+  100% { transform: translate(150%, -150%) scale(0.8); opacity: 0; }
+}
+
+@keyframes explodeRightDown {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+  50% { transform: translate(25%, -25%) scale(1); opacity: 1; }
+  100% { transform: translate(150%, 50%) scale(0.8); opacity: 0; }
+}
+
+@keyframes explodeLeft {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+  50% { transform: translate(-150%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(-250%, -50%) scale(0.8); opacity: 0; }
+}
+
+@keyframes explodeLeftUp {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+  50% { transform: translate(-125%, -75%) scale(1); opacity: 1; }
+  100% { transform: translate(-200%, -150%) scale(0.8); opacity: 0; }
+}
+
+@keyframes explodeLeftDown {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+  50% { transform: translate(-125%, -25%) scale(1); opacity: 1; }
+  100% { transform: translate(-200%, 50%) scale(0.8); opacity: 0; }
+}
+
+@keyframes explodeDown {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+  50% { transform: translate(-50%, 0%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, 100%) scale(0.8); opacity: 0; }
+}
+
+@keyframes explodeDownRight {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+  50% { transform: translate(0%, 0%) scale(1); opacity: 1; }
+  100% { transform: translate(100%, 100%) scale(0.8); opacity: 0; }
+}
+
+@keyframes explodeDownLeft {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+  50% { transform: translate(-100%, 0%) scale(1); opacity: 1; }
+  100% { transform: translate(-200%, 100%) scale(0.8); opacity: 0; }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -35,7 +108,7 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    /* CompanyName exact colors */
+    /* Novothon exact colors */
     --devfolio-yellow: 48 96% 53%;
     --devfolio-orange: 25 95% 53%;
     --devfolio-green: 142 76% 36%;
