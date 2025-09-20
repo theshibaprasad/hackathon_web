@@ -10,6 +10,13 @@ export interface IUser extends Document {
   username?: string;
   isBoarding: boolean;
   
+  // Google OAuth fields
+  googleId?: string;
+  isGoogleUser?: boolean;
+  
+  // Firebase Auth fields
+  firebaseUid?: string;
+  
   // Onboarding data fields
   profession?: 'student' | 'working_professional';
   gender?: string;
@@ -63,7 +70,9 @@ const UserSchema: Schema = new Schema({
   },
   password: {
     type: String,
-    required: true,
+    required: function(this: IUser) {
+      return !this.isGoogleUser; // Password not required for Google users
+    },
     minlength: 6
   },
   firstName: {
@@ -78,11 +87,15 @@ const UserSchema: Schema = new Schema({
   },
   phoneNumber: {
     type: String,
-    required: true,
+    required: function(this: IUser) {
+      return !this.isGoogleUser; // Phone number not required for Google users initially
+    },
     unique: true,
+    sparse: true, // Allow multiple null values
     trim: true,
     validate: {
       validator: function(v: string) {
+        if (!v) return true; // Allow empty for Google users
         // Indian phone number validation: +91 followed by 10 digits (with or without spaces)
         const cleaned = v.replace(/\s+/g, ''); // Remove all spaces
         return /^\+91[6-9]\d{9}$/.test(cleaned);
@@ -96,6 +109,24 @@ const UserSchema: Schema = new Schema({
     sparse: true
   },
   username: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
+  
+  // Google OAuth fields
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
+  isGoogleUser: {
+    type: Boolean,
+    default: false
+  },
+  
+  // Firebase Auth fields
+  firebaseUid: {
     type: String,
     unique: true,
     sparse: true

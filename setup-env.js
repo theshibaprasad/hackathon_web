@@ -21,7 +21,7 @@ EMAIL_USER=your-email@gmail.com
 EMAIL_PASS=your-app-password
 
 # Next.js
-NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_URL=http://localhost:4000
 NEXTAUTH_SECRET=${crypto.randomBytes(32).toString('hex')}
 `;
 

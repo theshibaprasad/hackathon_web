@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export const CompanyHeader = () => {
   const router = useRouter();
@@ -25,12 +26,15 @@ export const CompanyHeader = () => {
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <motion.div 
           whileHover={{ scale: 1.05 }}
-          className="flex items-center space-x-2"
+          className="flex items-center"
         >
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-lg">H</span>
-          </div>
-          <span className="text-2xl font-bold text-primary">Novothon</span>
+          <Image
+            src="/Novothon_Logo.png"
+            alt="Novothon Logo"
+            width={150}
+            height={50}
+            className="h-12 w-auto object-contain"
+          />
         </motion.div>
         
         <nav className="hidden md:flex items-center space-x-8">

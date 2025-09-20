@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Github, Twitter, Linkedin } from "lucide-react";
+import Image from "next/image";
 
 const footerLinks = {
   company: ["Code of Conduct", "Privacy Policy", "Terms of Service", "FAQ", "Platform Status", "Twitter"],
@@ -13,11 +14,14 @@ export const Footer = () => {
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           <div className="col-span-1">
-            <div className="flex items-center space-x-2 mb-6">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-lg">C</span>
-              </div>
-              <span className="text-2xl font-bold">Novothon</span>
+            <div className="flex items-center mb-6">
+              <Image
+                src="/Novothon_Logo.png"
+                alt="Novothon Logo"
+                width={150}
+                height={50}
+                className="h-12 w-auto object-contain"
+              />
             </div>
             <p className="text-muted-foreground mb-6 max-w-md">
               We love{" "}

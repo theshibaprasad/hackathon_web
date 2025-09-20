@@ -8,6 +8,11 @@ export interface ISettings extends Document {
   createdAt: Date;
 }
 
+export interface ISettingsModel extends mongoose.Model<ISettings> {
+  getSetting(key: string, defaultValue?: any): Promise<any>;
+  setSetting(key: string, value: any, description?: string): Promise<ISettings>;
+}
+
 const SettingsSchema = new Schema<ISettings>({
   key: {
     type: String,
@@ -61,4 +66,4 @@ SettingsSchema.statics.setSetting = async function(key: string, value: any, desc
   }
 };
 
-export default mongoose.models.Settings || mongoose.model<ISettings>('Settings', SettingsSchema);
+export default mongoose.models.Settings || mongoose.model<ISettings, ISettingsModel>('Settings', SettingsSchema);

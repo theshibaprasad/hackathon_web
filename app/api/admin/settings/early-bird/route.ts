@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Admin from '@/models/Admin';
-import Settings from '@/models/Settings';
+import Settings, { ISettingsModel } from '@/models/Settings';
 import jwt from 'jsonwebtoken';
 
 // Get Early Bird offer status
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
 
     // Get Early Bird offer status from database
     await connectDB();
-    const earlyBirdEnabled = await Settings.getSetting('early_bird_enabled', true);
+    const earlyBirdEnabled = await (Settings as ISettingsModel).getSetting('early_bird_enabled', true);
     
     return NextResponse.json({
       success: true,
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update setting in database
-    await Settings.setSetting(
+    await (Settings as ISettingsModel).setSetting(
       'early_bird_enabled', 
       earlyBirdEnabled, 
       'Controls whether the Early Bird offer is active for hackathon registration'

@@ -16,7 +16,7 @@ interface PaymentSuccessModalProps {
     email: string;
     firstName: string;
     lastName: string;
-    phoneNumber: string;
+    phoneNumber?: string;
   };
   paymentDetails: {
     paymentId: string;

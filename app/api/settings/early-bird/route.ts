@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import Settings from '@/models/Settings';
+import Settings, { ISettingsModel } from '@/models/Settings';
 
 // Public endpoint to get Early Bird offer status
 export async function GET(request: NextRequest) {
   try {
     // Get Early Bird offer status from database
     await connectDB();
-    const earlyBirdEnabled = await Settings.getSetting('early_bird_enabled', true);
+    const earlyBirdEnabled = await (Settings as ISettingsModel).getSetting('early_bird_enabled', true);
     
     return NextResponse.json({
       success: true,

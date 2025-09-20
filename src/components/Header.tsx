@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { User, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 // Define user type for the header
 interface HeaderUser {
@@ -76,11 +77,14 @@ export const Header = () => {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 glass-effect">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-lg">C</span>
-          </div>
-          <span className="text-2xl font-bold text-primary">Novothon</span>
+        <div className="flex items-center">
+          <Image
+            src="/Novothon_Logo.png"
+            alt="Novothon Logo"
+            width={150}
+            height={50}
+            className="h-12 w-auto object-contain"
+          />
         </div>
         
         <nav className="hidden md:flex items-center space-x-8">

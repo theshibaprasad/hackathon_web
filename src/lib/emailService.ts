@@ -23,7 +23,7 @@ export interface EmailOptions {
 export const sendEmail = async (options: EmailOptions) => {
   try {
     const mailOptions = {
-      from: `"Hackathon Platform" <${process.env.EMAIL_USER}>`,
+      from: `"Novothon Platform" <${process.env.EMAIL_USER}>`,
       to: options.to,
       subject: options.subject,
       html: options.html,
@@ -75,7 +75,7 @@ export const sendOTPVerificationEmail = async (userEmail: string, userName: stri
           If you didn't create an account with us, please ignore this email.
         </p>
         <p style="color: #666; font-size: 14px;">
-          Need help? Contact us at support@hackathonplatform.com
+          Need help? Contact us at support@novothonplatform.com
         </p>
       </div>
     </div>
@@ -83,7 +83,7 @@ export const sendOTPVerificationEmail = async (userEmail: string, userName: stri
 
   return await sendEmail({
     to: userEmail,
-    subject: '🔐 Verify Your Email - Complete Your Hackathon Platform Registration',
+    subject: '🔐 Verify Your Email - Complete Your Novothon Platform Registration',
     html,
   });
 };
@@ -93,7 +93,7 @@ export const sendWelcomeEmail = async (userEmail: string, userName: string) => {
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
       <div style="text-align: center; margin-bottom: 30px;">
-        <h1 style="color: #333; margin-bottom: 10px;">Welcome to Hackathon Platform!</h1>
+        <h1 style="color: #333; margin-bottom: 10px;">Welcome to Novothon Platform!</h1>
         <p style="color: #666; font-size: 16px;">Hello ${userName},</p>
       </div>
       
@@ -123,7 +123,7 @@ export const sendWelcomeEmail = async (userEmail: string, userName: string) => {
       
       <div style="text-align: center; margin: 30px 0;">
         <p style="color: #666; font-size: 14px;">
-          Need help? Contact us at support@hackathonplatform.com
+          Need help? Contact us at support@novothonplatform.com
         </p>
       </div>
     </div>
@@ -131,7 +131,7 @@ export const sendWelcomeEmail = async (userEmail: string, userName: string) => {
 
   return await sendEmail({
     to: userEmail,
-    subject: '🎉 Welcome to Hackathon Platform - Your Account is Ready!',
+    subject: '🎉 Welcome to Novothon Platform - Your Account is Ready!',
     html,
   });
 };
@@ -273,7 +273,7 @@ export const sendPasswordResetEmail = async (
 
   return await sendEmail({
     to: userEmail,
-    subject: 'Password Reset Request - Hackathon Platform',
+    subject: 'Password Reset Request - Novothon Platform',
     html,
   });
 };
@@ -314,7 +314,7 @@ export const sendOTPEmail = async (userEmail: string, userName: string, otp: str
           If you didn't request a password reset, please ignore this email.
         </p>
         <p style="color: #666; font-size: 14px;">
-          Need help? Contact us at support@hackathonplatform.com
+          Need help? Contact us at support@novothonplatform.com
         </p>
       </div>
     </div>
@@ -322,7 +322,7 @@ export const sendOTPEmail = async (userEmail: string, userName: string, otp: str
 
   return await sendEmail({
     to: userEmail,
-    subject: '🔐 Password Reset OTP - Hackathon Platform',
+    subject: '🔐 Password Reset OTP - Novothon Platform',
     html,
   });
 };

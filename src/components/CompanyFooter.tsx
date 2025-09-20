@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Github, Twitter, Linkedin } from "lucide-react";
+import Image from "next/image";
 
 const footerLinks = {
   company: ["Code of Conduct", "Privacy Policy", "Terms of Service", "FAQ", "Platform Status", "Twitter"],
@@ -21,11 +22,14 @@ export const CompanyFooter = () => {
             transition={{ duration: 0.6 }}
             className="col-span-1"
           >
-            <div className="flex items-center space-x-2 mb-6">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-lg">C</span>
-              </div>
-              <span className="text-2xl font-bold text-primary">Novothon</span>
+            <div className="flex items-center mb-6">
+              <Image
+                src="/Novothon_Logo.png"
+                alt="Novothon Logo"
+                width={150}
+                height={50}
+                className="h-12 w-auto object-contain"
+              />
             </div>
             <p className="text-muted-foreground mb-6 max-w-md">
               We love{" "}
