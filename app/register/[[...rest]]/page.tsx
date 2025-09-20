@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,12 +28,33 @@ export default function RegisterPage() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [showOTPVerification, setShowOTPVerification] = useState(false);
-  const [otp, setOtp] = useState('');
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isVerifyingOTP, setIsVerifyingOTP] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [otpToken, setOtpToken] = useState('');
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const { toast } = useToast();
   const router = useRouter();
+
+  const validatePassword = (password: string) => {
+    const minLength = password.length >= 6;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    
+    return {
+      isValid: minLength && hasUpperCase && hasLowerCase && hasNumbers,
+      checks: {
+        minLength,
+        hasUpperCase,
+        hasLowerCase,
+        hasNumbers
+      }
+    };
+  };
+
+  const passwordValidation = validatePassword(formData.password);
+  const passwordsMatch = formData.password === formData.confirmPassword && formData.confirmPassword.length > 0;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -103,15 +124,44 @@ export default function RegisterPage() {
     }
   };
 
-  const handleOTPChange = (value: string) => {
-    // Only allow 6 digits
-    if (value.length <= 6 && /^\d*$/.test(value)) {
-      setOtp(value);
+  const handleOTPChange = (index: number, value: string) => {
+    if (value.length > 1) return; // Prevent multiple characters
+    
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+
+    // Auto-focus next input
+    if (value && index < 5) {
+      inputRefs.current[index + 1]?.focus();
     }
   };
 
+  const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+    const newOtp = [...otp];
+    
+    for (let i = 0; i < pastedData.length && i < 6; i++) {
+      newOtp[i] = pastedData[i];
+    }
+    
+    setOtp(newOtp);
+    
+    // Focus the next empty input or the last one
+    const nextIndex = Math.min(pastedData.length, 5);
+    inputRefs.current[nextIndex]?.focus();
+  };
+
   const handleVerifyOTP = async () => {
-    if (otp.length !== 6) {
+    const otpString = otp.join('');
+    if (otpString.length !== 6) {
       toast({
         title: "Invalid OTP",
         description: "Please enter a 6-digit verification code",
@@ -130,7 +180,7 @@ export default function RegisterPage() {
         },
         body: JSON.stringify({
           email: formData.email,
-          otp: otp,
+          otp: otpString,
           otpToken: otpToken
         }),
       });
@@ -223,20 +273,20 @@ export default function RegisterPage() {
       return;
     }
 
-    if (formData.password !== formData.confirmPassword) {
+    if (!passwordValidation.isValid) {
       toast({
-        title: "Password Mismatch",
-        description: "Passwords do not match",
+        title: "Invalid Password",
+        description: "Password must be at least 6 characters with uppercase, lowercase, and numbers",
         variant: "destructive",
       });
       setIsLoading(false);
       return;
     }
 
-    if (formData.password.length < 6) {
+    if (!passwordsMatch) {
       toast({
-        title: "Password Too Short",
-        description: "Password must be at least 6 characters",
+        title: "Passwords Don't Match",
+        description: "Please make sure both passwords are the same",
         variant: "destructive",
       });
       setIsLoading(false);
@@ -351,23 +401,31 @@ export default function RegisterPage() {
               <Card className="shadow-2xl border-0 bg-card/80 backdrop-blur-sm rounded-2xl">
                 <CardContent className="pt-6">
                   <div className="space-y-6">
-                    <div className="space-y-2">
+                    <div className="space-y-4">
                       <Label htmlFor="otp">Verification Code</Label>
-                      <Input
-                        id="otp"
-                        type="text"
-                        placeholder="Enter 6-digit code"
-                        value={otp}
-                        onChange={(e) => handleOTPChange(e.target.value)}
-                        maxLength={6}
-                        className="h-12 rounded-lg border-2 focus:border-primary transition-colors bg-background/50 text-center text-2xl tracking-widest"
-                      />
+                      <div className="flex justify-center space-x-2">
+                        {otp.map((digit, index) => (
+                          <Input
+                            key={index}
+                            ref={(el) => { inputRefs.current[index] = el; }}
+                            type="text"
+                            inputMode="numeric"
+                            maxLength={1}
+                            value={digit}
+                            onChange={(e) => handleOTPChange(index, e.target.value)}
+                            onKeyDown={(e) => handleKeyDown(index, e)}
+                            onPaste={handlePaste}
+                            className="w-12 h-12 text-center text-lg font-semibold border-2 focus:border-primary transition-colors bg-background/50"
+                            disabled={isVerifyingOTP || isRedirecting}
+                          />
+                        ))}
+                      </div>
                     </div>
                     
                     <Button
                       onClick={handleVerifyOTP}
                       className="w-full h-12 rounded-lg font-medium transition-all duration-200 hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/25"
-                      disabled={isVerifyingOTP || isRedirecting || otp.length !== 6}
+                      disabled={isVerifyingOTP || isRedirecting || otp.join('').length !== 6}
                     >
                       {isRedirecting ? (
                         <>
@@ -561,6 +619,28 @@ export default function RegisterPage() {
                         )}
                       </Button>
                     </div>
+                    
+                    {/* Password Requirements */}
+                    {formData.password && (
+                      <div className="space-y-1 text-xs">
+                        <div className={`flex items-center ${passwordValidation.checks.minLength ? 'text-green-600' : 'text-red-600'}`}>
+                          <div className={`w-1.5 h-1.5 rounded-full mr-2 ${passwordValidation.checks.minLength ? 'bg-green-600' : 'bg-red-600'}`} />
+                          At least 6 characters
+                        </div>
+                        <div className={`flex items-center ${passwordValidation.checks.hasUpperCase ? 'text-green-600' : 'text-red-600'}`}>
+                          <div className={`w-1.5 h-1.5 rounded-full mr-2 ${passwordValidation.checks.hasUpperCase ? 'bg-green-600' : 'bg-red-600'}`} />
+                          One uppercase letter
+                        </div>
+                        <div className={`flex items-center ${passwordValidation.checks.hasLowerCase ? 'text-green-600' : 'text-red-600'}`}>
+                          <div className={`w-1.5 h-1.5 rounded-full mr-2 ${passwordValidation.checks.hasLowerCase ? 'bg-green-600' : 'bg-red-600'}`} />
+                          One lowercase letter
+                        </div>
+                        <div className={`flex items-center ${passwordValidation.checks.hasNumbers ? 'text-green-600' : 'text-red-600'}`}>
+                          <div className={`w-1.5 h-1.5 rounded-full mr-2 ${passwordValidation.checks.hasNumbers ? 'bg-green-600' : 'bg-red-600'}`} />
+                          One number
+                        </div>
+                      </div>
+                    )}
                   </div>
                   
                   <div className="space-y-1">
@@ -590,6 +670,18 @@ export default function RegisterPage() {
                         )}
                       </Button>
                     </div>
+                    
+                    {/* Password Match Indicator */}
+                    {formData.confirmPassword && (
+                      <div className={`flex items-center text-xs ${
+                        passwordsMatch ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        <div className={`w-1.5 h-1.5 rounded-full mr-2 ${
+                          passwordsMatch ? 'bg-green-600' : 'bg-red-600'
+                        }`} />
+                        {passwordsMatch ? 'Passwords match' : 'Passwords do not match'}
+                      </div>
+                    )}
                   </div>
                   
                   {/* Privacy Policy Agreement */}
@@ -618,7 +710,7 @@ export default function RegisterPage() {
                   <Button
                     type="submit"
                     className="w-full h-10 rounded-lg font-medium transition-all duration-200 hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/25"
-                    disabled={isLoading || !agreeToTerms}
+                    disabled={isLoading || !agreeToTerms || !passwordValidation.isValid || !passwordsMatch}
                   >
                     {isLoading ? (
                       <>

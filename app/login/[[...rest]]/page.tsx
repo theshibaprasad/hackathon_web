@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import ForgotPasswordModal from '@/components/auth/ForgotPasswordModal';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -18,6 +19,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
 
@@ -185,6 +187,16 @@ export default function LoginPage() {
                     </div>
                   </div>
                   
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotPassword(true)}
+                      className="text-sm text-primary hover:text-primary/80 hover:underline font-medium transition-colors"
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
+                  
                   <Button
                     type="submit"
                     className="w-full h-12 rounded-lg font-medium transition-all duration-200 hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/25"
@@ -265,6 +277,13 @@ export default function LoginPage() {
           </motion.div>
         </motion.div>
       </motion.div>
+
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal
+        isOpen={showForgotPassword}
+        onClose={() => setShowForgotPassword(false)}
+        onBackToLogin={() => setShowForgotPassword(false)}
+      />
     </div>
   );
 }

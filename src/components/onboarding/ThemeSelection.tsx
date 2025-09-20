@@ -5,7 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, ArrowRight, Code, Brain, Heart, Zap, Shield, Globe } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { ArrowLeft, ArrowRight, Code, Brain, Heart, Zap, Shield, Globe, Users, Crown } from 'lucide-react';
 import { OnboardingFormData } from '@/types/onboarding';
 
 interface ThemeSelectionProps {
@@ -117,6 +119,7 @@ const hackathonThemes = [
 export default function ThemeSelection({ data, updateData, onNext, onPrev }: ThemeSelectionProps) {
   const [selectedThemes, setSelectedThemes] = useState<string[]>(data.selectedThemes);
   const [selectedProblemStatements, setSelectedProblemStatements] = useState<string[]>(data.selectedProblemStatements);
+  const [teamName, setTeamName] = useState<string>(data.teamName || '');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleThemeToggle = (themeId: string) => {
@@ -139,8 +142,20 @@ export default function ThemeSelection({ data, updateData, onNext, onPrev }: The
     updateData({ selectedProblemStatements: newSelectedStatements });
   };
 
+  const handleTeamNameChange = (value: string) => {
+    setTeamName(value);
+    updateData({ 
+      teamName: value,
+      isTeamLeader: true // User is always the team leader
+    });
+  };
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
+
+    if (!teamName.trim()) {
+      newErrors.teamName = 'Please enter a team name';
+    }
 
     if (selectedThemes.length === 0) {
       newErrors.themes = 'Please select a theme';
@@ -175,6 +190,48 @@ export default function ThemeSelection({ data, updateData, onNext, onPrev }: The
         <p className="text-gray-600">
           Select a hackathon theme and problem statement that interests you
         </p>
+      </div>
+
+      {/* Team Information */}
+      <div className="space-y-4">
+        <div className="flex items-center space-x-2 mb-4">
+          <Users className="w-5 h-5 text-primary" />
+          <h3 className="text-lg font-semibold text-gray-900">Team Information</h3>
+        </div>
+        
+        <Card className="border-2 border-primary/20 bg-primary/5">
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2 mb-2">
+                <Crown className="w-4 h-4 text-yellow-500" />
+                <span className="text-sm font-medium text-gray-700">You are the Team Leader</span>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="teamName" className="text-sm font-medium text-gray-700">
+                  Team Name *
+                </Label>
+                <Input
+                  id="teamName"
+                  type="text"
+                  placeholder="Enter your team name"
+                  value={teamName}
+                  onChange={(e) => handleTeamNameChange(e.target.value)}
+                  className="w-full"
+                />
+                {errors.teamName && (
+                  <p className="text-sm text-red-500">{errors.teamName}</p>
+                )}
+              </div>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-xs text-blue-700">
+                  <strong>Note:</strong> You can add team members after successfully registering for the hackathon.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Theme Selection */}
@@ -266,10 +323,16 @@ export default function ThemeSelection({ data, updateData, onNext, onPrev }: The
       )}
 
       {/* Selected Summary */}
-      {selectedThemes.length > 0 && (
+      {(teamName || selectedThemes.length > 0) && (
         <div className="bg-gray-50 rounded-lg p-4">
           <h4 className="font-medium text-gray-900 mb-2">Selected Summary:</h4>
           <div className="space-y-2">
+            {teamName && (
+              <div>
+                <span className="text-sm font-medium text-gray-700">Team Name: </span>
+                <span className="text-sm text-gray-600">{teamName}</span>
+              </div>
+            )}
             <div>
               <span className="text-sm font-medium text-gray-700">Theme: </span>
               <span className="text-sm text-gray-600">

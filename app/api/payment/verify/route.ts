@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import connectDB from '@/lib/mongodb';
-import OnboardingData from '@/models/OnboardingData';
+import User from '@/models/User';
 import jwt from 'jsonwebtoken';
 
 export async function POST(request: NextRequest) {
@@ -52,26 +52,36 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    // Update onboarding data with payment details
-    const onboardingData = await OnboardingData.findOneAndUpdate(
-      { userId: decoded.userId },
+    // Update user with payment details and set isBoarding to true
+    const updatedUser = await User.findByIdAndUpdate(
+      decoded.userId,
       {
         paymentStatus: 'completed',
         paymentAmount: amount,
         razorpayOrderId: razorpay_order_id,
         razorpayPaymentId: razorpay_payment_id,
         razorpaySignature: razorpay_signature,
-        isEarlyBird: isEarlyBird
+        isEarlyBird: isEarlyBird,
+        isBoarding: true // Set to true after successful payment
       },
       { new: true }
     );
 
-    if (!onboardingData) {
+    if (!updatedUser) {
       return NextResponse.json(
-        { error: 'Onboarding data not found' },
+        { error: 'User not found' },
         { status: 404 }
       );
     }
+
+    console.log('Payment verification successful:', {
+      userId: decoded.userId,
+      paymentStatus: updatedUser.paymentStatus,
+      paymentAmount: updatedUser.paymentAmount,
+      razorpayPaymentId: updatedUser.razorpayPaymentId,
+      razorpayOrderId: updatedUser.razorpayOrderId,
+      isBoarding: updatedUser.isBoarding
+    });
 
     return NextResponse.json({
       success: true,

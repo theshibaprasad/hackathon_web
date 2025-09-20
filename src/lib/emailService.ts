@@ -1,5 +1,10 @@
 import nodemailer from 'nodemailer';
 
+// Generate 6-digit OTP
+export const generateOTP = (): string => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -269,6 +274,55 @@ export const sendPasswordResetEmail = async (
   return await sendEmail({
     to: userEmail,
     subject: 'Password Reset Request - Hackathon Platform',
+    html,
+  });
+};
+
+// OTP email template for password reset
+export const sendOTPEmail = async (userEmail: string, userName: string, otp: string) => {
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="color: #333; margin-bottom: 10px;">Password Reset OTP</h1>
+        <p style="color: #666; font-size: 16px;">Hello ${userName},</p>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <h2 style="color: #333; margin-bottom: 15px;">Reset Your Password</h2>
+        <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
+          Use the following 6-digit code to reset your password:
+        </p>
+        
+        <div style="text-align: center; margin: 20px 0;">
+          <div style="background: #4F46E5; color: white; font-size: 32px; font-weight: bold; padding: 20px; border-radius: 8px; display: inline-block; font-family: monospace; letter-spacing: 8px;">
+            ${otp}
+          </div>
+          <p style="color: #666; font-size: 14px; margin-top: 10px;">
+            This code expires in 5 minutes
+          </p>
+        </div>
+      </div>
+      
+      <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #ffc107;">
+        <p style="color: #856404; margin: 0; font-size: 14px;">
+          <strong>Security Note:</strong> Never share this code with anyone. Our team will never ask for your OTP.
+        </p>
+      </div>
+      
+      <div style="text-align: center; margin: 30px 0;">
+        <p style="color: #666; font-size: 14px;">
+          If you didn't request a password reset, please ignore this email.
+        </p>
+        <p style="color: #666; font-size: 14px;">
+          Need help? Contact us at support@hackathonplatform.com
+        </p>
+      </div>
+    </div>
+  `;
+
+  return await sendEmail({
+    to: userEmail,
+    subject: '🔐 Password Reset OTP - Hackathon Platform',
     html,
   });
 };

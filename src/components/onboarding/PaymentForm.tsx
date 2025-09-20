@@ -258,13 +258,17 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
               // Update form data with payment details
               updateData({
                 paymentStatus: 'completed',
+                paymentAmount: finalAmount,
                 razorpayOrderId: response.razorpay_order_id,
                 razorpayPaymentId: response.razorpay_payment_id,
                 razorpaySignature: response.razorpay_signature,
               });
               
-              // Submit the form
-              onSubmit();
+              // Wait a moment to ensure the update is processed
+              setTimeout(() => {
+                // Submit the form
+                onSubmit();
+              }, 100);
             } else {
               throw new Error(verifyData.error || 'Payment verification failed');
             }

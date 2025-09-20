@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
+import PaymentSuccessModal from '@/components/onboarding/PaymentSuccessModal';
 
 // Import form components
 import ProfessionSelection from '@/components/onboarding/ProfessionSelection';
@@ -40,6 +41,8 @@ const initialData: OnboardingFormData = {
   companyName: '',
   jobTitle: '',
   yearsOfExperience: '',
+  teamName: '',
+  isTeamLeader: false,
   selectedThemes: [],
   selectedProblemStatements: [],
   paymentStatus: 'pending',
@@ -58,11 +61,17 @@ export default function OnboardingClient({ user }: OnboardingClientProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<OnboardingFormData>(initialData);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
+  const [paymentDetails, setPaymentDetails] = useState<any>(null);
   const { toast } = useToast();
   const router = useRouter();
 
   const updateFormData = (updates: Partial<OnboardingFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
+  };
+
+  const handleClosePaymentSuccess = () => {
+    setShowPaymentSuccess(false);
   };
 
   const nextStep = () => {
@@ -91,15 +100,34 @@ export default function OnboardingClient({ user }: OnboardingClientProps) {
       const data = await response.json();
 
       if (response.ok) {
-        toast({
-          title: "Onboarding Complete!",
-          description: "Your profile has been created successfully. Redirecting to dashboard...",
-          variant: "default",
+        // Fetch the latest user data from database to get updated payment details
+        const userResponse = await fetch('/api/onboarding/save', {
+          method: 'GET',
         });
         
-        setTimeout(() => {
-          router.push('/dashboard');
-        }, 2000);
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          const user = userData.data;
+          
+          // Set payment details for the success modal from database
+          setPaymentDetails({
+            paymentId: user.razorpayPaymentId || 'N/A',
+            orderId: user.razorpayOrderId || 'N/A',
+            amount: user.paymentAmount || formData.paymentAmount,
+            isEarlyBird: user.isEarlyBird || formData.isEarlyBird
+          });
+        } else {
+          // Fallback to form data if database fetch fails
+          setPaymentDetails({
+            paymentId: formData.razorpayPaymentId || 'N/A',
+            orderId: formData.razorpayOrderId || 'N/A',
+            amount: formData.paymentAmount,
+            isEarlyBird: formData.isEarlyBird
+          });
+        }
+        
+        // Show payment success modal
+        setShowPaymentSuccess(true);
       } else {
         toast({
           title: "Error",
@@ -231,6 +259,17 @@ export default function OnboardingClient({ user }: OnboardingClientProps) {
           </Card>
         </motion.div>
       </div>
+
+      {/* Payment Success Modal */}
+      {paymentDetails && (
+        <PaymentSuccessModal
+          isOpen={showPaymentSuccess}
+          formData={formData}
+          user={user}
+          paymentDetails={paymentDetails}
+          onClose={handleClosePaymentSuccess}
+        />
+      )}
     </div>
   );
 }

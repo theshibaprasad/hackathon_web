@@ -8,6 +8,47 @@ export interface IUser extends Document {
   phoneNumber: string;
   clerkId?: string;
   username?: string;
+  isBoarding: boolean;
+  
+  // Onboarding data fields
+  profession?: 'student' | 'working_professional';
+  gender?: string;
+  city?: string;
+  state?: string;
+  pin?: string;
+  
+  // Student specific fields
+  instituteName?: string;
+  degree?: string;
+  branch?: string;
+  yearOfStudy?: string;
+  graduationYear?: string;
+  
+  // Working Professional specific fields
+  companyName?: string;
+  jobTitle?: string;
+  yearsOfExperience?: string;
+  
+  // Team information
+  teamName?: string;
+  isTeamLeader?: boolean;
+  
+  // Hackathon preferences
+  selectedThemes?: string[];
+  selectedProblemStatements?: string[];
+  
+  // Payment details
+  paymentStatus?: 'pending' | 'completed' | 'failed';
+  paymentAmount?: number;
+  razorpayOrderId?: string;
+  razorpayPaymentId?: string;
+  razorpaySignature?: string;
+  isEarlyBird?: boolean;
+  
+  // Password reset fields
+  resetPasswordOTP?: string;
+  resetPasswordOTPExpiry?: Date;
+  
   createdAt: Date;
   updatedAt: Date;
 }
@@ -58,6 +99,129 @@ const UserSchema: Schema = new Schema({
     type: String,
     unique: true,
     sparse: true
+  },
+  isBoarding: {
+    type: Boolean,
+    default: false
+  },
+  
+  // Onboarding data fields
+  profession: {
+    type: String,
+    enum: ['student', 'working_professional']
+  },
+  gender: {
+    type: String,
+    enum: ['male', 'female', 'other', 'prefer_not_to_say']
+  },
+  city: {
+    type: String,
+    trim: true
+  },
+  state: {
+    type: String,
+    trim: true
+  },
+  pin: {
+    type: String,
+    trim: true,
+    validate: {
+      validator: function(v: string) {
+        return !v || /^\d{6}$/.test(v);
+      },
+      message: 'PIN must be a 6-digit number'
+    }
+  },
+  
+  // Student specific fields
+  instituteName: {
+    type: String,
+    trim: true
+  },
+  degree: {
+    type: String,
+    trim: true
+  },
+  branch: {
+    type: String,
+    trim: true
+  },
+  yearOfStudy: {
+    type: String,
+    trim: true
+  },
+  graduationYear: {
+    type: String,
+    trim: true
+  },
+  
+  // Working Professional specific fields
+  companyName: {
+    type: String,
+    trim: true
+  },
+  jobTitle: {
+    type: String,
+    trim: true
+  },
+  yearsOfExperience: {
+    type: String,
+    trim: true
+  },
+  
+  // Team information
+  teamName: {
+    type: String,
+    trim: true
+  },
+  isTeamLeader: {
+    type: Boolean,
+    default: false
+  },
+  
+  // Hackathon preferences
+  selectedThemes: [{
+    type: String,
+    trim: true
+  }],
+  selectedProblemStatements: [{
+    type: String,
+    trim: true
+  }],
+  
+  // Payment details
+  paymentStatus: {
+    type: String,
+    enum: ['pending', 'completed', 'failed'],
+    default: 'pending'
+  },
+  paymentAmount: {
+    type: Number
+  },
+  razorpayOrderId: {
+    type: String,
+    trim: true
+  },
+  razorpayPaymentId: {
+    type: String,
+    trim: true
+  },
+  razorpaySignature: {
+    type: String,
+    trim: true
+  },
+  isEarlyBird: {
+    type: Boolean,
+    default: false
+  },
+  
+  // Password reset fields
+  resetPasswordOTP: {
+    type: String,
+    trim: true
+  },
+  resetPasswordOTPExpiry: {
+    type: Date
   }
 }, {
   timestamps: true

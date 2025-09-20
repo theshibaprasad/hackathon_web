@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import OnboardingData from '@/models/OnboardingData';
 import User from '@/models/User';
 import jwt from 'jsonwebtoken';
 
@@ -39,42 +38,43 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if onboarding data already exists
-    const existingData = await OnboardingData.findOne({ userId: decoded.userId });
-    
-    if (existingData) {
-      // Update existing data
-      const updatedData = await OnboardingData.findOneAndUpdate(
-        { userId: decoded.userId },
-        {
-          ...body,
-          userId: decoded.userId,
-          paymentStatus: body.paymentStatus || 'pending'
-        },
-        { new: true, upsert: true }
+    // Prepare update data - don't include isBoarding as it should only be set by payment verification
+    const updateData = {
+      ...body,
+      paymentStatus: body.paymentStatus || 'pending'
+    };
+
+    // Remove isBoarding from the update data to prevent overriding the payment verification setting
+    delete updateData.isBoarding;
+
+    // Update user with onboarding data
+    const updatedUser = await User.findByIdAndUpdate(
+      decoded.userId,
+      updateData,
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return NextResponse.json(
+        { error: 'Failed to update user data' },
+        { status: 500 }
       );
-      
-      return NextResponse.json({
-        success: true,
-        message: 'Onboarding data updated successfully',
-        data: updatedData
-      });
-    } else {
-      // Create new onboarding data
-      const onboardingData = new OnboardingData({
-        ...body,
-        userId: decoded.userId,
-        paymentStatus: body.paymentStatus || 'pending'
-      });
-
-      await onboardingData.save();
-
-      return NextResponse.json({
-        success: true,
-        message: 'Onboarding data saved successfully',
-        data: onboardingData
-      });
     }
+
+    console.log('Onboarding save successful:', {
+      userId: decoded.userId,
+      paymentStatus: updatedUser.paymentStatus,
+      paymentAmount: updatedUser.paymentAmount,
+      razorpayPaymentId: updatedUser.razorpayPaymentId,
+      razorpayOrderId: updatedUser.razorpayOrderId,
+      isBoarding: updatedUser.isBoarding
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: 'Onboarding data saved successfully',
+      data: updatedUser
+    });
   } catch (error) {
     console.error('Onboarding save error:', error);
     return NextResponse.json(
@@ -108,19 +108,19 @@ export async function GET(request: NextRequest) {
 
     await connectDB();
 
-    // Get onboarding data
-    const onboardingData = await OnboardingData.findOne({ userId: decoded.userId });
+    // Get user data (which now includes onboarding data)
+    const user = await User.findById(decoded.userId);
     
-    if (!onboardingData) {
+    if (!user) {
       return NextResponse.json(
-        { error: 'Onboarding data not found' },
+        { error: 'User not found' },
         { status: 404 }
       );
     }
 
     return NextResponse.json({
       success: true,
-      data: onboardingData
+      data: user
     });
   } catch (error) {
     console.error('Onboarding fetch error:', error);

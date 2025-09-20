@@ -14,6 +14,8 @@ export interface OnboardingFormData {
   companyName?: string;
   jobTitle?: string;
   yearsOfExperience?: string;
+  teamName?: string;
+  isTeamLeader?: boolean;
   selectedThemes: string[];
   selectedProblemStatements: string[];
   paymentStatus: 'pending' | 'completed' | 'failed';
