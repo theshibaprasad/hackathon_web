@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
+import Payment from '@/models/Payment';
+import Team from '@/models/Team';
 import jwt from 'jsonwebtoken';
+import { refreshUserToken } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,6 +16,8 @@ export async function POST(request: NextRequest) {
       amount,
       isEarlyBird
     } = await request.json();
+
+    console.log('Payment verification - Received isEarlyBird:', isEarlyBird);
 
     // Get JWT token from cookies
     const token = request.cookies.get('auth-token')?.value;
@@ -52,16 +57,30 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    // Update user with payment details and set isBoarding to true
+    // Find the payment record
+    const payment = await Payment.findOne({ razorpayOrderId: razorpay_order_id });
+    if (!payment) {
+      return NextResponse.json(
+        { error: 'Payment record not found' },
+        { status: 404 }
+      );
+    }
+
+    // Update payment status to success
+    const updatedPayment = await Payment.findByIdAndUpdate(
+      payment._id,
+      {
+        paymentStatus: 'success',
+        razorpayPaymentId: razorpay_payment_id,
+        razorpaySignature: razorpay_signature
+      },
+      { new: true }
+    );
+
+    // Update user to set isBoarding to true after successful payment
     const updatedUser = await User.findByIdAndUpdate(
       decoded.userId,
       {
-        paymentStatus: 'completed',
-        paymentAmount: amount,
-        razorpayOrderId: razorpay_order_id,
-        razorpayPaymentId: razorpay_payment_id,
-        razorpaySignature: razorpay_signature,
-        isEarlyBird: isEarlyBird,
         isBoarding: true // Set to true after successful payment
       },
       { new: true }
@@ -74,21 +93,43 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Refresh JWT token with updated isBoarding status
+    const newToken = await refreshUserToken(decoded.userId);
+
     console.log('Payment verification successful:', {
       userId: decoded.userId,
-      paymentStatus: updatedUser.paymentStatus,
-      paymentAmount: updatedUser.paymentAmount,
-      razorpayPaymentId: updatedUser.razorpayPaymentId,
-      razorpayOrderId: updatedUser.razorpayOrderId,
+      paymentId: updatedPayment._id,
+      paymentStatus: updatedPayment.paymentStatus,
+      paymentAmount: updatedPayment.amount,
+      razorpayPaymentId: updatedPayment.razorpayPaymentId,
+      razorpayOrderId: updatedPayment.razorpayOrderId,
       isBoarding: updatedUser.isBoarding
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: 'Payment verified successfully',
       paymentId: razorpay_payment_id,
-      orderId: razorpay_order_id
+      orderId: razorpay_order_id,
+      payment: {
+        id: updatedPayment._id,
+        status: updatedPayment.paymentStatus,
+        amount: updatedPayment.amount,
+        isEarlyBird: updatedPayment.isEarlyBird
+      }
     });
+
+    // Set the new JWT token in the response cookie
+    if (newToken) {
+      response.cookies.set('auth-token', newToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      });
+    }
+
+    return response;
   } catch (error) {
     console.error('Payment verification error:', error);
     return NextResponse.json(

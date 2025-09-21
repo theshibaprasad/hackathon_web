@@ -117,29 +117,29 @@ const hackathonThemes = [
 ];
 
 export default function ThemeSelection({ data, updateData, onNext, onPrev }: ThemeSelectionProps) {
-  const [selectedThemes, setSelectedThemes] = useState<string[]>(data.selectedThemes);
-  const [selectedProblemStatements, setSelectedProblemStatements] = useState<string[]>(data.selectedProblemStatements);
+  const [selectedTheme, setSelectedTheme] = useState<string>(data.themeId || '');
+  const [selectedProblemStatement, setSelectedProblemStatement] = useState<string>(data.problemId || '');
   const [teamName, setTeamName] = useState<string>(data.teamName || '');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleThemeToggle = (themeId: string) => {
     // Allow only one theme selection
-    const newSelectedThemes = selectedThemes.includes(themeId) ? [] : [themeId];
+    const newSelectedTheme = selectedTheme === themeId ? '' : themeId;
     
-    setSelectedThemes(newSelectedThemes);
-    updateData({ selectedThemes: newSelectedThemes });
+    setSelectedTheme(newSelectedTheme);
+    updateData({ themeId: newSelectedTheme });
     
-    // Clear all problem statements when theme changes
-    setSelectedProblemStatements([]);
-    updateData({ selectedProblemStatements: [] });
+    // Clear problem statement when theme changes
+    setSelectedProblemStatement('');
+    updateData({ problemId: '' });
   };
 
   const handleProblemStatementToggle = (statement: string) => {
     // Allow only one problem statement selection
-    const newSelectedStatements = selectedProblemStatements.includes(statement) ? [] : [statement];
+    const newSelectedStatement = selectedProblemStatement === statement ? '' : statement;
     
-    setSelectedProblemStatements(newSelectedStatements);
-    updateData({ selectedProblemStatements: newSelectedStatements });
+    setSelectedProblemStatement(newSelectedStatement);
+    updateData({ problemId: newSelectedStatement });
   };
 
   const handleTeamNameChange = (value: string) => {
@@ -157,11 +157,11 @@ export default function ThemeSelection({ data, updateData, onNext, onPrev }: The
       newErrors.teamName = 'Please enter a team name';
     }
 
-    if (selectedThemes.length === 0) {
+    if (!selectedTheme) {
       newErrors.themes = 'Please select a theme';
     }
 
-    if (selectedProblemStatements.length === 0) {
+    if (!selectedProblemStatement) {
       newErrors.problemStatements = 'Please select a problem statement';
     }
 
@@ -177,7 +177,7 @@ export default function ThemeSelection({ data, updateData, onNext, onPrev }: The
 
   const getAvailableProblemStatements = () => {
     return hackathonThemes
-      .filter(theme => selectedThemes.includes(theme.id))
+      .filter(theme => theme.id === selectedTheme)
       .flatMap(theme => theme.problemStatements);
   };
 
@@ -240,7 +240,7 @@ export default function ThemeSelection({ data, updateData, onNext, onPrev }: The
         <div className="grid md:grid-cols-2 gap-4">
           {hackathonThemes.map((theme) => {
             const Icon = theme.icon;
-            const isSelected = selectedThemes.includes(theme.id);
+            const isSelected = selectedTheme === theme.id;
             
             return (
               <Card
@@ -286,7 +286,7 @@ export default function ThemeSelection({ data, updateData, onNext, onPrev }: The
       </div>
 
       {/* Problem Statements Selection */}
-      {selectedThemes.length > 0 && (
+      {selectedTheme && (
         <div className="space-y-4">
           <h3 className="text-lg font-semibold text-gray-900">Select a Problem Statement *</h3>
           <p className="text-sm text-gray-600">
@@ -297,7 +297,7 @@ export default function ThemeSelection({ data, updateData, onNext, onPrev }: The
               <Card
                 key={index}
                 className={`cursor-pointer transition-all duration-200 ${
-                  selectedProblemStatements.includes(statement)
+                  selectedProblemStatement === statement
                     ? 'border-2 border-primary bg-primary/5'
                     : 'border border-gray-200 hover:border-gray-300'
                 }`}
@@ -306,7 +306,7 @@ export default function ThemeSelection({ data, updateData, onNext, onPrev }: The
                 <CardContent className="p-4">
                   <div className="flex items-start space-x-3">
                     <Checkbox
-                      checked={selectedProblemStatements.includes(statement)}
+                      checked={selectedProblemStatement === statement}
                       onChange={() => handleProblemStatementToggle(statement)}
                       className="mt-0.5"
                     />
@@ -323,7 +323,7 @@ export default function ThemeSelection({ data, updateData, onNext, onPrev }: The
       )}
 
       {/* Selected Summary */}
-      {(teamName || selectedThemes.length > 0) && (
+      {(teamName || selectedTheme) && (
         <div className="bg-gray-50 rounded-lg p-4">
           <h4 className="font-medium text-gray-900 mb-2">Selected Summary:</h4>
           <div className="space-y-2">
@@ -336,13 +336,13 @@ export default function ThemeSelection({ data, updateData, onNext, onPrev }: The
             <div>
               <span className="text-sm font-medium text-gray-700">Theme: </span>
               <span className="text-sm text-gray-600">
-                {selectedThemes.length > 0 ? 'Selected' : 'Not selected'}
+                {selectedTheme ? 'Selected' : 'Not selected'}
               </span>
             </div>
             <div>
               <span className="text-sm font-medium text-gray-700">Problem Statement: </span>
               <span className="text-sm text-gray-600">
-                {selectedProblemStatements.length > 0 ? 'Selected' : 'Not selected'}
+                {selectedProblemStatement ? 'Selected' : 'Not selected'}
               </span>
             </div>
           </div>

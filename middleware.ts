@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import jwt from 'jsonwebtoken';
 
 const protectedRoutes = [
   '/dashboard',
@@ -56,6 +57,19 @@ export function middleware(request: NextRequest) {
       
       if (payload.exp && payload.exp < currentTime) {
         throw new Error('Token expired');
+      }
+
+      // Special handling for onboarding route only
+      if (pathname.startsWith('/onboarding')) {
+        // Check isBoarding status from JWT token
+        if (payload.isBoarding) {
+          // User has already completed onboarding, redirect to dashboard
+          const dashboardUrl = new URL('/dashboard', request.url);
+          return NextResponse.redirect(dashboardUrl);
+        }
+        
+        // User hasn't completed onboarding, allow access to onboarding
+        return NextResponse.next();
       }
 
       return NextResponse.next();

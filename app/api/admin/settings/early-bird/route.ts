@@ -4,7 +4,7 @@ import Admin from '@/models/Admin';
 import Settings, { ISettingsModel } from '@/models/Settings';
 import jwt from 'jsonwebtoken';
 
-// Get Early Bird offer status
+// Get all settings
 export async function GET(request: NextRequest) {
   try {
     // Verify admin authentication
@@ -36,16 +36,19 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get Early Bird offer status from database
-    await connectDB();
+    // Get both settings from database with default values
     const earlyBirdEnabled = await (Settings as ISettingsModel).getSetting('early_bird_enabled', true);
+    const hackathonRegistrationEnabled = await (Settings as ISettingsModel).getSetting('hackathon_registration_enabled', true);
     
     return NextResponse.json({
       success: true,
-      earlyBirdEnabled
+      settings: {
+        earlyBirdEnabled,
+        hackathonRegistrationEnabled
+      }
     });
   } catch (error) {
-    console.error('Error getting Early Bird status:', error);
+    console.error('Error getting settings:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -53,7 +56,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// Update Early Bird offer status
+// Update settings
 export async function POST(request: NextRequest) {
   try {
     // Verify admin authentication
@@ -85,8 +88,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { earlyBirdEnabled } = await request.json();
+    const { earlyBirdEnabled, hackathonRegistrationEnabled } = await request.json();
 
+    // Validate input
     if (typeof earlyBirdEnabled !== 'boolean') {
       return NextResponse.json(
         { error: 'Invalid earlyBirdEnabled value' },
@@ -94,20 +98,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Update setting in database
+    if (typeof hackathonRegistrationEnabled !== 'boolean') {
+      return NextResponse.json(
+        { error: 'Invalid hackathonRegistrationEnabled value' },
+        { status: 400 }
+      );
+    }
+
+    // Update both settings in database
     await (Settings as ISettingsModel).setSetting(
       'early_bird_enabled', 
       earlyBirdEnabled, 
       'Controls whether the Early Bird offer is active for hackathon registration'
     );
 
+    await (Settings as ISettingsModel).setSetting(
+      'hackathon_registration_enabled', 
+      hackathonRegistrationEnabled, 
+      'Controls whether hackathon registration is open for new users'
+    );
+
     return NextResponse.json({
       success: true,
-      message: `Early Bird offer ${earlyBirdEnabled ? 'enabled' : 'disabled'} successfully`,
-      earlyBirdEnabled
+      message: 'Settings updated successfully',
+      settings: {
+        earlyBirdEnabled,
+        hackathonRegistrationEnabled
+      }
     });
   } catch (error) {
-    console.error('Error updating Early Bird status:', error);
+    console.error('Error updating settings:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

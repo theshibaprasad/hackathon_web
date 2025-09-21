@@ -14,7 +14,7 @@ interface ProfessionSelectionProps {
 }
 
 export default function ProfessionSelection({ data, updateData, onNext }: ProfessionSelectionProps) {
-  const [selectedProfession, setSelectedProfession] = useState<'student' | 'working_professional' | null>(data.profession);
+  const [selectedProfession, setSelectedProfession] = useState<'student' | 'working_professional' | null>(data.profession || null);
 
   const handleProfessionSelect = (profession: 'student' | 'working_professional') => {
     setSelectedProfession(profession);

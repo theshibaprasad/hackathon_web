@@ -14,22 +14,77 @@ interface WorkingProfessionalFormProps {
   updateData: (updates: Partial<OnboardingFormData>) => void;
   onNext: () => void;
   onPrev: () => void;
+  user?: {
+    isGoogleUser: boolean;
+    isOTPVerified: boolean;
+  };
 }
 
-export default function WorkingProfessionalForm({ data, updateData, onNext, onPrev }: WorkingProfessionalFormProps) {
+export default function WorkingProfessionalForm({ data, updateData, onNext, onPrev, user }: WorkingProfessionalFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Helper function to create complete job object
+  const createJobObject = (updates: Partial<{ jobTitle: string; company: string; yearOfExperience: string; city: string; state: string; pin: string }>) => {
+    return {
+      jobTitle: updates.jobTitle || data.job?.jobTitle || '',
+      company: updates.company || data.job?.company || '',
+      yearOfExperience: updates.yearOfExperience || data.job?.yearOfExperience || '',
+      city: updates.city || data.job?.city || '',
+      state: updates.state || data.job?.state || '',
+      pin: updates.pin || data.job?.pin || ''
+    };
+  };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
+    // Basic information validation (only for Google users who haven't verified OTP)
+    if (user?.isGoogleUser && !user?.isOTPVerified) {
+      if (!data.firstName?.trim()) newErrors.firstName = 'First name is required';
+      if (!data.lastName?.trim()) newErrors.lastName = 'Last name is required';
+      if (!data.phoneNumber?.trim()) newErrors.phoneNumber = 'Phone number is required';
+    }
+    
+    // Phone number validation (same as register page)
+    if (data.phoneNumber?.trim()) {
+      let phoneNumber = data.phoneNumber;
+      
+      // If it's just 10 digits, add +91
+      if (/^\d{10}$/.test(phoneNumber)) {
+        phoneNumber = '+91' + phoneNumber;
+      }
+      // If it starts with 91 and has 10 more digits, add +
+      else if (/^91\d{10}$/.test(phoneNumber)) {
+        phoneNumber = '+' + phoneNumber;
+      }
+      // If it starts with 0 and has 10 digits, remove 0 and add +91
+      else if (/^0\d{9}$/.test(phoneNumber)) {
+        phoneNumber = '+91' + phoneNumber.slice(1);
+      }
+      
+      const phoneRegex = /^\+91[6-9]\d{9}$/;
+      if (!phoneRegex.test(phoneNumber)) {
+        newErrors.phoneNumber = 'Please enter a valid Indian phone number';
+      }
+    }
+
+    // Personal details validation
     if (!data.gender) newErrors.gender = 'Please select your gender';
-    if (!data.city.trim()) newErrors.city = 'City is required';
-    if (!data.state.trim()) newErrors.state = 'State is required';
-    if (!data.pin.trim()) newErrors.pin = 'PIN is required';
-    if (!/^\d{6}$/.test(data.pin)) newErrors.pin = 'PIN must be 6 digits';
-    if (!data.companyName?.trim()) newErrors.companyName = 'Company name is required';
-    if (!data.jobTitle?.trim()) newErrors.jobTitle = 'Job title is required';
-    if (!data.yearsOfExperience) newErrors.yearsOfExperience = 'Years of experience is required';
+    
+    // Company address validation - ROLE-BASED NESTED STRUCTURE
+    const companyCity = data.job?.city || data.city;
+    const companyState = data.job?.state || data.state;
+    const companyPin = data.job?.pin || data.pin;
+    
+    if (!companyCity?.trim()) newErrors.city = 'Company city is required';
+    if (!companyState?.trim()) newErrors.state = 'Company state is required';
+    if (!companyPin?.trim()) newErrors.pin = 'Company PIN code is required';
+    if (companyPin && !/^\d{6}$/.test(companyPin)) newErrors.pin = 'PIN must be 6 digits';
+    
+    // Professional details validation - ROLE-BASED NESTED STRUCTURE
+    if (!data.job?.company?.trim()) newErrors.companyName = 'Company name is required';
+    if (!data.job?.jobTitle?.trim()) newErrors.jobTitle = 'Job title is required';
+    if (!data.job?.yearOfExperience) newErrors.yearsOfExperience = 'Years of experience is required';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -45,6 +100,34 @@ export default function WorkingProfessionalForm({ data, updateData, onNext, onPr
     updateData({ [field]: value });
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+    
+    // Remove all non-digit characters
+    const digits = value.replace(/\D/g, '');
+    
+    // Handle different input formats (same as register page)
+    if (digits.length <= 10) {
+      // If user enters just digits (up to 10), keep as is
+      updateData({ phoneNumber: digits });
+    } else if (digits.length === 11 && digits.startsWith('91')) {
+      // If user enters 91 followed by 10 digits, format as +91
+      updateData({ phoneNumber: '+91' + digits.slice(2) });
+    } else if (digits.length === 12 && digits.startsWith('91')) {
+      // If user enters 91 followed by 10 digits with extra, format as +91
+      updateData({ phoneNumber: '+91' + digits.slice(2, 12) });
+    } else if (digits.length > 10) {
+      // If more than 10 digits, take only the last 10
+      updateData({ phoneNumber: digits.slice(-10) });
+    } else {
+      updateData({ phoneNumber: digits });
+    }
+    
+    if (errors.phoneNumber) {
+      setErrors(prev => ({ ...prev, phoneNumber: '' }));
     }
   };
 
@@ -68,6 +151,59 @@ export default function WorkingProfessionalForm({ data, updateData, onNext, onPr
           Tell us about your professional background and personal details
         </p>
       </div>
+
+      {/* Basic Information - Only show for Google users who haven't verified OTP */}
+      {user?.isGoogleUser && !user?.isOTPVerified && (
+        <div className="space-y-6">
+          <div className="flex items-center space-x-3 mb-6">
+            <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+              <span className="text-purple-600 font-semibold text-sm">👤</span>
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900">
+              Basic Information
+            </h3>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="firstName" className="text-sm font-medium">First Name *</Label>
+              <Input
+                id="firstName"
+                value={data.firstName}
+                onChange={(e) => handleInputChange('firstName', e.target.value)}
+                placeholder="Enter your first name"
+                className={`h-11 ${errors.firstName ? 'border-red-500 focus:border-red-500' : 'focus:border-primary focus:ring-2 focus:ring-primary/20'}`}
+              />
+              {errors.firstName && <p className="text-sm text-red-500">{errors.firstName}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="lastName" className="text-sm font-medium">Last Name *</Label>
+              <Input
+                id="lastName"
+                value={data.lastName}
+                onChange={(e) => handleInputChange('lastName', e.target.value)}
+                placeholder="Enter your last name"
+                className={`h-11 ${errors.lastName ? 'border-red-500 focus:border-red-500' : 'focus:border-primary focus:ring-2 focus:ring-primary/20'}`}
+              />
+              {errors.lastName && <p className="text-sm text-red-500">{errors.lastName}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phoneNumber" className="text-sm font-medium">Phone Number *</Label>
+              <Input
+                id="phoneNumber"
+                type="tel"
+                value={data.phoneNumber}
+                onChange={handlePhoneChange}
+                placeholder="+91 0123456789"
+                className={`h-11 ${errors.phoneNumber ? 'border-red-500 focus:border-red-500' : 'focus:border-primary focus:ring-2 focus:ring-primary/20'}`}
+              />
+              {errors.phoneNumber && <p className="text-sm text-red-500">{errors.phoneNumber}</p>}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Personal Information */}
       <div className="space-y-6">
@@ -127,8 +263,17 @@ export default function WorkingProfessionalForm({ data, updateData, onNext, onPr
             <Label htmlFor="companyName" className="text-sm font-medium">Company Name *</Label>
             <Input
               id="companyName"
-              value={data.companyName}
-              onChange={(e) => handleInputChange('companyName', e.target.value)}
+              value={data.job?.company || ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                updateData({
+                  job: createJobObject({ company: value }),
+                  companyName: value // Keep legacy field for backward compatibility
+                });
+                if (errors.companyName) {
+                  setErrors(prev => ({ ...prev, companyName: '' }));
+                }
+              }}
               placeholder="Enter your company name"
               className={`h-11 ${errors.companyName ? 'border-red-500 focus:border-red-500' : 'focus:border-primary focus:ring-2 focus:ring-primary/20'}`}
             />
@@ -139,8 +284,17 @@ export default function WorkingProfessionalForm({ data, updateData, onNext, onPr
             <Label htmlFor="jobTitle" className="text-sm font-medium">Job Title *</Label>
             <Input
               id="jobTitle"
-              value={data.jobTitle}
-              onChange={(e) => handleInputChange('jobTitle', e.target.value)}
+              value={data.job?.jobTitle || ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                updateData({
+                  job: createJobObject({ jobTitle: value }),
+                  jobTitle: value // Keep legacy field for backward compatibility
+                });
+                if (errors.jobTitle) {
+                  setErrors(prev => ({ ...prev, jobTitle: '' }));
+                }
+              }}
               placeholder="e.g., Software Engineer, Product Manager, etc."
               className={`h-11 ${errors.jobTitle ? 'border-red-500 focus:border-red-500' : 'focus:border-primary focus:ring-2 focus:ring-primary/20'}`}
             />
@@ -149,7 +303,18 @@ export default function WorkingProfessionalForm({ data, updateData, onNext, onPr
 
           <div className="space-y-2">
             <Label htmlFor="yearsOfExperience" className="text-sm font-medium">Years of Experience *</Label>
-            <Select value={data.yearsOfExperience} onValueChange={(value) => handleInputChange('yearsOfExperience', value)}>
+            <Select 
+              value={data.job?.yearOfExperience || ''} 
+              onValueChange={(value) => {
+                updateData({
+                  job: createJobObject({ yearOfExperience: value }),
+                  yearsOfExperience: value // Keep legacy field for backward compatibility
+                });
+                if (errors.yearsOfExperience) {
+                  setErrors(prev => ({ ...prev, yearsOfExperience: '' }));
+                }
+              }}
+            >
               <SelectTrigger className={errors.yearsOfExperience ? 'border-red-500' : ''}>
                 <SelectValue placeholder="Select your experience" />
               </SelectTrigger>
@@ -162,13 +327,24 @@ export default function WorkingProfessionalForm({ data, updateData, onNext, onPr
             {errors.yearsOfExperience && <p className="text-sm text-red-500">{errors.yearsOfExperience}</p>}
           </div>
 
-          {/* Company Location */}
+          {/* Company Address */}
           <div className="space-y-2">
-            <Label htmlFor="city" className="text-sm font-medium">Company City *</Label>
+            <Label htmlFor="companyCity" className="text-sm font-medium">Company City *</Label>
             <Input
-              id="city"
-              value={data.city}
-              onChange={(e) => handleInputChange('city', e.target.value)}
+              id="companyCity"
+              value={data.job?.city || data.city || ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                console.log('WorkingProfessionalForm - Updating job city (ROLE-BASED):', value);
+                console.log('WorkingProfessionalForm - Current form data before update:', data);
+                updateData({ 
+                  job: createJobObject({ city: value }),
+                  city: value // Keep legacy field for backward compatibility
+                });
+                if (errors.city) {
+                  setErrors(prev => ({ ...prev, city: '' }));
+                }
+              }}
               placeholder="Enter company city"
               className={`h-11 ${errors.city ? 'border-red-500 focus:border-red-500' : 'focus:border-primary focus:ring-2 focus:ring-primary/20'}`}
             />
@@ -176,11 +352,25 @@ export default function WorkingProfessionalForm({ data, updateData, onNext, onPr
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="state" className="text-sm font-medium">Company State *</Label>
+            <Label htmlFor="companyState" className="text-sm font-medium">Company State *</Label>
             <Input
-              id="state"
-              value={data.state}
-              onChange={(e) => handleInputChange('state', e.target.value)}
+              id="companyState"
+              value={data.job?.state || data.state || ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                console.log('WorkingProfessionalForm - Updating job state (ROLE-BASED):', {
+                  value,
+                  currentData: data,
+                  currentJob: data.job
+                });
+                updateData({ 
+                  job: createJobObject({ state: value }),
+                  state: value // Keep legacy field for backward compatibility
+                });
+                if (errors.state) {
+                  setErrors(prev => ({ ...prev, state: '' }));
+                }
+              }}
               placeholder="Enter company state"
               className={`h-11 ${errors.state ? 'border-red-500 focus:border-red-500' : 'focus:border-primary focus:ring-2 focus:ring-primary/20'}`}
             />
@@ -188,11 +378,25 @@ export default function WorkingProfessionalForm({ data, updateData, onNext, onPr
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="pin" className="text-sm font-medium">Company PIN Code *</Label>
+            <Label htmlFor="companyPin" className="text-sm font-medium">Company PIN Code *</Label>
             <Input
-              id="pin"
-              value={data.pin}
-              onChange={(e) => handleInputChange('pin', e.target.value.replace(/\D/g, '').slice(0, 6))}
+              id="companyPin"
+              value={data.job?.pin || data.pin || ''}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                console.log('WorkingProfessionalForm - Updating job pinCode (ROLE-BASED):', {
+                  value,
+                  currentData: data,
+                  currentJob: data.job
+                });
+                updateData({ 
+                  job: createJobObject({ pin: value }),
+                  pin: value // Keep legacy field for backward compatibility
+                });
+                if (errors.pin) {
+                  setErrors(prev => ({ ...prev, pin: '' }));
+                }
+              }}
               placeholder="Enter 6-digit PIN"
               maxLength={6}
               className={`h-11 ${errors.pin ? 'border-red-500 focus:border-red-500' : 'focus:border-primary focus:ring-2 focus:ring-primary/20'}`}

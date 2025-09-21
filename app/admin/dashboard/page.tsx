@@ -58,8 +58,11 @@ export default function AdminDashboard() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [earlyBirdEnabled, setEarlyBirdEnabled] = useState(true);
-  const [updatingEarlyBird, setUpdatingEarlyBird] = useState(false);
+  const [settings, setSettings] = useState({
+    earlyBirdEnabled: true,
+    hackathonRegistrationEnabled: true
+  });
+  const [updatingSettings, setUpdatingSettings] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -67,8 +70,8 @@ export default function AdminDashboard() {
     checkAdminAuth();
     // Load dashboard data
     loadDashboardData();
-    // Load Early Bird settings
-    loadEarlyBirdSettings();
+    // Load settings
+    loadSettings();
     
     // Set up auto-refresh every 30 seconds
     const interval = setInterval(() => {
@@ -122,43 +125,48 @@ export default function AdminDashboard() {
     loadDashboardData(true);
   };
 
-  const loadEarlyBirdSettings = async () => {
+  const loadSettings = async () => {
     try {
       const response = await fetch('/api/admin/settings/early-bird');
       if (response.ok) {
         const data = await response.json();
-        setEarlyBirdEnabled(data.earlyBirdEnabled);
+        setSettings(data.settings);
       }
     } catch (error) {
-      console.error('Error loading Early Bird settings:', error);
+      console.error('Error loading settings:', error);
     }
   };
 
-  const handleEarlyBirdToggle = async () => {
-    setUpdatingEarlyBird(true);
+  const handleSettingsUpdate = async (settingType: 'earlyBird' | 'registration') => {
+    setUpdatingSettings(true);
     try {
+      const newSettings = { ...settings };
+      
+      if (settingType === 'earlyBird') {
+        newSettings.earlyBirdEnabled = !settings.earlyBirdEnabled;
+      } else {
+        newSettings.hackathonRegistrationEnabled = !settings.hackathonRegistrationEnabled;
+      }
+
       const response = await fetch('/api/admin/settings/early-bird', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          earlyBirdEnabled: !earlyBirdEnabled
-        }),
+        body: JSON.stringify(newSettings),
       });
 
       if (response.ok) {
         const data = await response.json();
-        setEarlyBirdEnabled(data.earlyBirdEnabled);
-        // Show success message (you can add a toast notification here)
+        setSettings(data.settings);
         console.log(data.message);
       } else {
-        console.error('Failed to update Early Bird settings');
+        console.error('Failed to update settings');
       }
     } catch (error) {
-      console.error('Error updating Early Bird settings:', error);
+      console.error('Error updating settings:', error);
     } finally {
-      setUpdatingEarlyBird(false);
+      setUpdatingSettings(false);
     }
   };
 
@@ -443,15 +451,68 @@ export default function AdminDashboard() {
           </motion.div>
         </div>
 
-        {/* Early Bird Settings */}
+        {/* Hackathon Settings */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Hackathon Settings</h2>
+          
+          {/* Registration Status */}
+          <Card className="mb-4">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="p-3 bg-blue-100 rounded-lg">
+                    {settings.hackathonRegistrationEnabled ? (
+                      <ToggleRight className="w-6 h-6 text-blue-600" />
+                    ) : (
+                      <ToggleLeft className="w-6 h-6 text-gray-400" />
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Hackathon Registration</h3>
+                    <p className="text-sm text-gray-600">
+                      {settings.hackathonRegistrationEnabled 
+                        ? "Registration is open and users can sign up for the hackathon" 
+                        : "Registration is closed and users will see a registration closed message"
+                      }
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => handleSettingsUpdate('registration')}
+                  disabled={updatingSettings}
+                  className={`flex items-center space-x-2 ${
+                    settings.hackathonRegistrationEnabled
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : 'bg-gray-600 hover:bg-gray-700 text-white'
+                  }`}
+                >
+                  {updatingSettings ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : settings.hackathonRegistrationEnabled ? (
+                    <ToggleRight className="w-4 h-4" />
+                  ) : (
+                    <ToggleLeft className="w-4 h-4" />
+                  )}
+                  <span>
+                    {updatingSettings 
+                      ? 'Updating...' 
+                      : settings.hackathonRegistrationEnabled 
+                        ? 'Close Registration' 
+                        : 'Open Registration'
+                    }
+                  </span>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Early Bird Settings */}
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <div className="p-3 bg-orange-100 rounded-lg">
-                    {earlyBirdEnabled ? (
+                    {settings.earlyBirdEnabled ? (
                       <ToggleRight className="w-6 h-6 text-orange-600" />
                     ) : (
                       <ToggleLeft className="w-6 h-6 text-gray-400" />
@@ -460,7 +521,7 @@ export default function AdminDashboard() {
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900">Novothon Early Bird Offer</h3>
                     <p className="text-sm text-gray-600">
-                      {earlyBirdEnabled 
+                      {settings.earlyBirdEnabled 
                         ? "Early Bird offer is currently active and visible to users" 
                         : "Early Bird offer is disabled and will show as expired"
                       }
@@ -468,25 +529,25 @@ export default function AdminDashboard() {
                   </div>
                 </div>
                 <Button
-                  onClick={handleEarlyBirdToggle}
-                  disabled={updatingEarlyBird}
+                  onClick={() => handleSettingsUpdate('earlyBird')}
+                  disabled={updatingSettings}
                   className={`flex items-center space-x-2 ${
-                    earlyBirdEnabled
+                    settings.earlyBirdEnabled
                       ? 'bg-orange-600 hover:bg-orange-700 text-white'
                       : 'bg-gray-600 hover:bg-gray-700 text-white'
                   }`}
                 >
-                  {updatingEarlyBird ? (
+                  {updatingSettings ? (
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : earlyBirdEnabled ? (
+                  ) : settings.earlyBirdEnabled ? (
                     <ToggleRight className="w-4 h-4" />
                   ) : (
                     <ToggleLeft className="w-4 h-4" />
                   )}
                   <span>
-                    {updatingEarlyBird 
+                    {updatingSettings 
                       ? 'Updating...' 
-                      : earlyBirdEnabled 
+                      : settings.earlyBirdEnabled 
                         ? 'Disable Offer' 
                         : 'Enable Offer'
                     }

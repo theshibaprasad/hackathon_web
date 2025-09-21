@@ -714,7 +714,6 @@ export default function RegisterPage() {
                   {/* Firebase Google Login Button */}
                   <FirebaseGoogleAuth
                     className="w-full h-12 rounded-lg font-medium transition-all duration-200 hover:bg-accent/10 hover:border-accent/50 hover:text-accent hover:shadow-md"
-                    disabled={isLoading}
                   />
                 </form>
                 

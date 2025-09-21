@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { useState, useEffect, useRef } from 'react';
+import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from 'firebase/auth';
 import { auth, googleProvider } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
@@ -26,14 +26,74 @@ export default function FirebaseGoogleAuth({
 }: FirebaseGoogleAuthProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const isSigningInRef = useRef(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Cleanup on component unmount
+  useEffect(() => {
+    return () => {
+      setIsLoading(false);
+      isSigningInRef.current = false;
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
+
+  // Function to reset all states and abort ongoing operations
+  const resetAuthState = () => {
+    console.log('Resetting authentication state');
+    setIsLoading(false);
+    isSigningInRef.current = false;
+    
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+  };
 
   const handleGoogleSignIn = async () => {
+    // Always reset everything first - fresh start every time
+    resetAuthState();
+    
+    // Small delay to ensure state is properly reset
+    await new Promise(resolve => setTimeout(resolve, 100));
+
     try {
       setIsLoading(true);
+      isSigningInRef.current = true;
+      
+      // Create abort controller for the request
+      abortControllerRef.current = new AbortController();
+      
+      // Set up a longer timeout (3 minutes) only as a safety net
+      timeoutRef.current = setTimeout(() => {
+        console.log('Google sign-in safety timeout (3 minutes) - resetting button state');
+        resetAuthState();
+      }, 180000); // 3 minutes
+      
+      console.log('Starting Google sign-in popup...');
       
       // Sign in with Google popup
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
+      
+      console.log('Google sign-in successful:', user.email);
+      
+      // Clear timeout since sign-in was successful
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
       
       // Get the ID token
       const idToken = await user.getIdToken();
@@ -45,11 +105,19 @@ export default function FirebaseGoogleAuth({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ idToken }),
+        signal: abortControllerRef.current.signal,
       });
 
       const data = await response.json();
 
       if (data.success) {
+        // Clear timeout and reset state
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+          timeoutRef.current = null;
+        }
+        resetAuthState();
+        
         toast({
           title: data.isNewUser ? "Account created successfully!" : "Login successful!",
           description: data.isNewUser 
@@ -72,12 +140,32 @@ export default function FirebaseGoogleAuth({
       }
     } catch (error: any) {
       console.error('Google sign-in error:', error);
+      console.log('Error code:', error.code);
+      console.log('Error message:', error.message);
       
+      // Clear timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      
+      // Handle popup cancellation gracefully - immediately reset button
+      if (error.code === 'auth/popup-closed-by-user' || 
+          error.code === 'auth/cancelled-popup-request' ||
+          error.code === 'auth/user-cancelled') {
+        console.log('User cancelled popup - immediately resetting button state');
+        resetAuthState();
+        // User cancelled - this is expected behavior, no error message needed
+        return;
+      }
+      
+      // For other errors, reset state and show error
+      resetAuthState();
+      
+      // Handle other errors
       let errorMessage = 'Authentication failed. Please try again.';
       
-      if (error.code === 'auth/popup-closed-by-user') {
-        errorMessage = 'Sign-in was cancelled. Please try again.';
-      } else if (error.code === 'auth/popup-blocked') {
+      if (error.code === 'auth/popup-blocked') {
         errorMessage = 'Popup was blocked. Please allow popups and try again.';
       } else if (error.code === 'auth/network-request-failed') {
         errorMessage = 'Network error. Please check your connection and try again.';
@@ -94,8 +182,6 @@ export default function FirebaseGoogleAuth({
       if (onError) {
         onError(errorMessage);
       }
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -106,6 +192,7 @@ export default function FirebaseGoogleAuth({
       variant={variant}
       size={size}
       className={`w-full ${className || ''}`}
+      type="button"
     >
       {isLoading ? (
         <>

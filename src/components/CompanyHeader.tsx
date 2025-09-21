@@ -33,7 +33,7 @@ export const CompanyHeader = () => {
             alt="Novothon Logo"
             width={150}
             height={50}
-            className="h-12 w-auto object-contain"
+            className="h-10 w-auto object-contain"
           />
         </motion.div>
         

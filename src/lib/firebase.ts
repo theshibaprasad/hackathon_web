@@ -23,6 +23,8 @@ export const auth = getAuth(app);
 
 // Initialize Google Auth Provider
 export const googleProvider = new GoogleAuthProvider();
+googleProvider.addScope('profile');
+googleProvider.addScope('email');
 
 // Initialize Analytics (only in browser)
 export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;

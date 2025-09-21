@@ -1,11 +1,45 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IUser extends Document {
-  email: string;
-  password: string;
+  _id: string;
   firstName: string;
   lastName: string;
+  email: string;
   phoneNumber: string;
+  password: string;
+  otpVerified: boolean;
+  
+  // User type
+  userType: 'student' | 'professional';
+  
+  // Education details (for students) - ROLE-BASED NESTED STRUCTURE
+  education?: {
+    instituteName: string;
+    branch: string;
+    degree: string;
+    graduationYear: string;
+    yearOfStudy: string;
+    city: string;
+    state: string;
+    pin: string;
+  };
+  
+  // Job details (for professionals) - ROLE-BASED NESTED STRUCTURE
+  job?: {
+    jobTitle: string;
+    company: string;
+    yearOfExperience: string;
+    city: string;
+    state: string;
+    pin: string;
+  };
+  
+  // Team reference
+  teamId?: string;
+  teamName?: string;
+  isTeamLeader?: boolean;
+  
+  // Legacy fields for backward compatibility
   clerkId?: string;
   username?: string;
   isBoarding: boolean;
@@ -17,40 +51,20 @@ export interface IUser extends Document {
   // Firebase Auth fields
   firebaseUid?: string;
   
-  // Onboarding data fields
+  // Legacy onboarding fields (to be migrated)
   profession?: 'student' | 'working_professional';
   gender?: string;
   city?: string;
   state?: string;
   pin?: string;
-  
-  // Student specific fields
   instituteName?: string;
   degree?: string;
   branch?: string;
   yearOfStudy?: string;
   graduationYear?: string;
-  
-  // Working Professional specific fields
   companyName?: string;
   jobTitle?: string;
   yearsOfExperience?: string;
-  
-  // Team information
-  teamName?: string;
-  isTeamLeader?: boolean;
-  
-  // Hackathon preferences
-  selectedThemes?: string[];
-  selectedProblemStatements?: string[];
-  
-  // Payment details
-  paymentStatus?: 'pending' | 'completed' | 'failed';
-  paymentAmount?: number;
-  razorpayOrderId?: string;
-  razorpayPaymentId?: string;
-  razorpaySignature?: string;
-  isEarlyBird?: boolean;
   
   // Password reset fields
   resetPasswordOTP?: string;
@@ -61,20 +75,6 @@ export interface IUser extends Document {
 }
 
 const UserSchema: Schema = new Schema({
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-    trim: true
-  },
-  password: {
-    type: String,
-    required: function(this: IUser) {
-      return !this.isGoogleUser; // Password not required for Google users
-    },
-    minlength: 6
-  },
   firstName: {
     type: String,
     required: true,
@@ -83,6 +83,13 @@ const UserSchema: Schema = new Schema({
   lastName: {
     type: String,
     required: true,
+    trim: true
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
     trim: true
   },
   phoneNumber: {
@@ -102,6 +109,115 @@ const UserSchema: Schema = new Schema({
       },
       message: 'Please enter a valid Indian phone number with +91 prefix'
     }
+  },
+  password: {
+    type: String,
+    required: function(this: IUser) {
+      return !this.isGoogleUser; // Password not required for Google users
+    },
+    minlength: 6
+  },
+  otpVerified: {
+    type: Boolean,
+    default: false
+  },
+  
+  // User type
+  userType: {
+    type: String,
+    enum: ['student', 'professional'],
+    required: true
+  },
+  
+  // Education details (for students) - ROLE-BASED NESTED STRUCTURE
+  education: {
+    type: {
+      instituteName: {
+        type: String,
+        trim: true
+      },
+      branch: {
+        type: String,
+        trim: true
+      },
+      degree: {
+        type: String,
+        trim: true
+      },
+      graduationYear: {
+        type: String,
+        trim: true
+      },
+      yearOfStudy: {
+        type: String,
+        trim: true
+      },
+      city: {
+        type: String,
+        trim: true
+      },
+      state: {
+        type: String,
+        trim: true
+      },
+      pin: {
+        type: String,
+        trim: true,
+        validate: {
+          validator: function(v: string) {
+            return !v || /^\d{6}$/.test(v);
+          },
+          message: 'PIN must be a 6-digit number'
+        }
+      }
+    },
+    default: {},
+    _id: false
+  },
+  
+  // Job details (for professionals) - ROLE-BASED NESTED STRUCTURE
+  job: {
+    type: {
+      jobTitle: {
+        type: String,
+        trim: true
+      },
+      company: {
+        type: String,
+        trim: true
+      },
+      yearOfExperience: {
+        type: String,
+        trim: true
+      },
+      city: {
+        type: String,
+        trim: true
+      },
+      state: {
+        type: String,
+        trim: true
+      },
+      pin: {
+        type: String,
+        trim: true,
+        validate: {
+          validator: function(v: string) {
+            return !v || /^\d{6}$/.test(v);
+          },
+          message: 'PIN must be a 6-digit number'
+        }
+      }
+    },
+    default: {},
+    _id: false
+  },
+  
+  // Team reference
+  teamId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Team',
+    default: null
   },
   clerkId: {
     type: String,
@@ -136,15 +252,7 @@ const UserSchema: Schema = new Schema({
     default: false
   },
   
-  // Onboarding data fields
-  profession: {
-    type: String,
-    enum: ['student', 'working_professional']
-  },
-  gender: {
-    type: String,
-    enum: ['male', 'female', 'other', 'prefer_not_to_say']
-  },
+  // Legacy address fields for backward compatibility
   city: {
     type: String,
     trim: true
@@ -164,42 +272,6 @@ const UserSchema: Schema = new Schema({
     }
   },
   
-  // Student specific fields
-  instituteName: {
-    type: String,
-    trim: true
-  },
-  degree: {
-    type: String,
-    trim: true
-  },
-  branch: {
-    type: String,
-    trim: true
-  },
-  yearOfStudy: {
-    type: String,
-    trim: true
-  },
-  graduationYear: {
-    type: String,
-    trim: true
-  },
-  
-  // Working Professional specific fields
-  companyName: {
-    type: String,
-    trim: true
-  },
-  jobTitle: {
-    type: String,
-    trim: true
-  },
-  yearsOfExperience: {
-    type: String,
-    trim: true
-  },
-  
   // Team information
   teamName: {
     type: String,
@@ -207,44 +279,23 @@ const UserSchema: Schema = new Schema({
   },
   isTeamLeader: {
     type: Boolean,
-    default: false
+    default: function(this: IUser) {
+      // User is team leader if they have a teamId and are the leader of that team
+      return !!this.teamId;
+    }
   },
   
-  // Hackathon preferences
-  selectedThemes: [{
+  // Legacy onboarding fields
+  profession: {
     type: String,
-    trim: true
-  }],
-  selectedProblemStatements: [{
+    enum: ['student', 'working_professional']
+  },
+  gender: {
     type: String,
-    trim: true
-  }],
+    enum: ['male', 'female', 'other', 'prefer_not_to_say']
+  },
   
-  // Payment details
-  paymentStatus: {
-    type: String,
-    enum: ['pending', 'completed', 'failed'],
-    default: 'pending'
-  },
-  paymentAmount: {
-    type: Number
-  },
-  razorpayOrderId: {
-    type: String,
-    trim: true
-  },
-  razorpayPaymentId: {
-    type: String,
-    trim: true
-  },
-  razorpaySignature: {
-    type: String,
-    trim: true
-  },
-  isEarlyBird: {
-    type: Boolean,
-    default: false
-  },
+  
   
   // Password reset fields
   resetPasswordOTP: {

@@ -45,6 +45,9 @@ export async function POST(request: NextRequest) {
         firstName: user.firstName,
         lastName: user.lastName,
         phoneNumber: user.phoneNumber,
+        isGoogleUser: user.isGoogleUser || false,
+        isOTPVerified: user.otpVerified || false,
+        isBoarding: user.isBoarding || false,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt
       },

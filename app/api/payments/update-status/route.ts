@@ -1,0 +1,93 @@
+import { NextRequest, NextResponse } from 'next/server';
+import connectDB from '@/lib/mongodb';
+import Payment from '@/models/Payment';
+import User from '@/models/User';
+
+export async function PUT(request: NextRequest) {
+  try {
+    const { 
+      razorpayOrderId, 
+      paymentStatus, 
+      razorpayPaymentId, 
+      razorpaySignature,
+      invoiceUrl 
+    } = await request.json();
+
+    if (!razorpayOrderId || !paymentStatus) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    if (!['pending', 'success', 'failed'].includes(paymentStatus)) {
+      return NextResponse.json(
+        { error: 'Invalid payment status' },
+        { status: 400 }
+      );
+    }
+
+    await connectDB();
+
+    // Find payment by razorpayOrderId
+    const payment = await Payment.findOne({ razorpayOrderId });
+    if (!payment) {
+      return NextResponse.json(
+        { error: 'Payment not found' },
+        { status: 404 }
+      );
+    }
+
+    // Update payment status
+    const updateData: any = { paymentStatus };
+    
+    if (razorpayPaymentId) {
+      updateData.razorpayPaymentId = razorpayPaymentId;
+    }
+    
+    if (razorpaySignature) {
+      updateData.razorpaySignature = razorpaySignature;
+    }
+    
+    if (invoiceUrl) {
+      updateData.invoiceUrl = invoiceUrl;
+    }
+
+    const updatedPayment = await Payment.findByIdAndUpdate(
+      payment._id,
+      updateData,
+      { new: true }
+    );
+
+    // If payment is successful, update user's payment status
+    if (paymentStatus === 'success') {
+      await User.findByIdAndUpdate(payment.userId, {
+        isBoarding: true // Set to true after successful payment
+      });
+    }
+
+    return NextResponse.json({
+      success: true,
+      payment: {
+        id: updatedPayment._id,
+        userId: updatedPayment.userId,
+        paymentStatus: updatedPayment.paymentStatus,
+        isEarlyBird: updatedPayment.isEarlyBird,
+        razorpayOrderId: updatedPayment.razorpayOrderId,
+        razorpayPaymentId: updatedPayment.razorpayPaymentId,
+        razorpaySignature: updatedPayment.razorpaySignature,
+        invoiceUrl: updatedPayment.invoiceUrl,
+        amount: updatedPayment.amount,
+        currency: updatedPayment.currency,
+        updatedAt: updatedPayment.updatedAt
+      }
+    });
+
+  } catch (error) {
+    console.error('Error updating payment status:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

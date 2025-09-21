@@ -38,6 +38,9 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
   const [earlyBirdOfferEnabled, setEarlyBirdOfferEnabled] = useState(true);
   const [loadingOfferStatus, setLoadingOfferStatus] = useState(true);
   const [userData, setUserData] = useState(user);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
   const isEarlyBirdRef = useRef(isEarlyBird);
 
   // Update ref when isEarlyBird changes
@@ -71,22 +74,22 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
   }, [finalAmount]);
   
 
-  // Load Early Bird offer status and user data
+  // Load settings and user data
   useEffect(() => {
-    const loadOfferStatus = async () => {
+    const loadSettings = async () => {
       try {
         const response = await fetch('/api/settings/early-bird');
         if (response.ok) {
           const data = await response.json();
-          setEarlyBirdOfferEnabled(data.earlyBirdEnabled);
+          setEarlyBirdOfferEnabled(data.settings.earlyBirdEnabled);
           
           // If Early Bird is disabled and user had it selected, switch to regular
-          if (!data.earlyBirdEnabled && isEarlyBirdRef.current) {
+          if (!data.settings.earlyBirdEnabled && isEarlyBirdRef.current) {
             setIsEarlyBird(false);
           }
         }
       } catch (error) {
-        console.error('Error loading Early Bird offer status:', error);
+        console.error('Error loading settings:', error);
       } finally {
         setLoadingOfferStatus(false);
       }
@@ -107,7 +110,7 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
       }
     };
 
-    loadOfferStatus();
+    loadSettings();
     loadUserData();
   }, []);
 
@@ -116,11 +119,44 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
     updateData({ paymentAmount: finalAmount, isEarlyBird });
   }, [isEarlyBird, finalAmount]);
 
+  const clearError = () => {
+    setPaymentError(null);
+  };
+
+  const handlePaymentFailure = async (orderId: string, errorReason?: string, errorCode?: string) => {
+    try {
+      const response = await fetch('/api/payment/failed', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          razorpay_order_id: orderId,
+          error_reason: errorReason,
+          error_code: errorCode
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        console.log('Payment failure recorded in database:', data);
+      } else {
+        console.error('Failed to record payment failure:', data.error);
+      }
+    } catch (error) {
+      console.error('Error recording payment failure:', error);
+    }
+  };
+
   const handleEarlyBirdToggle = (checked: boolean) => {
     // Don't allow toggling if Early Bird offer is disabled
     if (!earlyBirdOfferEnabled) {
       return;
     }
+
+    // Clear any existing errors when user makes changes
+    clearError();
 
     if (checked) {
       setIsAnimating(true);
@@ -163,6 +199,7 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
 
   const createRazorpayOrder = async (amount: number) => {
     try {
+      console.log('Creating Razorpay order with isEarlyBird:', isEarlyBird);
       const response = await fetch('/api/payment/create-order', {
         method: 'POST',
         headers: {
@@ -172,6 +209,7 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
           amount: amount * 100, // Convert to paise
           currency: 'INR',
           receipt: `hackathon_${Date.now()}`,
+          isEarlyBird: isEarlyBird, // Include isEarlyBird field
         }),
       });
 
@@ -189,6 +227,8 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
 
   const handlePayment = async () => {
     setIsProcessing(true);
+    clearError(); // Clear any previous errors
+    setCurrentOrderId(null); // Clear previous order ID
     
     try {
       // Validate amount before proceeding
@@ -202,8 +242,15 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
       }
 
       // Validate user data
-      if (!userData?.email || !userData?.phoneNumber) {
+      if (!userData?.email) {
         throw new Error('User information incomplete. Please refresh the page and try again.');
+      }
+      
+      // For Google Auth users, phoneNumber might be empty initially
+      // We'll use the phone number from form data if available
+      const phoneNumber = userData?.phoneNumber || data.phoneNumber;
+      if (!phoneNumber) {
+        throw new Error('Phone number is required. Please go back and complete your profile.');
       }
       
       // Load Razorpay script
@@ -214,6 +261,9 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
 
       // Create order
       const orderData = await createRazorpayOrder(finalAmount);
+      
+      // Store order ID for failure handling
+      setCurrentOrderId(orderData.id);
 
 
       // Validate minimum amount (Razorpay requires minimum 1 INR = 100 paise)
@@ -237,6 +287,7 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
           try {
             
             // Verify payment
+            console.log('Verifying payment with isEarlyBird:', isEarlyBird);
             const verifyResponse = await fetch('/api/payment/verify', {
               method: 'POST',
               headers: {
@@ -264,6 +315,9 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
                 razorpaySignature: response.razorpay_signature,
               });
               
+              // Stop the processing loader
+              setIsProcessing(false);
+              
               // Wait a moment to ensure the update is processed
               setTimeout(() => {
                 // Submit the form
@@ -282,16 +336,45 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
         prefill: {
           name: `${userData?.firstName || ''} ${userData?.lastName || ''}`.trim() || 'User',
           email: userData?.email || '',
-          contact: userData?.phoneNumber || '', // Use user's actual phone number
+          contact: phoneNumber, // Use the resolved phone number
         },
         notes: {
-          address: `${userData?.firstName || ''} ${userData?.lastName || ''}, ${data.city}, ${data.state} - ${data.pin}`,
+          address: (() => {
+            // Get address based on user type - ROLE-BASED NESTED STRUCTURE
+            let city = '', state = '', pin = '';
+            if (data.userType === 'student' || data.profession === 'student') {
+              city = data.education?.city || data.city || '';
+              state = data.education?.state || data.state || '';
+              pin = data.education?.pin || data.pin || '';
+            } else {
+              city = data.job?.city || data.city || '';
+              state = data.job?.state || data.state || '';
+              pin = data.job?.pin || data.pin || '';
+            }
+            
+            // Debug logging
+            console.log('PaymentForm - Address construction (ROLE-BASED NESTED):', {
+              userType: data.userType,
+              profession: data.profession,
+              educationData: data.education,
+              jobData: data.job,
+              legacyCity: data.city,
+              legacyState: data.state,
+              legacyPin: data.pin,
+              finalCity: city,
+              finalState: state,
+              finalPin: pin
+            });
+            
+            return `${userData?.firstName || ''} ${userData?.lastName || ''}, ${city}, ${state} - ${pin}`;
+          })(),
           user_id: userData?._id || '',
-          profession: data.profession || 'student',
+          profession: data.userType || data.profession || 'student',
           registration_type: isEarlyBird ? 'early_bird' : 'regular',
           amount_paid: finalAmount,
           email: userData?.email || '',
           full_name: `${userData?.firstName || ''} ${userData?.lastName || ''}`.trim(),
+          phone: phoneNumber,
         },
         modal: {
           ondismiss: function() {
@@ -317,26 +400,67 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
       
       // Add error handler for Razorpay modal
       rzp.on('payment.failed', function (response: any) {
-        alert(`Payment failed: ${response.error.description || 'Please try again.'}`);
+        const errorMessage = response.error?.description || 'Payment failed. Please try again.';
+        setPaymentError(errorMessage);
         setIsProcessing(false);
+        setRetryCount(prev => prev + 1);
+        
+        // Record payment failure in database
+        if (currentOrderId) {
+          handlePaymentFailure(
+            currentOrderId, 
+            response.error?.description || 'Payment failed',
+            response.error?.code || 'PAYMENT_FAILED'
+          );
+        }
       });
 
       // Add error handler for modal errors
       rzp.on('modal.error', function (response: any) {
-        alert('Payment modal error. Please try again.');
+        setPaymentError('Payment modal error. Please try again.');
         setIsProcessing(false);
+        setRetryCount(prev => prev + 1);
+        
+        // Record payment failure in database
+        if (currentOrderId) {
+          handlePaymentFailure(
+            currentOrderId, 
+            'Payment modal error',
+            'MODAL_ERROR'
+          );
+        }
       });
 
       try {
         rzp.open();
       } catch (error) {
-        alert('Failed to open payment modal. Please try again.');
+        setPaymentError('Failed to open payment modal. Please try again.');
         setIsProcessing(false);
+        setRetryCount(prev => prev + 1);
+        
+        // Record payment failure in database
+        if (currentOrderId) {
+          handlePaymentFailure(
+            currentOrderId, 
+            'Failed to open payment modal',
+            'MODAL_OPEN_ERROR'
+          );
+        }
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Please try again.';
-      alert(`Payment failed: ${errorMessage}`);
+      setPaymentError(errorMessage);
       setIsProcessing(false);
+      setRetryCount(prev => prev + 1);
+      
+      // Record payment failure in database
+      if (currentOrderId) {
+        handlePaymentFailure(
+          currentOrderId, 
+          errorMessage,
+          'PAYMENT_INIT_ERROR'
+        );
+      }
     }
   };
 
@@ -525,11 +649,86 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
             <div className="text-xs text-gray-500 mt-2">
               <div className="font-medium">{userData?.firstName} {userData?.lastName}</div>
               <div>{userData?.email}</div>
-              <div>{data.city}, {data.state} - {data.pin}</div>
+              <div>{(() => {
+                // Get address based on user type - ROLE-BASED NESTED STRUCTURE
+                let city = '', state = '', pin = '';
+                if (data.userType === 'student' || data.profession === 'student') {
+                  city = data.education?.city || data.city || '';
+                  state = data.education?.state || data.state || '';
+                  pin = data.education?.pin || data.pin || '';
+                } else {
+                  city = data.job?.city || data.city || '';
+                  state = data.job?.state || data.state || '';
+                  pin = data.job?.pin || data.pin || '';
+                }
+                
+                // Debug logging for payment summary
+                console.log('PaymentForm - Payment summary address (ROLE-BASED NESTED):', {
+                  userType: data.userType,
+                  profession: data.profession,
+                  educationData: data.education,
+                  jobData: data.job,
+                  legacyCity: data.city,
+                  legacyState: data.state,
+                  legacyPin: data.pin,
+                  finalCity: city,
+                  finalState: state,
+                  finalPin: pin
+                });
+                
+                return `${city}, ${state} - ${pin}`;
+              })()}</div>
             </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* Payment Error Display */}
+      {paymentError && (
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="p-4">
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0">
+                <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
+                  <span className="text-red-600 text-sm font-bold">!</span>
+                </div>
+              </div>
+              <div className="flex-1">
+                <h4 className="text-sm font-medium text-red-800 mb-1">
+                  Payment Failed
+                </h4>
+                <p className="text-sm text-red-700 mb-3">
+                  {paymentError}
+                </p>
+                <div className="flex space-x-2">
+                  <Button
+                    onClick={clearError}
+                    variant="outline"
+                    size="sm"
+                    className="text-red-700 border-red-300 hover:bg-red-100"
+                  >
+                    Dismiss
+                  </Button>
+                  {retryCount < 3 && (
+                    <Button
+                      onClick={handlePayment}
+                      size="sm"
+                      className="bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      Try Again ({3 - retryCount} attempts left)
+                    </Button>
+                  )}
+                </div>
+                {retryCount >= 3 && (
+                  <p className="text-xs text-red-600 mt-2">
+                    Maximum retry attempts reached. Please contact support if the issue persists.
+                  </p>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Navigation Buttons */}
       <div className="flex justify-between pt-8 border-t border-gray-200">
@@ -545,13 +744,27 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
         
         <Button
           onClick={handlePayment}
-          disabled={isProcessing || isLoading}
-          className="flex items-center bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold px-8 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+          disabled={isProcessing || isLoading || retryCount >= 3}
+          className={`flex items-center font-semibold px-8 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 ${
+            retryCount >= 3 
+              ? 'bg-gray-400 hover:bg-gray-400 cursor-not-allowed' 
+              : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800'
+          }`}
         >
           {isProcessing ? (
             <>
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
               Processing Payment...
+            </>
+          ) : retryCount >= 3 ? (
+            <>
+              <CreditCard className="w-4 h-4 mr-2" />
+              Max Retries Reached
+            </>
+          ) : retryCount > 0 ? (
+            <>
+              <CreditCard className="w-4 h-4 mr-2" />
+              Retry Payment - ₹{finalAmount}
             </>
           ) : (
             <>

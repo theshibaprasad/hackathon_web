@@ -33,7 +33,18 @@ export async function POST(request: NextRequest) {
 
     // Verify the Firebase ID token
     const decodedToken = await auth.verifyIdToken(idToken);
-    const { uid: firebaseUid, email, name, given_name, family_name } = decodedToken;
+    const { uid: firebaseUid, email, name, given_name, family_name, picture } = decodedToken;
+
+    // Log the full token data for debugging
+    console.log('Firebase Google Auth - Full token data:', {
+      uid: firebaseUid,
+      email,
+      name,
+      given_name,
+      family_name,
+      picture,
+      allClaims: Object.keys(decodedToken)
+    });
 
     if (!email || !firebaseUid) {
       return NextResponse.json(
@@ -50,13 +61,17 @@ export async function POST(request: NextRequest) {
     
     if (given_name && family_name) {
       // Use the separate given_name and family_name fields if available
-      firstName = given_name;
-      lastName = family_name;
+      firstName = given_name.trim();
+      lastName = family_name.trim();
+    } else if (given_name) {
+      // If only given_name is available
+      firstName = given_name.trim();
+      lastName = '';
     } else if (name) {
       // Fallback to parsing the full name
-      const nameParts = name.split(' ');
+      const nameParts = name.trim().split(/\s+/);
       firstName = nameParts[0] || 'User';
-      lastName = nameParts.slice(1).join(' ') || '';
+      lastName = nameParts.slice(1).join(' ').trim() || '';
     }
 
     // Log the captured data for debugging
@@ -91,6 +106,9 @@ export async function POST(request: NextRequest) {
           firstName: user.firstName,
           lastName: user.lastName,
           phoneNumber: user.phoneNumber || '',
+          isGoogleUser: user.isGoogleUser || false,
+          isOTPVerified: user.otpVerified || false,
+          isBoarding: user.isBoarding || false,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt
         },
@@ -133,6 +151,7 @@ export async function POST(request: NextRequest) {
         firstName: firstName,
         lastName: lastName,
         phoneNumber: '', // Will be collected during onboarding
+        userType: 'student', // Default user type, can be updated during onboarding
         firebaseUid: firebaseUid,
         isGoogleUser: true,
         isBoarding: false
@@ -148,6 +167,9 @@ export async function POST(request: NextRequest) {
           firstName: newUser.firstName,
           lastName: newUser.lastName,
           phoneNumber: newUser.phoneNumber || '',
+          isGoogleUser: newUser.isGoogleUser || false,
+          isOTPVerified: newUser.otpVerified || false,
+          isBoarding: newUser.isBoarding || false,
           createdAt: newUser.createdAt,
           updatedAt: newUser.updatedAt
         },
