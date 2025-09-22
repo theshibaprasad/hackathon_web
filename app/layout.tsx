@@ -14,11 +14,28 @@ export const metadata: Metadata = {
   authors: [{ name: 'Novothon' }],
   icons: {
     icon: [
-      { url: '/favicon.svg', type: 'image/svg+xml' },
-      { url: '/favicon.ico', sizes: 'any' }
+      { url: '/favicon/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon/favicon.ico', sizes: 'any' }
     ],
-    shortcut: '/favicon.ico',
-    apple: '/favicon.svg',
+    shortcut: '/favicon/favicon.ico',
+    apple: [
+      { url: '/favicon/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }
+    ],
+    other: [
+      {
+        rel: 'icon',
+        url: '/favicon/android-chrome-192x192.png',
+        sizes: '192x192',
+        type: 'image/png'
+      },
+      {
+        rel: 'icon',
+        url: '/favicon/android-chrome-512x512.png',
+        sizes: '512x512',
+        type: 'image/png'
+      }
+    ]
   },
   openGraph: {
     title: 'Novothon - Redefining Economic Opportunities for Builders',
@@ -42,6 +59,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="manifest" href="/site.webmanifest" />
+      </head>
       <body className={inter.className}>
         <TooltipProvider>
           <Toaster />

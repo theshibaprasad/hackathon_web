@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowRight, Laptop, Code, Github, Cpu, Database, Zap, Terminal, Smartphone, Globe, Monitor, Keyboard, Mouse, Wifi, HardDrive, Layers, FileText, GitBranch, Code2, Smartphone as Phone, Tablet, Headphones, Camera, Mic, Wrench, Settings } from "lucide-react";
+import Image from "next/image";
 
 // Optimized floating icons configuration - reduced size for better webpack performance
 const iconComponents = [Laptop, Code, Code2, Monitor, Keyboard, Github, Database, Terminal, GitBranch, Phone, Tablet, Cpu, HardDrive, Zap, Wifi, Layers, FileText, Headphones, Camera, Mic, Wrench, Settings, Globe, Mouse, Smartphone];
@@ -58,41 +59,20 @@ export const CompanyHero = () => {
       </div>
       
       <div className="relative z-10 max-w-5xl mx-auto text-center" >
-        <motion.h1 
+        <motion.div 
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-           className="text-4xl md:text-6xl font-bold leading-tight mb-8"
+          className="mb-12"
         >
-          Building the future through{" "}
-          <motion.span 
-            initial={{ backgroundPosition: "0% 50%" }}
-            animate={{ backgroundPosition: "100% 50%" }}
-            transition={{ duration: 3, repeat: Infinity, repeatType: "reverse" }}
-            className="bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] bg-clip-text text-transparent"
-          >
-            innovation and creativity
-          </motion.span>{" "}
-          with{" "}
-          <span className="relative">
-            hackathons
-            <motion.div 
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ delay: 1.2, duration: 0.8 }}
-              className="absolute -bottom-2 left-0 right-0 h-1 bg-accent rounded-full origin-left"
-            />
-          </span>
-        </motion.h1>
-        
-        <motion.p 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto"
-        >
-          Join the largest community of developers, designers, and innovators creating groundbreaking solutions through collaborative hackathons.
-        </motion.p>
+          <Image
+            src="/novothon_blue.svg"
+            alt="Novothon"
+            width={600}
+            height={300}
+            className="mx-auto h-48 w-auto object-contain"
+          />
+        </motion.div>
 
         <motion.div 
           initial={{ opacity: 0, y: 30 }}

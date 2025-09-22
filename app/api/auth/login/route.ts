@@ -37,19 +37,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create JWT token
+    // Create minimal JWT token with only essential auth data
     const token = jwt.sign(
       { 
         userId: user._id,
         email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        phoneNumber: user.phoneNumber,
-        isGoogleUser: user.isGoogleUser || false,
-        isOTPVerified: user.otpVerified || false,
-        isBoarding: user.isBoarding || false,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt
+        role: 'user'
       },
       process.env.JWT_SECRET!,
       { expiresIn: '7d' }

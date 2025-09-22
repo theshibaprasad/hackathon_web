@@ -79,11 +79,6 @@ export const HackathonDetails = () => {
   const [user, setUser] = useState<HackathonUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [hackathon, setHackathon] = useState<HackathonData>(hackathonData);
-  const [isRegistering, setIsRegistering] = useState(false);
-  const [registrationStatus, setRegistrationStatus] = useState<{
-    type: 'success' | 'error' | 'info';
-    message: string;
-  } | null>(null);
 
   // Fetch user data on component mount
   useEffect(() => {
@@ -97,6 +92,10 @@ export const HackathonDetails = () => {
         if (response.ok) {
           const data = await response.json();
           setUser(data.user);
+          // Check if user has completed onboarding (isBoarding = true)
+          // This means they are registered for the hackathon
+          const isRegistered = data.user.isBoarding || false;
+          setHackathon(prev => ({ ...prev, isRegistered }));
         }
       } catch (error) {
         console.error('Error fetching user:', error);
@@ -108,81 +107,9 @@ export const HackathonDetails = () => {
     fetchUser();
   }, []);
 
-  // Check if user is registered from database
-  useEffect(() => {
-    const checkRegistrationStatus = async () => {
-      if (user && hackathon.id) {
-        try {
-          const response = await fetch(`/api/hackathon/status?hackathonId=${hackathon.id}`, {
-            method: 'GET',
-            credentials: 'include',
-          });
+  // Registration is now handled during onboarding, no need for separate registration check
 
-          if (response.ok) {
-            const data = await response.json();
-            setHackathon(prev => ({ ...prev, isRegistered: data.isRegistered }));
-          }
-        } catch (error) {
-          console.error('Error checking registration status:', error);
-        }
-      }
-    };
-
-    checkRegistrationStatus();
-  }, [user, hackathon.id]);
-
-  const handleRegister = async () => {
-    if (!user) {
-      setRegistrationStatus({
-        type: 'error',
-        message: 'Please log in to register for the hackathon.'
-      });
-      return;
-    }
-
-    setIsRegistering(true);
-    setRegistrationStatus(null);
-
-    try {
-      const response = await fetch('/api/hackathon/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          hackathonId: hackathon.id
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Update registration status
-        setHackathon(prev => ({ ...prev, isRegistered: true, currentParticipants: prev.currentParticipants + 1 }));
-        
-        // Dispatch event to update dashboard
-        window.dispatchEvent(new CustomEvent('hackathonRegistered'));
-        
-        setRegistrationStatus({
-          type: 'success',
-          message: 'Successfully registered for Novothon! You can now access team management and project submission.'
-        });
-      } else {
-        setRegistrationStatus({
-          type: 'error',
-          message: data.message || 'Registration failed. Please try again.'
-        });
-      }
-    } catch (error) {
-      setRegistrationStatus({
-        type: 'error',
-        message: 'Registration failed. Please try again.'
-      });
-    } finally {
-      setIsRegistering(false);
-    }
-  };
+  // Registration is now handled during onboarding, no need for separate registration
 
   const registrationProgress = (hackathon.currentParticipants / hackathon.maxParticipants) * 100;
 
@@ -213,24 +140,6 @@ export const HackathonDetails = () => {
         </p>
       </motion.div>
 
-      {/* Registration Status Alert */}
-      {registrationStatus && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Alert className={registrationStatus.type === 'success' ? 'border-green-200 bg-green-50' : 
-                            registrationStatus.type === 'error' ? 'border-red-200 bg-red-50' : 
-                            'border-blue-200 bg-blue-50'}>
-            <AlertDescription className={registrationStatus.type === 'success' ? 'text-green-800' : 
-                                        registrationStatus.type === 'error' ? 'text-red-800' : 
-                                        'text-blue-800'}>
-              {registrationStatus.message}
-            </AlertDescription>
-          </Alert>
-        </motion.div>
-      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Content */}
@@ -396,25 +305,17 @@ export const HackathonDetails = () => {
                 ) : (
                   <div className="space-y-3">
                     <div className="text-sm text-muted-foreground">
-                      Registration closes on {hackathon.registrationDeadline}
+                      Complete your onboarding to register for the hackathon
                     </div>
                     <Button 
-                      onClick={handleRegister}
-                      disabled={isRegistering}
+                      onClick={() => window.location.href = '/onboarding'}
                       className="w-full"
                       size="lg"
                     >
-                      {isRegistering ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                          Registering...
-                        </>
-                      ) : (
-                        'Register Now'
-                      )}
+                      Complete Onboarding
                     </Button>
                     <p className="text-xs text-muted-foreground text-center">
-                      Free registration • No payment required
+                      Registration is part of the onboarding process
                     </p>
                   </div>
                 )}

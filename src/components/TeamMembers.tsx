@@ -15,6 +15,7 @@ interface TeamMembersUser {
   email: string;
   firstName: string;
   lastName: string;
+  teamId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -45,19 +46,9 @@ interface TeamMembersProps {
 export const TeamMembers = ({ user }: TeamMembersProps) => {
   const { toast } = useToast();
   
-  // Initialize members with user data immediately
-  const [members, setMembers] = useState<TeamMember[]>(() => {
-    if (user) {
-      return [{
-        id: user._id,
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        email: user.email || '',
-        isTeamLead: true
-      }];
-    }
-    return [];
-  });
+  // Initialize members state
+  const [members, setMembers] = useState<TeamMember[]>([]);
+  const [loading, setLoading] = useState(true);
   
   const [showAddForm, setShowAddForm] = useState(false);
   const [newMember, setNewMember] = useState({
@@ -68,18 +59,52 @@ export const TeamMembers = ({ user }: TeamMembersProps) => {
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [emailStatus, setEmailStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
-  // Update members when user changes
+  // Fetch team members from database
   useEffect(() => {
-    if (user) {
-      setMembers([{
-        id: user._id,
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        email: user.email || '',
-        isTeamLead: true
-      }]);
-    }
-  }, [user]);
+    const fetchTeamMembers = async () => {
+      if (user?.teamId) {
+        try {
+          const response = await fetch(`/api/teams/${user.teamId}`, {
+            method: 'GET',
+            credentials: 'include',
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            const teamMembers: TeamMember[] = [
+              // Add team leader first
+              {
+                id: data.team.leader.userId,
+                firstName: data.team.leader.name.split(' ')[0],
+                lastName: data.team.leader.name.split(' ').slice(1).join(' '),
+                email: data.team.leader.email,
+                isTeamLead: true
+              },
+              // Add team members (excluding leader if they're in the members array)
+              ...data.team.members
+                .filter((member: any) => member.userId !== data.team.leader.userId)
+                .map((member: any) => ({
+                  id: member.userId,
+                  firstName: member.name.split(' ')[0],
+                  lastName: member.name.split(' ').slice(1).join(' '),
+                  email: member.email,
+                  isTeamLead: false
+                }))
+            ];
+            setMembers(teamMembers);
+          }
+        } catch (error) {
+          console.error('Error fetching team members:', error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    fetchTeamMembers();
+  }, [user?.teamId]);
 
   // Prevent body scroll when modal is open and handle ESC key
   useEffect(() => {
@@ -159,48 +184,105 @@ export const TeamMembers = ({ user }: TeamMembersProps) => {
       isTeamLead: false
     };
 
-    // Add member to state first
-    setMembers(prevMembers => [...prevMembers, member]);
-    
-    // Send invitation email
+    // Add member to team via API
     setIsSendingEmail(true);
     setEmailStatus(null);
     
     try {
-      const response = await fetch('/api/emails/team-invitation', {
+      // First, add member to team
+      const teamResponse = await fetch('/api/teams/add-member', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
-          inviteeEmail: newMember.email.trim(),
-          inviteeName: `${newMember.firstName.trim()} ${newMember.lastName.trim()}`,
-          teamName: 'Your Team',
-          hackathonName: 'Hackathon 2024'
+          teamId: user?.teamId, // Get teamId from user data
+          email: newMember.email.trim(),
+          firstName: newMember.firstName.trim(),
+          lastName: newMember.lastName.trim(),
+          phone: '' // Phone not required for now
         }),
       });
 
-      if (response.ok) {
-        setEmailStatus({ type: 'success', message: 'Invitation email sent successfully!' });
-        toast({
-          title: "Member Added",
-          description: `${member.firstName} ${member.lastName} has been added to your team!`,
-          variant: "success",
+      const teamData = await teamResponse.json();
+
+      if (teamResponse.ok) {
+        // Refresh team members from database
+        const refreshResponse = await fetch(`/api/teams/${user?.teamId}`, {
+          method: 'GET',
+          credentials: 'include',
         });
+        
+        if (refreshResponse.ok) {
+          const refreshData = await refreshResponse.json();
+          const teamMembers: TeamMember[] = [
+            // Add team leader first
+            {
+              id: refreshData.team.leader.userId,
+              firstName: refreshData.team.leader.name.split(' ')[0],
+              lastName: refreshData.team.leader.name.split(' ').slice(1).join(' '),
+              email: refreshData.team.leader.email,
+              isTeamLead: true
+            },
+            // Add team members (excluding leader if they're in the members array)
+            ...refreshData.team.members
+              .filter((member: any) => member.userId !== refreshData.team.leader.userId)
+              .map((member: any) => ({
+                id: member.userId,
+                firstName: member.name.split(' ')[0],
+                lastName: member.name.split(' ').slice(1).join(' '),
+                email: member.email,
+                isTeamLead: false
+              }))
+          ];
+          setMembers(teamMembers);
+        }
+        
+        // Send invitation email
+        const emailResponse = await fetch('/api/emails/team-invitation', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            inviteeEmail: newMember.email.trim(),
+            inviteeName: `${newMember.firstName.trim()} ${newMember.lastName.trim()}`,
+            teamName: teamData.team.teamName || 'Your Team',
+            hackathonName: 'Novothon 2024'
+          }),
+        });
+
+        if (emailResponse.ok) {
+          setEmailStatus({ type: 'success', message: 'Member added and invitation email sent successfully!' });
+          toast({
+            title: "Member Added",
+            description: `${member.firstName} ${member.lastName} has been added to your team!`,
+            variant: "success",
+          });
+        } else {
+          setEmailStatus({ type: 'success', message: 'Member added successfully, but invitation email failed to send.' });
+          toast({
+            title: "Member Added",
+            description: `${member.firstName} ${member.lastName} has been added to your team!`,
+            variant: "success",
+          });
+        }
       } else {
-        setEmailStatus({ type: 'error', message: 'Failed to send invitation email.' });
+        // Handle API errors
+        setEmailStatus({ type: 'error', message: teamData.error || 'Failed to add member.' });
         toast({
-          title: "Email Error",
-          description: "Member added but invitation email failed to send.",
+          title: "Error",
+          description: teamData.error || 'Failed to add member to team.',
           variant: "destructive",
         });
       }
     } catch (error) {
-      console.error('Email sending error:', error);
-      setEmailStatus({ type: 'error', message: 'Failed to send invitation email.' });
+      console.error('Error adding team member:', error);
+      setEmailStatus({ type: 'error', message: 'Failed to add member to team.' });
       toast({
-        title: "Email Error",
-        description: "Member added but invitation email failed to send.",
+        title: "Error",
+        description: "Failed to add member to team.",
         variant: "destructive",
       });
     } finally {
@@ -224,6 +306,17 @@ export const TeamMembers = ({ user }: TeamMembersProps) => {
     }
     setMembers(members.filter(m => m.id !== id));
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <span className="ml-2 text-muted-foreground">Loading team members...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

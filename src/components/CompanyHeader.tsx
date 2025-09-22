@@ -26,15 +26,18 @@ export const CompanyHeader = () => {
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <motion.div 
           whileHover={{ scale: 1.05 }}
-          className="flex items-center"
+          className="flex items-center space-x-3"
         >
           <Image
-            src="/Novothon_Logo.png"
+            src="/favicon/android-chrome-192x192.png"
             alt="Novothon Logo"
-            width={150}
-            height={50}
-            className="h-10 w-auto object-contain"
+            width={40}
+            height={40}
+            className="h-10 w-10 object-contain"
           />
+          <h1 className="text-2xl font-bold" style={{ color: '#4437FB' }}>
+            NOVOTHON
+          </h1>
         </motion.div>
         
         <nav className="hidden md:flex items-center space-x-8">

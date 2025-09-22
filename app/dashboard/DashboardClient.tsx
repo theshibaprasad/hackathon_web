@@ -21,8 +21,16 @@ interface DashboardUser {
   email: string;
   firstName: string;
   lastName: string;
+  teamId?: string;
+  isBoarding: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+interface TeamData {
+  _id: string;
+  teamName: string;
+  isTeamLeader: boolean;
 }
 
 interface DashboardClientProps {
@@ -32,51 +40,65 @@ interface DashboardClientProps {
 export default function DashboardClient({ user }: DashboardClientProps) {
   const [activeTab, setActiveTab] = useState('hackathon');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isHackathonRegistered, setIsHackathonRegistered] = useState(false);
+  const [teamData, setTeamData] = useState<TeamData | null>(null);
   const [showRegistrationMessage, setShowRegistrationMessage] = useState(false);
+  const [currentUser, setCurrentUser] = useState<DashboardUser>(user);
+  const [loading, setLoading] = useState(true);
 
-  // Check hackathon registration status from database
+  // Use isBoarding status instead of hackathon registration
+  const isHackathonRegistered = currentUser.isBoarding;
+
+  // Fetch fresh user data on component mount
   useEffect(() => {
-    const checkRegistrationStatus = async () => {
+    const fetchFreshUserData = async () => {
       try {
-        const response = await fetch('/api/hackathon/status?hackathonId=novothon-1.0', {
+        const response = await fetch('/api/auth/me', {
           method: 'GET',
           credentials: 'include',
         });
 
         if (response.ok) {
           const data = await response.json();
-          setIsHackathonRegistered(data.isRegistered);
+          setCurrentUser(data.user);
         }
       } catch (error) {
-        console.error('Error checking registration status:', error);
+        console.error('Error fetching fresh user data:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    checkRegistrationStatus();
+    fetchFreshUserData();
   }, []);
 
-  // Listen for registration updates from HackathonDetails component
+  // Fetch team data if user has a teamId
   useEffect(() => {
-    const handleRegistrationUpdate = async () => {
-      try {
-        const response = await fetch('/api/hackathon/status?hackathonId=novothon-1.0', {
-          method: 'GET',
-          credentials: 'include',
-        });
+    const fetchTeamData = async () => {
+      if (currentUser.teamId) {
+        try {
+          const response = await fetch(`/api/teams/${currentUser.teamId}`, {
+            method: 'GET',
+            credentials: 'include',
+          });
 
-        if (response.ok) {
-          const data = await response.json();
-          setIsHackathonRegistered(data.isRegistered);
+          if (response.ok) {
+            const data = await response.json();
+            setTeamData({
+              _id: data.team._id,
+              teamName: data.team.teamName,
+              isTeamLeader: data.team.leader.userId === currentUser._id
+            });
+          }
+        } catch (error) {
+          console.error('Error fetching team data:', error);
         }
-      } catch (error) {
-        console.error('Error checking registration status:', error);
       }
     };
 
-    window.addEventListener('hackathonRegistered', handleRegistrationUpdate);
-    return () => window.removeEventListener('hackathonRegistered', handleRegistrationUpdate);
-  }, []);
+    if (!loading && currentUser.teamId) {
+      fetchTeamData();
+    }
+  }, [currentUser.teamId, currentUser._id, loading]);
 
   const menuItems = [
     { 
@@ -117,13 +139,24 @@ export default function DashboardClient({ user }: DashboardClientProps) {
       case 'hackathon':
         return <HackathonDetails />;
       case 'team-members':
-        return <TeamMembers user={user} />;
+        return <TeamMembers user={currentUser} />;
       case 'project-submission':
         return <ProjectSubmission />;
       default:
         return <HackathonDetails />;
     }
   };
+
+  if (loading) {
+    return (
+      <div className="h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen bg-background flex">
@@ -157,7 +190,7 @@ export default function DashboardClient({ user }: DashboardClientProps) {
           </Button>
         </div>
 
-        {/* User Info */}
+        {/* Team Info */}
         <div className="p-6 border-b border-border">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
@@ -165,10 +198,10 @@ export default function DashboardClient({ user }: DashboardClientProps) {
             </div>
             <div>
               <p className="font-medium">
-                {user.firstName} {user.lastName}
+                {teamData?.teamName || 'No Team'}
               </p>
               <p className="text-sm text-muted-foreground">
-                {user.email}
+                {teamData?.isTeamLeader ? 'Team Leader' : 'Team Member'}
               </p>
             </div>
           </div>
@@ -223,9 +256,9 @@ export default function DashboardClient({ user }: DashboardClientProps) {
             <div className="flex items-center gap-2">
               <div className="text-amber-600">⚠️</div>
               <div>
-                <p className="font-medium text-amber-800">Registration Required</p>
+                <p className="font-medium text-amber-800">Onboarding Required</p>
                 <p className="text-sm text-amber-700">
-                  Please register for the hackathon first to access team management and project submission features.
+                  Please complete your onboarding first to access team management and project submission features.
                 </p>
               </div>
             </div>

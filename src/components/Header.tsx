@@ -78,13 +78,9 @@ export const Header = () => {
     <header className="fixed top-0 left-0 right-0 z-50 glass-effect">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <div className="flex items-center">
-          <Image
-            src="/Novothon_Logo.png"
-            alt="Novothon Logo"
-            width={150}
-            height={50}
-            className="h-12 w-auto object-contain"
-          />
+          <h1 className="text-2xl font-bold" style={{ color: '#4437FB' }}>
+            NOVOTHON
+          </h1>
         </div>
         
         <nav className="hidden md:flex items-center space-x-8">

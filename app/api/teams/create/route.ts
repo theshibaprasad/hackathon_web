@@ -64,12 +64,7 @@ export async function POST(request: NextRequest) {
         email: leader.email,
         phone: leader.phoneNumber
       },
-      members: [{
-        userId: leader._id,
-        name: `${leader.firstName} ${leader.lastName}`,
-        email: leader.email,
-        phone: leader.phoneNumber
-      }],
+      members: [], // Don't include leader in members array
       themeId: themeId || 'TBD',
       problemId: problemId || 'TBD'
     });

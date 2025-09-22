@@ -12,6 +12,7 @@ export interface User {
   isGoogleUser: boolean;
   isOTPVerified: boolean;
   isBoarding: boolean;
+  teamId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -28,18 +29,19 @@ export async function getServerSideUser(): Promise<User | null> {
     // Verify JWT token
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
     
-    // Return user data from token
+    // Return minimal auth data from token
     return {
       _id: decoded.userId,
       email: decoded.email,
-      firstName: decoded.firstName || '',
-      lastName: decoded.lastName || '',
-      phoneNumber: decoded.phoneNumber || '',
-      isGoogleUser: decoded.isGoogleUser || false,
-      isOTPVerified: decoded.isOTPVerified || false,
-      isBoarding: decoded.isBoarding || false,
-      createdAt: decoded.createdAt || new Date().toISOString(),
-      updatedAt: decoded.updatedAt || new Date().toISOString()
+      firstName: '', // Will be fetched fresh from database
+      lastName: '', // Will be fetched fresh from database
+      phoneNumber: '', // Will be fetched fresh from database
+      isGoogleUser: false, // Will be fetched fresh from database
+      isOTPVerified: false, // Will be fetched fresh from database
+      isBoarding: false, // Will be fetched fresh from database
+      teamId: undefined, // Will be fetched fresh from database
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
   } catch (error) {
     console.error('Auth verification error:', error);
@@ -66,19 +68,12 @@ export async function refreshUserToken(userId: string): Promise<string | null> {
       return null;
     }
 
-    // Create new JWT token with updated user data
+    // Create minimal JWT token with only essential auth data
     const token = jwt.sign(
       { 
         userId: user._id,
         email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        phoneNumber: user.phoneNumber || '',
-        isGoogleUser: user.isGoogleUser || false,
-        isOTPVerified: user.otpVerified || false,
-        isBoarding: user.isBoarding || false,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt
+        role: 'user'
       },
       process.env.JWT_SECRET!,
       { expiresIn: '7d' }

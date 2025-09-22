@@ -15,13 +15,9 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           <div className="col-span-1">
             <div className="flex items-center mb-6">
-              <Image
-                src="/Novothon_Logo.png"
-                alt="Novothon Logo"
-                width={150}
-                height={50}
-                className="h-12 w-auto object-contain"
-              />
+              <h1 className="text-2xl font-bold" style={{ color: '#4437FB' }}>
+                NOVOTHON
+              </h1>
             </div>
             <p className="text-muted-foreground mb-6 max-w-md">
               We love{" "}

@@ -36,7 +36,9 @@ export async function GET(request: NextRequest) {
           id: user._id,
           email: user.email,
           firstName: user.firstName,
-          lastName: user.lastName
+          lastName: user.lastName,
+          isBoarding: user.isBoarding,
+          teamId: user.teamId
         }
       },
       { status: 200 }
