@@ -361,3 +361,4 @@ export default function TeamDetailsModal({ team, isOpen, onClose }: TeamDetailsM
     </AnimatePresence>
   );
 }
+

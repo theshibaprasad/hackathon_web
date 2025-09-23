@@ -2,45 +2,8 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
-// Admin schema
-const AdminSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    minlength: 3,
-    maxlength: 50
-  },
-  password: {
-    type: String,
-    required: true,
-    minlength: 6
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    lowercase: true
-  },
-  role: {
-    type: String,
-    enum: ['super_admin', 'admin'],
-    default: 'admin'
-  },
-  isActive: {
-    type: Boolean,
-    default: true
-  },
-  lastLogin: {
-    type: Date
-  }
-}, {
-  timestamps: true
-});
-
-const Admin = mongoose.model('Admin', AdminSchema);
+// Import the existing Admin model to avoid duplicate schema definitions
+const Admin = require('../src/models/Admin').default;
 
 async function createAdmin() {
   try {
@@ -49,7 +12,7 @@ async function createAdmin() {
     console.log('Connected to MongoDB');
 
     // Check if admin already exists
-    const existingAdmin = await Admin.findOne({ username: 'hackathon' });
+    const existingAdmin = await Admin.findOne({ username: 'admin' });
     if (existingAdmin) {
       console.log('Admin already exists!');
       process.exit(0);
@@ -57,7 +20,8 @@ async function createAdmin() {
 
     // Hash the password
     const saltRounds = 12;
-    const hashedPassword = await bcrypt.hash('hackshiba@9988', saltRounds);
+    const password = 'hackshiba@9988';
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     // Create admin
     const admin = new Admin({
@@ -71,7 +35,7 @@ async function createAdmin() {
     await admin.save();
     console.log('Admin created successfully!');
     console.log('Username: admin');
-    console.log('Password: novoshiba@9988');
+    console.log('Password: hackshiba@9988');
     console.log('Email: admin@novothon.com');
     console.log('Role: super_admin');
 
