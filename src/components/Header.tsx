@@ -19,9 +19,10 @@ interface HeaderUser {
 export const Header = () => {
   const [user, setUser] = useState<HeaderUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [registrationEnabled, setRegistrationEnabled] = useState(true);
   const router = useRouter();
 
-  // Fetch user data on component mount
+  // Fetch user data and registration status on component mount
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -41,7 +42,20 @@ export const Header = () => {
       }
     };
 
+    const fetchRegistrationStatus = async () => {
+      try {
+        const response = await fetch('/api/settings/registration-status');
+        if (response.ok) {
+          const data = await response.json();
+          setRegistrationEnabled(data.settings.hackathonRegistrationEnabled);
+        }
+      } catch (error) {
+        console.error('Error fetching registration status:', error);
+      }
+    };
+
     fetchUser();
+    fetchRegistrationStatus();
   }, []);
 
   const handleLogout = async () => {
@@ -119,7 +133,7 @@ export const Header = () => {
               </Button>
             </>
           ) : (
-            // Show sign in and sign up buttons when not authenticated
+            // Show sign in and register buttons when not authenticated
             <>
               <Button 
                 variant="ghost" 
@@ -131,10 +145,21 @@ export const Header = () => {
               </Button>
               <Button 
                 size="sm"
-                onClick={() => router.push('/register')}
-                className="hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/25 transition-all duration-200"
+                onClick={() => {
+                  if (registrationEnabled) {
+                    router.push('/register');
+                  } else {
+                    alert('Registration is currently closed. Please contact the organizers for more information.');
+                  }
+                }}
+                disabled={!registrationEnabled}
+                className={`transition-all duration-200 ${
+                  registrationEnabled 
+                    ? 'hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/25' 
+                    : 'opacity-50 cursor-not-allowed'
+                }`}
               >
-                Sign Up
+                {registrationEnabled ? 'Register' : 'Registration Closed'}
               </Button>
             </>
           )}

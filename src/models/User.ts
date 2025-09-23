@@ -114,8 +114,8 @@ const UserSchema: Schema = new Schema({
     type: String,
     required: function(this: IUser) {
       return !this.isGoogleUser; // Password not required for Google users
-    },
-    minlength: 6
+    }
+    // Password validation is handled at the application level before hashing
   },
   otpVerified: {
     type: Boolean,

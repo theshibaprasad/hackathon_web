@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
+import Team from '@/models/Team';
 import { sendOTPVerificationEmail } from '@/lib/emailService';
 import { jwtOTPService } from '@/lib/jwtOTPService';
 import { rateLimiter } from '@/lib/rateLimiter';
@@ -71,7 +72,7 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    // Check if user already exists (verified)
+    // Check if email exists in User collection
     const existingUser = await User.findOne({ 
       $or: [
         { email: email.toLowerCase() },
@@ -90,6 +91,20 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
+    }
+
+    // Check if email exists in Team collection (as team leader or member)
+    const existingTeamMember = await Team.findOne({
+      $or: [
+        { 'leader.email': email.toLowerCase() },
+        { 'members.email': email.toLowerCase() }
+      ]
+    });
+    if (existingTeamMember) {
+      return NextResponse.json(
+        { error: 'This email is already registered as a team member or team leader' },
+        { status: 400 }
+      );
     }
 
     // Hash password

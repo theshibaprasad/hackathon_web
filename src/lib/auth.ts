@@ -29,19 +29,27 @@ export async function getServerSideUser(): Promise<User | null> {
     // Verify JWT token
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
     
-    // Return minimal auth data from token
+    // Connect to database and fetch actual user data
+    await connectDB();
+    const user = await User.findById(decoded.userId);
+    
+    if (!user) {
+      return null;
+    }
+    
+    // Return actual user data from database
     return {
-      _id: decoded.userId,
-      email: decoded.email,
-      firstName: '', // Will be fetched fresh from database
-      lastName: '', // Will be fetched fresh from database
-      phoneNumber: '', // Will be fetched fresh from database
-      isGoogleUser: false, // Will be fetched fresh from database
-      isOTPVerified: false, // Will be fetched fresh from database
-      isBoarding: false, // Will be fetched fresh from database
-      teamId: undefined, // Will be fetched fresh from database
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      _id: user._id.toString(),
+      email: user.email,
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
+      phoneNumber: user.phoneNumber || '',
+      isGoogleUser: user.isGoogleUser || false,
+      isOTPVerified: user.otpVerified || false,
+      isBoarding: user.isBoarding || false,
+      teamId: user.teamId?.toString(),
+      createdAt: user.createdAt?.toISOString() || new Date().toISOString(),
+      updatedAt: user.updatedAt?.toISOString() || new Date().toISOString()
     };
   } catch (error) {
     console.error('Auth verification error:', error);

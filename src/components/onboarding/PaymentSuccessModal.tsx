@@ -42,12 +42,14 @@ export default function PaymentSuccessModal({
     try {
       // Create invoice data
       const invoiceData = {
-        invoiceNumber: `INV-${paymentDetails.orderId.slice(-8).toUpperCase()}`,
+        invoiceNumber: `INV-${paymentDetails.orderId && paymentDetails.orderId !== 'N/A' 
+          ? paymentDetails.orderId.slice(-8).toUpperCase() 
+          : 'TEMP'}`,
         date: new Date().toLocaleDateString('en-IN'),
         customer: {
-          name: `${user.firstName} ${user.lastName}`,
+          name: `${formData.firstName || user.firstName} ${formData.lastName || user.lastName}`,
           email: user.email,
-          phone: user.phoneNumber,
+          phone: formData.phoneNumber || user.phoneNumber,
           address: `${formData.city}, ${formData.state} - ${formData.pin}`
         },
         items: [{
@@ -55,8 +57,8 @@ export default function PaymentSuccessModal({
           amount: paymentDetails.amount
         }],
         total: paymentDetails.amount,
-        paymentId: paymentDetails.paymentId,
-        orderId: paymentDetails.orderId
+        paymentId: paymentDetails.paymentId || 'N/A',
+        orderId: paymentDetails.orderId || 'N/A'
       };
 
       // Generate PDF content (simplified version)
@@ -170,11 +172,19 @@ export default function PaymentSuccessModal({
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Payment ID:</span>
-                        <span className="font-mono text-xs">{paymentDetails.paymentId.slice(-8)}</span>
+                        <span className="font-mono text-xs">
+                          {paymentDetails.paymentId && paymentDetails.paymentId !== 'N/A' 
+                            ? paymentDetails.paymentId.slice(-8) 
+                            : 'N/A'}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Order ID:</span>
-                        <span className="font-mono text-xs">{paymentDetails.orderId.slice(-8)}</span>
+                        <span className="font-mono text-xs">
+                          {paymentDetails.orderId && paymentDetails.orderId !== 'N/A' 
+                            ? paymentDetails.orderId.slice(-8) 
+                            : 'N/A'}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Type:</span>
@@ -195,7 +205,7 @@ export default function PaymentSuccessModal({
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-gray-600">Name:</span>
-                        <span className="font-semibold">{user.firstName} {user.lastName}</span>
+                        <span className="font-semibold">{formData.firstName || user.firstName} {formData.lastName || user.lastName}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Email:</span>

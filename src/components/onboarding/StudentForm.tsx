@@ -40,8 +40,8 @@ export default function StudentForm({ data, updateData, onNext, onPrev, user }: 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    // Basic information validation (only for Google users who haven't verified OTP)
-    if (user?.isGoogleUser && !user?.isOTPVerified) {
+    // Basic information validation (for Google users or when basic info is missing)
+    if (user?.isGoogleUser || !data.firstName || !data.lastName || !data.phoneNumber) {
       if (!data.firstName?.trim()) newErrors.firstName = 'First name is required';
       if (!data.lastName?.trim()) newErrors.lastName = 'Last name is required';
       if (!data.phoneNumber?.trim()) newErrors.phoneNumber = 'Phone number is required';
@@ -96,6 +96,26 @@ export default function StudentForm({ data, updateData, onNext, onPrev, user }: 
 
   const handleNext = () => {
     if (validateForm()) {
+      // Format phone number before proceeding
+      if (data.phoneNumber?.trim()) {
+        let phoneNumber = data.phoneNumber;
+        
+        // If it's just 10 digits, add +91
+        if (/^\d{10}$/.test(phoneNumber)) {
+          phoneNumber = '+91' + phoneNumber;
+        }
+        // If it starts with 91 and has 10 more digits, add +
+        else if (/^91\d{10}$/.test(phoneNumber)) {
+          phoneNumber = '+' + phoneNumber;
+        }
+        // If it starts with 0 and has 10 digits, remove 0 and add +91
+        else if (/^0\d{9}$/.test(phoneNumber)) {
+          phoneNumber = '+91' + phoneNumber.slice(1);
+        }
+        
+        // Update the data with formatted phone number
+        updateData({ phoneNumber });
+      }
       onNext();
     }
   };
@@ -150,8 +170,8 @@ export default function StudentForm({ data, updateData, onNext, onPrev, user }: 
         </p>
       </div>
 
-      {/* Basic Information - Only show for Google users who haven't verified OTP */}
-      {user?.isGoogleUser && !user?.isOTPVerified && (
+      {/* Basic Information - Show for Google users or when basic info is missing */}
+      {(user?.isGoogleUser || !data.firstName || !data.lastName || !data.phoneNumber) && (
         <div className="space-y-6">
           <div className="flex items-center space-x-3 mb-6">
             <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">

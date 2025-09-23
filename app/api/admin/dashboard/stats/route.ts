@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import Admin from '@/models/Admin';
+import Team from '@/models/Team';
 import HackathonRegistration from '@/models/HackathonRegistration';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
@@ -10,7 +11,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 export async function GET(request: NextRequest) {
   try {
     // Verify admin authentication
-    const token = request.cookies.get('adminToken')?.value;
+    const token = request.cookies.get('admin-token')?.value;
     if (!token) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
@@ -33,6 +34,7 @@ export async function GET(request: NextRequest) {
     const [
       totalUsers,
       totalAdmins,
+      totalTeams,
       totalRegistrations,
       activeRegistrations,
       recentUsers,
@@ -43,6 +45,9 @@ export async function GET(request: NextRequest) {
       
       // Total admins count
       Admin.countDocuments({ isActive: true }),
+      
+      // Total teams count - directly from Team collection
+      Team.countDocuments(),
       
       // Total hackathon registrations
       HackathonRegistration.countDocuments(),
@@ -60,14 +65,6 @@ export async function GET(request: NextRequest) {
         createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
       })
     ]);
-
-    // Calculate teams (assuming each team has multiple registrations)
-    const teamStats = await HackathonRegistration.aggregate([
-      { $match: { status: 'registered' } },
-      { $group: { _id: '$teamId', count: { $sum: 1 } } },
-      { $count: 'totalTeams' }
-    ]);
-    const totalTeams = teamStats[0]?.totalTeams || 0;
 
     // Calculate email stats (this would need to be tracked in a separate collection)
     // For now, we'll estimate based on registrations

@@ -81,8 +81,8 @@ export default function OnboardingClient({ user }: OnboardingClientProps) {
   const [formData, setFormData] = useState<OnboardingFormData>({
     ...initialData,
     userId: user._id,
-    firstName: user.firstName,
-    lastName: user.lastName,
+    firstName: user.firstName || '',
+    lastName: user.lastName || '',
     email: user.email,
     phoneNumber: user.phoneNumber || '',
     // Initialize education and job objects
@@ -284,13 +284,42 @@ export default function OnboardingClient({ user }: OnboardingClientProps) {
       const data = await response.json();
 
       if (response.ok) {
-        // Use form data for payment details since they're already updated after successful payment
-        setPaymentDetails({
-          paymentId: formData.razorpayPaymentId || 'N/A',
-          orderId: formData.razorpayOrderId || 'N/A',
-          amount: formData.paymentAmount,
-          isEarlyBird: formData.isEarlyBird
-        });
+        // Fetch payment details from database to get the actual payment IDs
+        try {
+          const paymentResponse = await fetch('/api/payments/latest', {
+            method: 'GET',
+            credentials: 'include'
+          });
+          
+          if (paymentResponse.ok) {
+            const paymentData = await paymentResponse.json();
+            console.log('OnboardingClient - Fetched payment details:', paymentData);
+            
+            setPaymentDetails({
+              paymentId: paymentData.payment?.razorpayPaymentId || formData.razorpayPaymentId || 'N/A',
+              orderId: paymentData.payment?.razorpayOrderId || formData.razorpayOrderId || 'N/A',
+              amount: paymentData.payment?.amount || formData.paymentAmount,
+              isEarlyBird: paymentData.payment?.isEarlyBird || formData.isEarlyBird
+            });
+          } else {
+            // Fallback to form data if API call fails
+            setPaymentDetails({
+              paymentId: formData.razorpayPaymentId || 'N/A',
+              orderId: formData.razorpayOrderId || 'N/A',
+              amount: formData.paymentAmount,
+              isEarlyBird: formData.isEarlyBird
+            });
+          }
+        } catch (paymentError) {
+          console.error('Error fetching payment details:', paymentError);
+          // Fallback to form data if API call fails
+          setPaymentDetails({
+            paymentId: formData.razorpayPaymentId || 'N/A',
+            orderId: formData.razorpayOrderId || 'N/A',
+            amount: formData.paymentAmount,
+            isEarlyBird: formData.isEarlyBird
+          });
+        }
         
         // Show payment success modal
         setShowPaymentSuccess(true);

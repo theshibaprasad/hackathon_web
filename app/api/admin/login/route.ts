@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     );
 
     // Set HTTP-only cookie
-    response.cookies.set('adminToken', token, {
+    response.cookies.set('admin-token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',

@@ -78,7 +78,7 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const response = await fetch('/api/settings/early-bird');
+        const response = await fetch('/api/settings/registration-status');
         if (response.ok) {
           const data = await response.json();
           setEarlyBirdOfferEnabled(data.settings.earlyBirdEnabled);
@@ -251,6 +251,16 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
       const phoneNumber = userData?.phoneNumber || data.phoneNumber;
       if (!phoneNumber) {
         throw new Error('Phone number is required. Please go back and complete your profile.');
+      }
+      
+      // Update userData with form data if it's more complete
+      if (data.firstName && data.lastName && data.phoneNumber) {
+        setUserData(prev => ({
+          ...prev,
+          firstName: data.firstName || prev.firstName,
+          lastName: data.lastName || prev.lastName,
+          phoneNumber: data.phoneNumber || prev.phoneNumber
+        }));
       }
       
       // Load Razorpay script
@@ -487,8 +497,8 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
             <div className="text-center mb-3">
               <div className="h-6 mb-2"></div>
               <CardTitle className="text-lg text-gray-900 mb-1">Regular Plan</CardTitle>
-            <div className="text-3xl font-bold text-gray-900">
-              ₹{currentPricing.regular}
+              <div className="text-3xl font-bold text-gray-900">
+                ₹{currentPricing.regular}
               </div>
             </div>
             <ul className="space-y-2 text-xs text-gray-600">
@@ -529,20 +539,20 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
             onClick={() => handleEarlyBirdToggle(true)}>
               <CardContent className="p-4">
                 <div className="text-center mb-3">
-                <div className="flex items-center justify-center mb-2">
-                    <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold animate-pulse px-2 py-1 rounded-full">
-                    <Star className="w-3 h-3 mr-1" />
-                      50% OFF
-                  </Badge>
-                </div>
+                  <div className="flex items-center justify-center mb-2">
+                    <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold animate-pulse px-3 py-1 rounded-full shadow-lg">
+                      <Star className="w-3 h-3 mr-1" />
+                      LIMITED TIME OFFER
+                    </Badge>
+                  </div>
                   <CardTitle className="text-lg text-gray-900 mb-1">Novothon Early Bird</CardTitle>
                   <div className="flex items-center justify-center gap-2 mb-1">
-                <div className="text-3xl font-bold text-gray-900">
-                  ₹{currentPricing.earlyBird}
-                </div>
-                <div className="text-sm text-gray-500 line-through">
-                  ₹{currentPricing.regular}
-                </div>
+                    <div className="text-3xl font-bold text-gray-900">
+                      ₹{currentPricing.earlyBird}
+                    </div>
+                    <div className="text-sm text-gray-500 line-through">
+                      ₹{currentPricing.regular}
+                    </div>
                   </div>
                   <div className="text-xs text-orange-600 font-medium">
                     Save ₹{currentPricing.regular - currentPricing.earlyBird}!
@@ -626,10 +636,8 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
           <div className="space-y-2 text-sm">
             <div className="flex justify-between items-center">
               <span className="text-gray-700">Registration Fee:</span>
-              <span className={`font-semibold text-base transition-all duration-500 ${
-                isAnimating ? 'text-red-500 scale-110' : 'text-gray-900'
-              }`}>
-                ₹{finalAmount}
+              <span className="font-semibold text-base text-gray-900">
+                ₹{currentPricing.regular}
               </span>
             </div>
             {isEarlyBird && earlyBirdOfferEnabled && (
@@ -638,11 +646,13 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
                 <span className="text-green-600 font-bold text-xs">
                   -₹{currentPricing.regular - currentPricing.earlyBird}
                 </span>
-            </div>
+              </div>
             )}
             <div className="border-t border-blue-200 pt-2 flex justify-between items-center">
               <span className="font-bold text-base text-gray-900">Total Amount:</span>
-              <span className="font-bold text-xl text-blue-600">
+              <span className={`font-bold text-xl text-blue-600 transition-all duration-500 ${
+                isAnimating ? 'scale-110' : ''
+              }`}>
                 ₹{finalAmount}
               </span>
             </div>

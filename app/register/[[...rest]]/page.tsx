@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,6 +32,8 @@ export default function RegisterPage() {
   const [isVerifyingOTP, setIsVerifyingOTP] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [otpToken, setOtpToken] = useState('');
+  const [registrationEnabled, setRegistrationEnabled] = useState(true);
+  const [checkingRegistration, setCheckingRegistration] = useState(true);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const { toast } = useToast();
   const router = useRouter();
@@ -55,6 +57,25 @@ export default function RegisterPage() {
 
   const passwordValidation = validatePassword(formData.password);
   const passwordsMatch = formData.password === formData.confirmPassword && formData.confirmPassword.length > 0;
+
+  // Check registration status on component mount
+  useEffect(() => {
+    const checkRegistrationStatus = async () => {
+      try {
+        const response = await fetch('/api/settings/registration-status');
+        if (response.ok) {
+          const data = await response.json();
+          setRegistrationEnabled(data.settings.hackathonRegistrationEnabled);
+        }
+      } catch (error) {
+        console.error('Error checking registration status:', error);
+      } finally {
+        setCheckingRegistration(false);
+      }
+    };
+
+    checkRegistrationStatus();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -241,6 +262,17 @@ export default function RegisterPage() {
     e.preventDefault();
     setIsLoading(true);
 
+    // Check if registration is enabled
+    if (!registrationEnabled) {
+      toast({
+        title: "Registration Closed",
+        description: "Registration is currently closed. Please contact the organizers for more information.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
+
     // Validation
     if (!agreeToTerms) {
       toast({
@@ -341,6 +373,94 @@ export default function RegisterPage() {
       setIsLoading(false);
     }
   };
+
+  // Show registration closed message if registration is disabled
+  if (!checkingRegistration && !registrationEnabled) {
+    return (
+      <div className="min-h-screen flex flex-col lg:flex-row gap-0">
+        {/* Left side - Registration Closed Message */}
+        <motion.div 
+          className="w-full lg:w-1/2 flex items-center justify-center lg:justify-end px-4 lg:pr-4 py-8 lg:py-0"
+          initial={{ x: 0, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 1.2, ease: [0.25, 0.1, 0.25, 1] }}
+        >
+          <motion.div 
+            className="w-full max-w-md"
+            initial={{ x: -100, opacity: 0, scale: 0.7 }}
+            animate={{ x: 0, opacity: 1, scale: 1 }}
+            transition={{ duration: 1.2, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+          >
+            <motion.div 
+              className="text-center mb-6 lg:mb-8"
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+            >
+              <h1 className="text-2xl lg:text-3xl font-bold text-foreground mb-2">Registration Closed</h1>
+              <p className="text-sm lg:text-base text-muted-foreground">
+                Registration for the hackathon is currently closed.<br />
+                <span className="text-xs text-muted-foreground">Please contact the organizers for more information.</span>
+              </p>
+            </motion.div>
+            
+            <motion.div
+              initial={{ y: 40, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
+            >
+              <Card className="shadow-2xl border-0 bg-card/80 backdrop-blur-sm rounded-2xl">
+                <CardContent className="pt-6">
+                  <div className="space-y-6">
+                    <div className="text-center">
+                      <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span className="text-2xl">🚫</span>
+                      </div>
+                      <h3 className="text-xl font-semibold text-foreground mb-2">Registration Unavailable</h3>
+                      <p className="text-muted-foreground mb-6">
+                        We're sorry, but registration for this hackathon has been closed. 
+                        If you have any questions, please contact the organizers.
+                      </p>
+                      <Button
+                        onClick={() => router.push('/')}
+                        className="w-full h-12 rounded-lg font-medium transition-all duration-200 hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/25"
+                      >
+                        Return to Home
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </motion.div>
+        </motion.div>
+
+        {/* Right side - SVG Image (Desktop Only) */}
+        <motion.div 
+          className="hidden lg:flex lg:w-1/2 bg-white items-center justify-start pl-4"
+          initial={{ x: 0, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 1.2, ease: [0.25, 0.1, 0.25, 1] }}
+        >
+          <motion.div 
+            className="max-w-lg w-full"
+            initial={{ x: 100, opacity: 0, scale: 0.7 }}
+            animate={{ x: 0, opacity: 1, scale: 1 }}
+            transition={{ duration: 1.2, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+          >
+            <Image
+              src="/Register_pic.svg"
+              alt="Register Illustration"
+              width={600}
+              height={400}
+              className="w-full h-auto"
+              priority
+            />
+          </motion.div>
+        </motion.div>
+      </div>
+    );
+  }
 
   if (showOTPVerification) {
     return (

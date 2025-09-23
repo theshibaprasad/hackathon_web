@@ -48,8 +48,7 @@ const AdminSchema = new Schema<IAdmin>({
   timestamps: true
 });
 
-// Index for faster queries
-AdminSchema.index({ username: 1 });
-AdminSchema.index({ email: 1 });
+// Indexes are automatically created by unique: true in field definitions
+// No need for explicit index creation
 
 export default mongoose.models.Admin || mongoose.model<IAdmin>('Admin', AdminSchema);

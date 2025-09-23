@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
+import Team from '@/models/Team';
 import { generateRandomPassword } from '@/lib/passwordGenerator';
 
 // Initialize Firebase Admin SDK
@@ -141,6 +142,20 @@ export async function POST(request: NextRequest) {
 
       return response;
     } else {
+      // Check if email exists in Team collection (as team leader or member)
+      const existingTeamMember = await Team.findOne({
+        $or: [
+          { 'leader.email': email.toLowerCase() },
+          { 'members.email': email.toLowerCase() }
+        ]
+      });
+      if (existingTeamMember) {
+        return NextResponse.json(
+          { error: 'This email is already registered as a team member or team leader' },
+          { status: 400 }
+        );
+      }
+
       // New user - create account
       const generatedPassword = generateRandomPassword();
       const hashedPassword = await bcrypt.hash(generatedPassword, 12);

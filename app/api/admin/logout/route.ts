@@ -8,7 +8,7 @@ export async function POST() {
     );
 
     // Clear the admin token cookie
-    response.cookies.set('adminToken', '', {
+    response.cookies.set('admin-token', '', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',

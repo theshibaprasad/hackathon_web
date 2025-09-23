@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,8 @@ import {
   CheckCircle,
   AlertCircle,
   ExternalLink,
-  X
+  X,
+  Clock
 } from "lucide-react";
 
 export const ProjectSubmission = () => {
@@ -32,6 +33,28 @@ export const ProjectSubmission = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState<'draft' | 'submitted'>('draft');
+  const [hackathonStatus, setHackathonStatus] = useState<'live' | 'stop'>('live');
+
+  // Fetch hackathon status
+  useEffect(() => {
+    const fetchHackathonStatus = async () => {
+      try {
+        const response = await fetch('/api/settings/hackathon-status', {
+          method: 'GET',
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setHackathonStatus(data.hackathonStatus);
+        }
+      } catch (error) {
+        console.error('Error fetching hackathon status:', error);
+      }
+    };
+
+    fetchHackathonStatus();
+  }, []);
 
   const handleInputChange = (field: string, value: string) => {
     setProjectData(prev => ({
@@ -78,6 +101,43 @@ export const ProjectSubmission = () => {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
+
+  // Show simple message when hackathon is not live
+  if (hackathonStatus === 'stop') {
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold text-foreground">Project Submission</h2>
+            <p className="text-muted-foreground mt-2">
+              Submit your hackathon project details and files
+            </p>
+          </div>
+          <Badge variant="destructive" className="text-sm">
+            <Clock className="w-4 h-4 mr-1" />
+            Hackathon Stopped
+          </Badge>
+        </div>
+
+        {/* Simple Message */}
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center p-8">
+            <Clock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Hackathon is not live now
+            </h3>
+            <p className="text-gray-600 mb-4">
+              When it will live you can post your project. Please check back later.
+            </p>
+            <Badge variant="outline" className="text-sm">
+              Project submission is currently disabled
+            </Badge>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

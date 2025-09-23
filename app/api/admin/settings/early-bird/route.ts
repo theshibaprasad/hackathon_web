@@ -36,15 +36,17 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get both settings from database with default values
+    // Get all settings from database with default values
     const earlyBirdEnabled = await (Settings as ISettingsModel).getSetting('early_bird_enabled', true);
     const hackathonRegistrationEnabled = await (Settings as ISettingsModel).getSetting('hackathon_registration_enabled', true);
+    const hackathonStatus = await (Settings as ISettingsModel).getSetting('hackathon_status', 'live');
     
     return NextResponse.json({
       success: true,
       settings: {
         earlyBirdEnabled,
-        hackathonRegistrationEnabled
+        hackathonRegistrationEnabled,
+        hackathonStatus
       }
     });
   } catch (error) {
@@ -88,7 +90,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { earlyBirdEnabled, hackathonRegistrationEnabled } = await request.json();
+    const { earlyBirdEnabled, hackathonRegistrationEnabled, hackathonStatus } = await request.json();
 
     // Validate input
     if (typeof earlyBirdEnabled !== 'boolean') {
@@ -105,7 +107,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Update both settings in database
+    if (hackathonStatus && !['live', 'stop'].includes(hackathonStatus)) {
+      return NextResponse.json(
+        { error: 'Invalid hackathonStatus value. Must be "live" or "stop"' },
+        { status: 400 }
+      );
+    }
+
+    // Update all settings in database
     await (Settings as ISettingsModel).setSetting(
       'early_bird_enabled', 
       earlyBirdEnabled, 
@@ -118,12 +127,21 @@ export async function POST(request: NextRequest) {
       'Controls whether hackathon registration is open for new users'
     );
 
+    if (hackathonStatus) {
+      await (Settings as ISettingsModel).setSetting(
+        'hackathon_status', 
+        hackathonStatus, 
+        'Controls whether the hackathon is live (allows project submission) or stopped'
+      );
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Settings updated successfully',
       settings: {
         earlyBirdEnabled,
-        hackathonRegistrationEnabled
+        hackathonRegistrationEnabled,
+        hackathonStatus: hackathonStatus || 'live'
       }
     });
   } catch (error) {

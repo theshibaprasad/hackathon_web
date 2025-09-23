@@ -79,7 +79,7 @@ export const CompanyHeader = () => {
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button size="sm" className="bg-primary hover:bg-primary/90" onClick={handleSignUp}>
-              Signup
+              Register
             </Button>
           </motion.div>
         </div>

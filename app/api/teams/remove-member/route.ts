@@ -3,16 +3,13 @@ import connectDB from '@/lib/mongodb';
 import Team from '@/models/Team';
 import jwt from 'jsonwebtoken';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { teamId: string } }
-) {
+export async function DELETE(request: NextRequest) {
   try {
-    const { teamId } = params;
+    const { teamId, memberId } = await request.json();
 
-    if (!teamId) {
+    if (!teamId || !memberId) {
       return NextResponse.json(
-        { error: 'Team ID is required' },
+        { error: 'Missing required fields: teamId and memberId are required' },
         { status: 400 }
       );
     }
@@ -39,7 +36,7 @@ export async function GET(
 
     await connectDB();
 
-    // Find team by ID
+    // Get team
     const team = await Team.findById(teamId);
     if (!team) {
       return NextResponse.json(
@@ -48,38 +45,51 @@ export async function GET(
       );
     }
 
-    // Check if user is part of this team
+    // Check if user is the team leader
     const isLeader = team.leader.userId.toString() === decoded.userId;
-    const isMember = team.members.some((member: any) => member.userId.toString() === decoded.userId);
-    const isTeamMember = isLeader || isMember;
-
-    if (!isTeamMember) {
+    if (!isLeader) {
       return NextResponse.json(
-        { error: 'Unauthorized - Not a team member' },
+        { error: 'Unauthorized - Only team leader can remove members' },
         { status: 403 }
       );
     }
 
-    // Return team members data
+    // Check if member exists
+    const memberIndex = team.members.findIndex(
+      (member: any) => member.userId.toString() === memberId
+    );
+    
+    if (memberIndex === -1) {
+      return NextResponse.json(
+        { error: 'Member not found in this team' },
+        { status: 404 }
+      );
+    }
+
+    // Remove member from team
+    const removedMember = team.members[memberIndex];
+    team.members.splice(memberIndex, 1);
+    await team.save();
+
     return NextResponse.json({
       success: true,
+      message: 'Member removed successfully',
+      removedMember: {
+        name: removedMember.name,
+        email: removedMember.email
+      },
       team: {
-        _id: team._id,
+        id: team._id,
         teamName: team.teamName,
-        leader: team.leader,
-        members: team.members,
-        totalMembers: team.members.length + 1, // +1 for leader
-        createdAt: team.createdAt,
-        updatedAt: team.updatedAt
+        members: team.members
       }
     });
 
   } catch (error) {
-    console.error('Error fetching team members:', error);
+    console.error('Error removing team member:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );
   }
 }
-

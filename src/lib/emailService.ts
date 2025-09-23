@@ -184,6 +184,77 @@ export const sendTeamInvitationEmail = async (
   });
 };
 
+// Enhanced team invitation email template with theme and problem statement
+export const sendEnhancedTeamInvitationEmail = async (
+  inviteeEmail: string, 
+  inviteeName: string,
+  teamName: string,
+  leaderName: string,
+  hackathonName: string,
+  theme?: string,
+  problemStatement?: string
+) => {
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="color: #333; margin-bottom: 10px;">🎉 Team Invitation</h1>
+        <p style="color: #666; font-size: 16px;">Hello ${inviteeName}, you've been invited to join a team!</p>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <h2 style="color: #333; margin-bottom: 15px;">${leaderName} wants you to join their team!</h2>
+        <div style="background: white; padding: 20px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #4F46E5;">
+          <p style="margin: 8px 0; font-size: 16px;"><strong>🏆 Team:</strong> ${teamName}</p>
+          <p style="margin: 8px 0; font-size: 16px;"><strong>🎯 Hackathon:</strong> ${hackathonName}</p>
+          <p style="margin: 8px 0; font-size: 16px;"><strong>👑 Team Leader:</strong> ${leaderName}</p>
+          ${theme ? `<p style="margin: 8px 0; font-size: 16px;"><strong>🎨 Theme:</strong> ${theme}</p>` : ''}
+        </div>
+        
+        ${problemStatement ? `
+        <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #ffc107;">
+          <h3 style="color: #856404; margin: 0 0 10px 0; font-size: 16px;">📋 Problem Statement</h3>
+          <p style="color: #856404; line-height: 1.6; margin: 0; font-size: 14px;">
+            ${problemStatement}
+          </p>
+        </div>
+        ` : ''}
+        
+        <p style="color: #666; line-height: 1.6; margin: 15px 0;">
+          Join this team to collaborate on an exciting hackathon project and work together to build something amazing! 
+          This is your chance to showcase your skills and be part of an innovative solution.
+        </p>
+      </div>
+      
+      
+      <div style="background: #e3f2fd; padding: 15px; border-radius: 6px; margin: 20px 0;">
+        <h3 style="color: #1976d2; margin: 0 0 10px 0; font-size: 16px;">💡 What to expect:</h3>
+        <ul style="color: #1976d2; line-height: 1.6; margin: 0; padding-left: 20px; font-size: 14px;">
+          <li>Collaborate with talented team members</li>
+          <li>Work on innovative solutions and projects</li>
+          <li>Learn new technologies and skills</li>
+          <li>Network with other participants</li>
+          <li>Compete for exciting prizes and recognition</li>
+        </ul>
+      </div>
+      
+      <div style="text-align: center; margin: 30px 0;">
+        <p style="color: #666; font-size: 14px;">
+          ⏰ This invitation will expire in 7 days. Don't miss out on this amazing opportunity!
+        </p>
+        <p style="color: #666; font-size: 14px;">
+          Need help? Contact us at support@novothonplatform.com
+        </p>
+      </div>
+    </div>
+  `;
+
+  return await sendEmail({
+    to: inviteeEmail,
+    subject: `🎉 Team Invitation: Join ${teamName} for ${hackathonName} - ${leaderName}`,
+    html,
+  });
+};
+
 // Hackathon update email template
 export const sendHackathonUpdateEmail = async (
   userEmail: string,

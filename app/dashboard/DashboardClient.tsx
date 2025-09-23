@@ -7,6 +7,7 @@ import { TeamMembers } from "@/components/TeamMembers";
 import { ProjectSubmission } from "@/components/ProjectSubmission";
 import { Header } from "@/components/Header";
 import { HackathonDetails } from "@/components/HackathonDetails";
+import { useToast } from "@/hooks/use-toast";
 import { 
   LayoutDashboard, 
   Users, 
@@ -38,17 +39,19 @@ interface DashboardClientProps {
 }
 
 export default function DashboardClient({ user }: DashboardClientProps) {
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('hackathon');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [teamData, setTeamData] = useState<TeamData | null>(null);
   const [showRegistrationMessage, setShowRegistrationMessage] = useState(false);
   const [currentUser, setCurrentUser] = useState<DashboardUser>(user);
   const [loading, setLoading] = useState(true);
+  const [hackathonStatus, setHackathonStatus] = useState<'live' | 'stop'>('live');
 
   // Use isBoarding status instead of hackathon registration
   const isHackathonRegistered = currentUser.isBoarding;
 
-  // Fetch fresh user data on component mount
+  // Fetch fresh user data and hackathon status on component mount
   useEffect(() => {
     const fetchFreshUserData = async () => {
       try {
@@ -68,7 +71,24 @@ export default function DashboardClient({ user }: DashboardClientProps) {
       }
     };
 
+    const fetchHackathonStatus = async () => {
+      try {
+        const response = await fetch('/api/settings/hackathon-status', {
+          method: 'GET',
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setHackathonStatus(data.hackathonStatus);
+        }
+      } catch (error) {
+        console.error('Error fetching hackathon status:', error);
+      }
+    };
+
     fetchFreshUserData();
+    fetchHackathonStatus();
   }, []);
 
   // Fetch team data if user has a teamId
@@ -127,6 +147,16 @@ export default function DashboardClient({ user }: DashboardClientProps) {
     if (menuItem?.disabled) {
       setShowRegistrationMessage(true);
       setTimeout(() => setShowRegistrationMessage(false), 3000);
+      return;
+    }
+
+    // Check if trying to access project submission when hackathon is not live
+    if (tabId === 'project-submission' && hackathonStatus === 'stop') {
+      toast({
+        title: "Hackathon is not live now",
+        description: "When it will live you can post your project. Please check back later.",
+        variant: "destructive",
+      });
       return;
     }
     
