@@ -33,29 +33,23 @@ export async function GET(request: NextRequest) {
     // Get payment information for each team
     const teamsWithPayments = await Promise.all(
       teams.map(async (team) => {
-        // Get payment for team leader
+        // Get payment for team leader only (team members don't pay individually)
         const leaderPayment = await Payment.findOne({ 
           userId: team.leader.userId,
           paymentStatus: 'success'
         }).lean();
 
-        // Get payments for team members
-        const memberPayments = await Promise.all(
-          team.members.map(async (member) => {
-            return await Payment.findOne({ 
-              userId: member.userId,
-              paymentStatus: 'success'
-            }).lean();
-          })
-        );
+        // Team members don't have individual payments - they're covered by team leader's payment
+        // Only the team leader pays the registration fee, not individual members
+        const memberPayments = team.members.map(() => null); // All members show as "covered by team payment"
 
         return {
           ...team,
           paymentInfo: {
             leaderPayment,
-            memberPayments: memberPayments.filter(p => p !== null),
-            totalPaid: (leaderPayment?.amount || 0) + memberPayments.reduce((sum, p) => sum + (p?.amount || 0), 0),
-            isFullyPaid: leaderPayment && memberPayments.every(p => p !== null)
+            memberPayments, // All null - members don't pay individually
+            totalPaid: leaderPayment?.amount || 0,
+            isFullyPaid: !!leaderPayment // Only team leader needs to pay
           }
         };
       })

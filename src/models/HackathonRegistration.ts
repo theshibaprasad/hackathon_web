@@ -39,7 +39,11 @@ const HackathonRegistrationSchema: Schema = new Schema({
     required: false
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  // Prevent automatic collection creation
+  collection: 'hackathonregistrations',
+  // Only create collection when explicitly needed
+  autoCreate: false
 });
 
 // Create compound index to ensure one registration per user per hackathon

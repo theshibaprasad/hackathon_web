@@ -75,7 +75,11 @@ export default function TeamDetailsModal({ team, isOpen, onClose }: TeamDetailsM
     }
   };
 
-  const getPaymentStatus = (payment: any) => {
+  const getPaymentStatus = (payment: any, isMember: boolean = false) => {
+    if (isMember) {
+      // Team members don't pay individually - they're covered by team leader's payment
+      return "Covered by team payment";
+    }
     if (!payment) return "Not paid";
     return `₹${payment.amount} - ${payment.paymentStatus}`;
   };
@@ -157,130 +161,106 @@ export default function TeamDetailsModal({ team, isOpen, onClose }: TeamDetailsM
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between mb-4">
-                    <span className="font-medium">Overall Status</span>
-                    {getStatusBadge(team.paymentInfo.isFullyPaid ? "success" : "pending")}
+                    <span className="font-medium">Team Payment Status</span>
+                    <div className="flex items-center space-x-2">
+                      {getStatusBadge(team.paymentInfo.leaderPayment ? "success" : "pending")}
+                      <span className="text-sm text-gray-600">
+                        {team.paymentInfo.leaderPayment ? 
+                          `₹${team.paymentInfo.leaderPayment.amount} paid by team leader` : 
+                          'Team leader payment pending'
+                        }
+                      </span>
+                    </div>
                   </div>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <Shield className="w-4 h-4 text-red-600" />
-                        <span className="font-medium">Team Leader</span>
+                  
+                  {/* Payment Explanation */}
+                  <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-start space-x-2">
+                      <div className="flex-shrink-0">
+                        <CheckCircle className="w-4 h-4 text-blue-600 mt-0.5" />
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-sm">{getPaymentStatus(team.paymentInfo.leaderPayment)}</span>
-                        {team.paymentInfo.leaderPayment && getStatusBadge(team.paymentInfo.leaderPayment.paymentStatus)}
+                      <div>
+                        <p className="text-sm text-blue-800 font-medium">Team Payment Model</p>
+                        <p className="text-xs text-blue-600 mt-1">
+                          Only the team leader pays the registration fee. Team members are automatically covered by this single payment.
+                        </p>
                       </div>
                     </div>
-                    {team.members.map((member, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div className="flex items-center space-x-3">
-                          <Users className="w-4 h-4 text-blue-600" />
-                          <span className="font-medium">{member.name}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm">{getPaymentStatus(team.paymentInfo.memberPayments[index])}</span>
-                          {team.paymentInfo.memberPayments[index] && getStatusBadge(team.paymentInfo.memberPayments[index].paymentStatus)}
+                  </div>
+                  
+                  {/* Team Leader Payment Details */}
+                  <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg">
+                    <div className="flex items-start space-x-4">
+                      <div className="flex-shrink-0">
+                        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                          <Shield className="w-5 h-5 text-green-600" />
                         </div>
                       </div>
-                    ))}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <h4 className="text-sm font-semibold text-gray-900">{team.leader.name}</h4>
+                          <Badge className="bg-green-100 text-green-800 text-xs">Team Leader</Badge>
+                        </div>
+                        <div className="space-y-1 mb-3">
+                          <div className="flex items-center space-x-2 text-sm text-gray-600">
+                            <Mail className="w-3 h-3" />
+                            <span>{team.leader.email}</span>
+                          </div>
+                          <div className="flex items-center space-x-2 text-sm text-gray-600">
+                            <Phone className="w-3 h-3" />
+                            <span>{team.leader.phone}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm font-medium text-gray-700">Payment Status:</span>
+                          <span className="text-sm">{getPaymentStatus(team.paymentInfo.leaderPayment)}</span>
+                          {team.paymentInfo.leaderPayment && getStatusBadge(team.paymentInfo.leaderPayment.paymentStatus)}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Team Leader Details */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Shield className="w-5 h-5 mr-2 text-red-600" />
-                    Team Leader
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-3">
-                      <div className="flex items-center space-x-2">
-                        <Users className="w-4 h-4 text-gray-500" />
-                        <span className="font-medium">{team.leader.name}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Mail className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm">{team.leader.email}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Phone className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm">{team.leader.phone}</span>
-                      </div>
-                    </div>
-                    <div className="space-y-3">
-                      <div className="flex items-center space-x-2">
-                        <DollarSign className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm">
-                          {team.paymentInfo.leaderPayment ? 
-                            `Paid ₹${team.paymentInfo.leaderPayment.amount}` : 
-                            'Not paid'
-                          }
-                        </span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Calendar className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm">
-                          {team.paymentInfo.leaderPayment ? 
-                            `Paid on ${new Date(team.paymentInfo.leaderPayment.createdAt).toLocaleDateString()}` : 
-                            'No payment'
-                          }
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
 
               {/* Team Members */}
               {team.members.length > 0 && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Users className="w-5 h-5 mr-2 text-blue-600" />
-                      Team Members ({team.members.length})
+                    <CardTitle className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <Users className="w-5 h-5 mr-2 text-blue-600" />
+                        Team Members
+                      </div>
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                        {team.members.length} member{team.members.length !== 1 ? 's' : ''}
+                      </Badge>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
+                    <div className="grid gap-3">
                       {team.members.map((member, index) => (
-                        <div key={index} className="border rounded-lg p-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <div className="flex items-center space-x-2">
-                                <Users className="w-4 h-4 text-gray-500" />
-                                <span className="font-medium">{member.name}</span>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <Mail className="w-4 h-4 text-gray-500" />
-                                <span className="text-sm">{member.email}</span>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <Phone className="w-4 h-4 text-gray-500" />
-                                <span className="text-sm">{member.phone}</span>
+                        <div key={index} className="p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                          <div className="flex items-start space-x-4">
+                            <div className="flex-shrink-0">
+                              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                <Users className="w-5 h-5 text-blue-600" />
                               </div>
                             </div>
-                            <div className="space-y-2">
-                              <div className="flex items-center space-x-2">
-                                <DollarSign className="w-4 h-4 text-gray-500" />
-                                <span className="text-sm">
-                                  {team.paymentInfo.memberPayments[index] ? 
-                                    `Paid ₹${team.paymentInfo.memberPayments[index].amount}` : 
-                                    'Not paid'
-                                  }
-                                </span>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center space-x-2 mb-2">
+                                <h4 className="text-sm font-semibold text-gray-900">{member.name}</h4>
+                                <Badge variant="outline" className="text-xs">Member</Badge>
                               </div>
-                              <div className="flex items-center space-x-2">
-                                <Calendar className="w-4 h-4 text-gray-500" />
-                                <span className="text-sm">
-                                  {team.paymentInfo.memberPayments[index] ? 
-                                    `Paid on ${new Date(team.paymentInfo.memberPayments[index].createdAt).toLocaleDateString()}` : 
-                                    'No payment'
-                                  }
-                                </span>
+                              <div className="space-y-1">
+                                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                                  <Mail className="w-3 h-3" />
+                                  <span>{member.email}</span>
+                                </div>
+                                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                                  <Phone className="w-3 h-3" />
+                                  <span>{member.phone}</span>
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -333,9 +313,12 @@ export default function TeamDetailsModal({ team, isOpen, onClose }: TeamDetailsM
                     </div>
                     <div className="text-center p-4 bg-green-50 rounded-lg">
                       <p className="text-2xl font-bold text-green-600">
-                        {team.paymentInfo.memberPayments.filter(p => p).length + (team.paymentInfo.leaderPayment ? 1 : 0)}
+                        {team.paymentInfo.leaderPayment ? "1" : "0"}
                       </p>
-                      <p className="text-sm text-gray-600">Paid Members</p>
+                      <p className="text-sm text-gray-600">Payment Status</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {team.paymentInfo.leaderPayment ? "Paid by Leader" : "Pending Payment"}
+                      </p>
                     </div>
                     <div className="text-center p-4 bg-purple-50 rounded-lg">
                       <p className="text-2xl font-bold text-purple-600">₹{team.paymentInfo.totalPaid}</p>
@@ -361,4 +344,5 @@ export default function TeamDetailsModal({ team, isOpen, onClose }: TeamDetailsM
     </AnimatePresence>
   );
 }
+
 

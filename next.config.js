@@ -1,7 +1,32 @@
 /** @type {import('next').NextConfig} */
+
+// Suppress punycode deprecation warnings
+if (typeof process !== 'undefined') {
+  const originalEmit = process.emit;
+  process.emit = function (name, data, ...args) {
+    if (name === 'warning' && data && data.name === 'DeprecationWarning' && data.message.includes('punycode')) {
+      return false;
+    }
+    return originalEmit.apply(process, arguments);
+  };
+}
+
 const nextConfig = {
   images: {
-    domains: ['images.unsplash.com', 'via.placeholder.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
   },
   typescript: {
     ignoreBuildErrors: false,
@@ -13,6 +38,15 @@ const nextConfig = {
     serverComponentsExternalPackages: ['mongoose'],
   },
   webpack: (config, { dev, isServer }) => {
+    // Suppress deprecation warnings
+    const originalEmit = process.emit;
+    process.emit = function (name, data, ...args) {
+      if (name === 'warning' && data && data.name === 'DeprecationWarning' && data.message.includes('punycode')) {
+        return false;
+      }
+      return originalEmit.apply(process, arguments);
+    };
+    
     // Fix module system compatibility
     config.resolve = {
       ...config.resolve,
@@ -21,11 +55,13 @@ const nextConfig = {
         fs: false,
         net: false,
         tls: false,
-        punycode: false,
+        punycode: require.resolve('punycode.js'),
       },
       alias: {
         ...config.resolve.alias,
         '@emotion/is-prop-valid': require.resolve('@emotion/is-prop-valid'),
+        // Additional alias to prevent punycode deprecation warnings
+        punycode: require.resolve('punycode.js'),
       },
     };
 
