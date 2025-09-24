@@ -71,7 +71,6 @@ export async function POST(request: NextRequest) {
     });
 
     await registration.save();
-    console.log('Registration API - Registration saved:', registration._id);
 
     return NextResponse.json({
       message: 'Successfully registered for hackathon',

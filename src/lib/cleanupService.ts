@@ -6,11 +6,9 @@ class CleanupService {
 
   start() {
     if (this.isRunning) {
-      console.log('🧹 Cleanup service is already running');
       return;
     }
 
-    console.log('🚀 Starting cleanup service - runs every 5 minutes');
     this.isRunning = true;
 
     // Run immediately on start
@@ -28,7 +26,6 @@ class CleanupService {
       this.intervalId = null;
     }
     this.isRunning = false;
-    console.log('🛑 Cleanup service stopped');
   }
 
   private async runCleanup() {
@@ -41,10 +38,7 @@ class CleanupService {
         },
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log(`✅ Cleanup completed: ${data.message}`);
-      } else {
+      if (!response.ok) {
         console.error('❌ Cleanup failed:', await response.text());
       }
     } catch (error) {

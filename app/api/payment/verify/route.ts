@@ -17,7 +17,6 @@ export async function POST(request: NextRequest) {
       isEarlyBird
     } = await request.json();
 
-    console.log('Payment verification - Received isEarlyBird:', isEarlyBird);
 
     // Get JWT token from cookies
     const token = request.cookies.get('auth-token')?.value;
@@ -96,15 +95,6 @@ export async function POST(request: NextRequest) {
     // Refresh JWT token with updated isBoarding status
     const newToken = await refreshUserToken(decoded.userId);
 
-    console.log('Payment verification successful:', {
-      userId: decoded.userId,
-      paymentId: updatedPayment._id,
-      paymentStatus: updatedPayment.paymentStatus,
-      paymentAmount: updatedPayment.amount,
-      razorpayPaymentId: updatedPayment.razorpayPaymentId,
-      razorpayOrderId: updatedPayment.razorpayOrderId,
-      isBoarding: updatedUser.isBoarding
-    });
 
     const response = NextResponse.json({
       success: true,

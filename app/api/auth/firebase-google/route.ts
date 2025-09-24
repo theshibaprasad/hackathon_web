@@ -36,16 +36,6 @@ export async function POST(request: NextRequest) {
     const decodedToken = await auth.verifyIdToken(idToken);
     const { uid: firebaseUid, email, name, given_name, family_name, picture } = decodedToken;
 
-    // Log the full token data for debugging
-    console.log('Firebase Google Auth - Full token data:', {
-      uid: firebaseUid,
-      email,
-      name,
-      given_name,
-      family_name,
-      picture,
-      allClaims: Object.keys(decodedToken)
-    });
 
     if (!email || !firebaseUid) {
       return NextResponse.json(
@@ -75,13 +65,6 @@ export async function POST(request: NextRequest) {
       lastName = nameParts.slice(1).join(' ').trim() || '';
     }
 
-    // Log the captured data for debugging
-    console.log('Firebase Google Auth - Captured data:', {
-      email: email.toLowerCase(),
-      firstName,
-      lastName,
-      firebaseUid
-    });
 
     // Check if user already exists
     let user = await User.findOne({ 

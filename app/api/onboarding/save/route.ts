@@ -39,17 +39,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Debug logging
-    console.log('Onboarding save - Received data:', {
-      userType: body.userType,
-      profession: body.profession,
-      education: body.education,
-      job: body.job,
-      city: body.city,
-      state: body.state,
-      pin: body.pin,
-      fullBody: body
-    });
 
     // Map profession to userType correctly
     let mappedUserType = 'student'; // default
@@ -67,7 +56,8 @@ export async function POST(request: NextRequest) {
       lastName: body.lastName || user.lastName,
       email: body.email || user.email,
       phoneNumber: body.phoneNumber || user.phoneNumber,
-      userType: mappedUserType
+      userType: mappedUserType,
+      isBoarding: true // Mark onboarding as completed
     };
 
     // Handle role-based data storage - ROLE-BASED NESTED STRUCTURE
@@ -82,19 +72,6 @@ export async function POST(request: NextRequest) {
       const state = body.education?.state || body.state || '';
       const pin = body.education?.pin || body.pin || '';
       
-      console.log('Onboarding save - Student processing (ROLE-BASED NESTED):', {
-        instituteName: body.education?.instituteName || body.instituteName,
-        branch: body.education?.branch || body.branch,
-        degree: body.education?.degree || body.degree,
-        graduationYear: body.education?.graduationYear || body.graduationYear,
-        yearOfStudy: body.education?.yearOfStudy || body.yearOfStudy,
-        city: body.education?.city || body.city,
-        state: body.education?.state || body.state,
-        pin: body.education?.pin || body.pin,
-        finalCity: city,
-        finalState: state,
-        finalPin: pin
-      });
       
       // Create education object for students (role-based nested structure)
       userUpdateData.education = {
@@ -111,8 +88,6 @@ export async function POST(request: NextRequest) {
       // Clear job object for students (will be removed from database)
       userUpdateData.job = undefined;
       
-      console.log('Onboarding save - Created education object for student:', userUpdateData.education);
-      console.log('Onboarding save - Cleared job object for student');
       
     } else if (mappedUserType === 'professional') {
       // For professionals: create job object and clear education object
@@ -123,17 +98,6 @@ export async function POST(request: NextRequest) {
       const state = body.job?.state || body.state || '';
       const pin = body.job?.pin || body.pin || '';
       
-      console.log('Onboarding save - Professional processing (ROLE-BASED NESTED):', {
-        jobTitle: body.job?.jobTitle || body.jobTitle,
-        company: body.job?.company || body.companyName,
-        yearOfExperience: body.job?.yearOfExperience || body.yearsOfExperience,
-        city: body.job?.city || body.city,
-        state: body.job?.state || body.state,
-        pin: body.job?.pin || body.pin,
-        finalCity: city,
-        finalState: state,
-        finalPin: pin
-      });
       
       // Create job object for professionals (role-based nested structure)
       userUpdateData.job = {
@@ -148,16 +112,8 @@ export async function POST(request: NextRequest) {
       // Clear education object for professionals (will be removed from database)
       userUpdateData.education = undefined;
       
-      console.log('Onboarding save - Created job object for professional:', userUpdateData.job);
-      console.log('Onboarding save - Cleared education object for professional');
     }
 
-    // Debug logging for update data
-    console.log('Onboarding save - Update data (ROLE-BASED NESTED):', {
-      userType: mappedUserType,
-      education: userUpdateData.education,
-      job: userUpdateData.job
-    });
 
     // Update user with onboarding data - ROLE-BASED NESTED STRUCTURE
     let updatedUser;
@@ -173,7 +129,6 @@ export async function POST(request: NextRequest) {
       delete updateObject.job;
     }
     
-    console.log('Onboarding save - Final update object (ROLE-BASED NESTED):', updateObject);
     
     // Prepare MongoDB update operation
     const mongoUpdate: any = { $set: updateObject };
@@ -192,10 +147,7 @@ export async function POST(request: NextRequest) {
     // Add $unset operation if there are fields to remove
     if (Object.keys(fieldsToUnset).length > 0) {
       mongoUpdate.$unset = fieldsToUnset;
-      console.log('Onboarding save - Fields to remove from database (ROLE-BASED NESTED):', fieldsToUnset);
     }
-    
-    console.log('Onboarding save - MongoDB update operation (ROLE-BASED NESTED):', mongoUpdate);
     
     updatedUser = await User.findByIdAndUpdate(
       decoded.userId,
@@ -203,16 +155,6 @@ export async function POST(request: NextRequest) {
       { new: true, upsert: false }
     );
     
-    console.log('Onboarding save - MongoDB update result (ROLE-BASED NESTED):', {
-      userId: decoded.userId,
-      updateData: userUpdateData,
-      updatedUser: updatedUser ? {
-        id: updatedUser._id,
-        userType: updatedUser.userType,
-        education: updatedUser.education,
-        job: updatedUser.job
-      } : null
-    });
 
     if (!updatedUser) {
       return NextResponse.json(
@@ -221,21 +163,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Debug logging for updated user
-    console.log('Onboarding save - Updated user (ROLE-BASED NESTED):', {
-      id: updatedUser._id,
-      userType: updatedUser.userType,
-      education: updatedUser.education,
-      job: updatedUser.job
-    });
 
     // Create team if team name is provided
     let team = null;
     if (body.teamName) {
-      console.log('Onboarding save - Team creation requested:', {
-        teamName: body.teamName,
-        userId: decoded.userId
-      });
 
       // Create new team (duplicate team names are allowed)
       team = new Team({
@@ -252,30 +183,14 @@ export async function POST(request: NextRequest) {
       });
 
       await team.save();
-      console.log('Onboarding save - Team created successfully:', {
-        teamId: team._id,
-        teamName: team.teamName,
-        leader: team.leader
-      });
 
       // Update user with teamId and set as team leader
       await User.findByIdAndUpdate(decoded.userId, { 
         teamId: team._id,
         isTeamLeader: true 
       });
-      console.log('Onboarding save - User updated with team info:', {
-        userId: decoded.userId,
-        teamId: team._id,
-        isTeamLeader: true
-      });
     }
 
-    console.log('Onboarding save successful:', {
-      userId: decoded.userId,
-      userType: updatedUser.userType,
-      teamId: team?._id,
-      isBoarding: updatedUser.isBoarding
-    });
 
     return NextResponse.json({
       success: true,

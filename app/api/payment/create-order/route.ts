@@ -14,7 +14,6 @@ export async function POST(request: NextRequest) {
   try {
     const { amount, currency, receipt, isEarlyBird = false } = await request.json();
     
-    console.log('Create order - Received isEarlyBird:', isEarlyBird);
     
     if (!amount || !currency) {
       return NextResponse.json(

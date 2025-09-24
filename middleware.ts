@@ -8,7 +8,7 @@ const protectedRoutes = [
   '/test-middleware'
 ];
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
   // Define routes that should be excluded from protection
@@ -61,14 +61,7 @@ export function middleware(request: NextRequest) {
 
       // Special handling for onboarding route only
       if (pathname.startsWith('/onboarding')) {
-        // Check isBoarding status from JWT token
-        if (payload.isBoarding) {
-          // User has already completed onboarding, redirect to dashboard
-          const dashboardUrl = new URL('/dashboard', request.url);
-          return NextResponse.redirect(dashboardUrl);
-        }
-        
-        // User hasn't completed onboarding, allow access to onboarding
+        // Allow access to onboarding - OnboardingGuard will handle the database check
         return NextResponse.next();
       }
 
@@ -86,8 +79,10 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/dashboard/:path*',
+    '/onboarding',
     '/onboarding/:path*',
     '/test-middleware/:path*',
-    '/((?!admin|login|register).*)'
+    '/test-onboarding-status/:path*',
+    '/((?!admin|login|register|api).*)'
   ],
 };

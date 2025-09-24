@@ -139,9 +139,7 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
 
       const data = await response.json();
       
-      if (response.ok) {
-        console.log('Payment failure recorded in database:', data);
-      } else {
+      if (!response.ok) {
         console.error('Failed to record payment failure:', data.error);
       }
     } catch (error) {
@@ -199,7 +197,6 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
 
   const createRazorpayOrder = async (amount: number) => {
     try {
-      console.log('Creating Razorpay order with isEarlyBird:', isEarlyBird);
       const response = await fetch('/api/payment/create-order', {
         method: 'POST',
         headers: {
@@ -297,7 +294,6 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
           try {
             
             // Verify payment
-            console.log('Verifying payment with isEarlyBird:', isEarlyBird);
             const verifyResponse = await fetch('/api/payment/verify', {
               method: 'POST',
               headers: {
@@ -362,19 +358,6 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
               pin = data.job?.pin || data.pin || '';
             }
             
-            // Debug logging
-            console.log('PaymentForm - Address construction (ROLE-BASED NESTED):', {
-              userType: data.userType,
-              profession: data.profession,
-              educationData: data.education,
-              jobData: data.job,
-              legacyCity: data.city,
-              legacyState: data.state,
-              legacyPin: data.pin,
-              finalCity: city,
-              finalState: state,
-              finalPin: pin
-            });
             
             return `${userData?.firstName || ''} ${userData?.lastName || ''}, ${city}, ${state} - ${pin}`;
           })(),
@@ -672,19 +655,6 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
                   pin = data.job?.pin || data.pin || '';
                 }
                 
-                // Debug logging for payment summary
-                console.log('PaymentForm - Payment summary address (ROLE-BASED NESTED):', {
-                  userType: data.userType,
-                  profession: data.profession,
-                  educationData: data.education,
-                  jobData: data.job,
-                  legacyCity: data.city,
-                  legacyState: data.state,
-                  legacyPin: data.pin,
-                  finalCity: city,
-                  finalState: state,
-                  finalPin: pin
-                });
                 
                 return `${city}, ${state} - ${pin}`;
               })()}</div>

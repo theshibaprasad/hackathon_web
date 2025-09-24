@@ -26,12 +26,12 @@ export default function WorkingProfessionalForm({ data, updateData, onNext, onPr
   // Helper function to create complete job object
   const createJobObject = (updates: Partial<{ jobTitle: string; company: string; yearOfExperience: string; city: string; state: string; pin: string }>) => {
     return {
-      jobTitle: updates.jobTitle || data.job?.jobTitle || '',
-      company: updates.company || data.job?.company || '',
-      yearOfExperience: updates.yearOfExperience || data.job?.yearOfExperience || '',
-      city: updates.city || data.job?.city || '',
-      state: updates.state || data.job?.state || '',
-      pin: updates.pin || data.job?.pin || ''
+      jobTitle: updates.jobTitle !== undefined ? updates.jobTitle : (data.job?.jobTitle || ''),
+      company: updates.company !== undefined ? updates.company : (data.job?.company || ''),
+      yearOfExperience: updates.yearOfExperience !== undefined ? updates.yearOfExperience : (data.job?.yearOfExperience || ''),
+      city: updates.city !== undefined ? updates.city : (data.job?.city || ''),
+      state: updates.state !== undefined ? updates.state : (data.job?.state || ''),
+      pin: updates.pin !== undefined ? updates.pin : (data.job?.pin || '')
     };
   };
 
@@ -355,8 +355,6 @@ export default function WorkingProfessionalForm({ data, updateData, onNext, onPr
               value={data.job?.city || data.city || ''}
               onChange={(e) => {
                 const value = e.target.value;
-                console.log('WorkingProfessionalForm - Updating job city (ROLE-BASED):', value);
-                console.log('WorkingProfessionalForm - Current form data before update:', data);
                 updateData({ 
                   job: createJobObject({ city: value }),
                   city: value // Keep legacy field for backward compatibility
@@ -378,11 +376,6 @@ export default function WorkingProfessionalForm({ data, updateData, onNext, onPr
               value={data.job?.state || data.state || ''}
               onChange={(e) => {
                 const value = e.target.value;
-                console.log('WorkingProfessionalForm - Updating job state (ROLE-BASED):', {
-                  value,
-                  currentData: data,
-                  currentJob: data.job
-                });
                 updateData({ 
                   job: createJobObject({ state: value }),
                   state: value // Keep legacy field for backward compatibility
@@ -404,11 +397,6 @@ export default function WorkingProfessionalForm({ data, updateData, onNext, onPr
               value={data.job?.pin || data.pin || ''}
               onChange={(e) => {
                 const value = e.target.value.replace(/\D/g, '').slice(0, 6);
-                console.log('WorkingProfessionalForm - Updating job pinCode (ROLE-BASED):', {
-                  value,
-                  currentData: data,
-                  currentJob: data.job
-                });
                 updateData({ 
                   job: createJobObject({ pin: value }),
                   pin: value // Keep legacy field for backward compatibility

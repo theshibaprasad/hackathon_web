@@ -26,14 +26,14 @@ export default function StudentForm({ data, updateData, onNext, onPrev, user }: 
   // Helper function to create complete education object
   const createEducationObject = (updates: Partial<{ instituteName: string; branch: string; degree: string; graduationYear: string; yearOfStudy: string; city: string; state: string; pin: string }>) => {
     return {
-      instituteName: updates.instituteName || data.education?.instituteName || '',
-      branch: updates.branch || data.education?.branch || '',
-      degree: updates.degree || data.education?.degree || '',
-      graduationYear: updates.graduationYear || data.education?.graduationYear || '',
-      yearOfStudy: updates.yearOfStudy || data.education?.yearOfStudy || '',
-      city: updates.city || data.education?.city || '',
-      state: updates.state || data.education?.state || '',
-      pin: updates.pin || data.education?.pin || ''
+      instituteName: updates.instituteName !== undefined ? updates.instituteName : (data.education?.instituteName || ''),
+      branch: updates.branch !== undefined ? updates.branch : (data.education?.branch || ''),
+      degree: updates.degree !== undefined ? updates.degree : (data.education?.degree || ''),
+      graduationYear: updates.graduationYear !== undefined ? updates.graduationYear : (data.education?.graduationYear || ''),
+      yearOfStudy: updates.yearOfStudy !== undefined ? updates.yearOfStudy : (data.education?.yearOfStudy || ''),
+      city: updates.city !== undefined ? updates.city : (data.education?.city || ''),
+      state: updates.state !== undefined ? updates.state : (data.education?.state || ''),
+      pin: updates.pin !== undefined ? updates.pin : (data.education?.pin || '')
     };
   };
 
@@ -416,11 +416,6 @@ export default function StudentForm({ data, updateData, onNext, onPrev, user }: 
               value={data.education?.city || data.city || ''}
               onChange={(e) => {
                 const value = e.target.value;
-                console.log('StudentForm - Updating education city (ROLE-BASED):', {
-                  value,
-                  currentData: data,
-                  currentEducation: data.education
-                });
                 updateData({ 
                   education: createEducationObject({ city: value }),
                   city: value // Keep legacy field for backward compatibility
@@ -442,11 +437,6 @@ export default function StudentForm({ data, updateData, onNext, onPrev, user }: 
               value={data.education?.state || data.state || ''}
               onChange={(e) => {
                 const value = e.target.value;
-                console.log('StudentForm - Updating education state (ROLE-BASED):', {
-                  value,
-                  currentData: data,
-                  currentEducation: data.education
-                });
                 updateData({ 
                   education: createEducationObject({ state: value }),
                   state: value // Keep legacy field for backward compatibility
@@ -468,11 +458,6 @@ export default function StudentForm({ data, updateData, onNext, onPrev, user }: 
               value={data.education?.pin || data.pin || ''}
               onChange={(e) => {
                 const value = e.target.value.replace(/\D/g, '').slice(0, 6);
-                console.log('StudentForm - Updating education pinCode (ROLE-BASED):', {
-                  value,
-                  currentData: data,
-                  currentEducation: data.education
-                });
                 updateData({ 
                   education: createEducationObject({ pin: value }),
                   pin: value // Keep legacy field for backward compatibility

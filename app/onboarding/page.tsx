@@ -1,5 +1,6 @@
 import { getServerSideUser } from '@/lib/auth';
 import OnboardingClient from './OnboardingClient';
+import OnboardingGuard from '@/components/OnboardingGuard';
 
 export default async function OnboardingPage() {
   // Server-side authentication check
@@ -10,5 +11,9 @@ export default async function OnboardingPage() {
     return null;
   }
 
-  return <OnboardingClient user={user} />;
+  return (
+    <OnboardingGuard>
+      <OnboardingClient user={user} />
+    </OnboardingGuard>
+  );
 }

@@ -46,7 +46,6 @@ export default function FirebaseGoogleAuth({
 
   // Function to reset all states and abort ongoing operations
   const resetAuthState = () => {
-    console.log('Resetting authentication state');
     setIsLoading(false);
     isSigningInRef.current = false;
     
@@ -77,17 +76,14 @@ export default function FirebaseGoogleAuth({
       
       // Set up a longer timeout (3 minutes) only as a safety net
       timeoutRef.current = setTimeout(() => {
-        console.log('Google sign-in safety timeout (3 minutes) - resetting button state');
         resetAuthState();
       }, 180000); // 3 minutes
       
-      console.log('Starting Google sign-in popup...');
       
       // Sign in with Google popup
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
       
-      console.log('Google sign-in successful:', user.email);
       
       // Clear timeout since sign-in was successful
       if (timeoutRef.current) {
@@ -140,8 +136,6 @@ export default function FirebaseGoogleAuth({
       }
     } catch (error: any) {
       console.error('Google sign-in error:', error);
-      console.log('Error code:', error.code);
-      console.log('Error message:', error.message);
       
       // Clear timeout
       if (timeoutRef.current) {
@@ -153,7 +147,6 @@ export default function FirebaseGoogleAuth({
       if (error.code === 'auth/popup-closed-by-user' || 
           error.code === 'auth/cancelled-popup-request' ||
           error.code === 'auth/user-cancelled') {
-        console.log('User cancelled popup - immediately resetting button state');
         resetAuthState();
         // User cancelled - this is expected behavior, no error message needed
         return;

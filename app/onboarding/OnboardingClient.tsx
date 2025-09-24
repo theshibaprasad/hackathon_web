@@ -125,12 +125,6 @@ export default function OnboardingClient({ user }: OnboardingClientProps) {
           const result = await response.json();
           const userData = result.data;
           
-          console.log('OnboardingClient - Loaded user data:', {
-            userType: userData.userType,
-            profession: userData.profession,
-            education: userData.education,
-            job: userData.job
-          });
           
           // Update formData with existing user data - ROLE-BASED NESTED STRUCTURE
           setFormData(prev => ({
@@ -230,15 +224,6 @@ export default function OnboardingClient({ user }: OnboardingClientProps) {
         }
       }
       
-      console.log('OnboardingClient - Updated form data (ROLE-BASED NESTED):', {
-        userType: newData.userType,
-        profession: newData.profession,
-        education: newData.education,
-        job: newData.job,
-        legacyCity: newData.city,
-        legacyState: newData.state,
-        legacyPin: newData.pin
-      });
       
       return newData;
     });
@@ -263,16 +248,6 @@ export default function OnboardingClient({ user }: OnboardingClientProps) {
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      console.log('OnboardingClient - Submitting form data:', {
-        userType: formData.userType,
-        profession: formData.profession,
-        education: formData.education,
-        job: formData.job,
-        city: formData.city,
-        state: formData.state,
-        pin: formData.pin,
-        fullFormData: formData
-      });
       const response = await fetch('/api/onboarding/save', {
         method: 'POST',
         headers: {
@@ -293,7 +268,6 @@ export default function OnboardingClient({ user }: OnboardingClientProps) {
           
           if (paymentResponse.ok) {
             const paymentData = await paymentResponse.json();
-            console.log('OnboardingClient - Fetched payment details:', paymentData);
             
             setPaymentDetails({
               paymentId: paymentData.payment?.razorpayPaymentId || formData.razorpayPaymentId || 'N/A',

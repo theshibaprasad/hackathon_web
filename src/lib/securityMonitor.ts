@@ -25,10 +25,6 @@ class SecurityMonitor {
       this.events = this.events.slice(-this.MAX_EVENTS);
     }
 
-    // Log to console in development
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🚨 Security Event:', securityEvent);
-    }
   }
 
   // Check for suspicious patterns

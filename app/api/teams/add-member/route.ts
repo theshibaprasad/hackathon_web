@@ -60,13 +60,6 @@ export async function POST(request: NextRequest) {
     
     team.members.push(newMember);
     await team.save();
-    
-    console.log('Team member added to Teams collection:', {
-      teamId: team._id,
-      teamName: team.teamName,
-      newMember,
-      totalMembers: team.members.length
-    });
 
     return NextResponse.json({
       success: true,

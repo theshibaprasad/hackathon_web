@@ -11,11 +11,6 @@ export async function POST(request: NextRequest) {
       error_code
     } = await request.json();
 
-    console.log('Payment failure - Received data:', {
-      razorpay_order_id,
-      error_reason,
-      error_code
-    });
 
     // Get JWT token from cookies
     const token = request.cookies.get('auth-token')?.value;
@@ -78,14 +73,6 @@ export async function POST(request: NextRequest) {
       { new: true }
     );
 
-    console.log('Payment marked as failed:', {
-      userId: decoded.userId,
-      paymentId: updatedPayment._id,
-      paymentStatus: updatedPayment.paymentStatus,
-      razorpayOrderId: updatedPayment.razorpayOrderId,
-      errorReason: updatedPayment.errorReason,
-      errorCode: updatedPayment.errorCode
-    });
 
     return NextResponse.json({
       success: true,
