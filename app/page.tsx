@@ -8,6 +8,7 @@ import { CompanyTestimonialSection } from "@/components/CompanyTestimonialSectio
 import { CompanyValuesSection } from "@/components/CompanyValuesSection"
 import { CompanyCommunitySection } from "@/components/CompanyCommunitySection"
 import { CompanyCompanySection } from "@/components/CompanyCompanySection"
+import { FAQSection } from "@/components/FAQSection"
 import { CompanyFooter } from "@/components/CompanyFooter"
 
 export default function Home() {
@@ -33,6 +34,7 @@ export default function Home() {
       <CompanyValuesSection />
       <CompanyCommunitySection />
       <CompanyCompanySection />
+      <FAQSection />
       <CompanyFooter />
     </div>
   )

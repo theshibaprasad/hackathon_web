@@ -43,6 +43,7 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
   const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
   const [regularPriceClickCount, setRegularPriceClickCount] = useState(0);
   const [isSpecialPricing, setIsSpecialPricing] = useState(false);
+  const [specialPricingEnabled, setSpecialPricingEnabled] = useState(false);
   const isEarlyBirdRef = useRef(isEarlyBird);
 
   // Update ref when isEarlyBird changes
@@ -66,8 +67,8 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
   
   // Calculate final amount with special pricing logic
   const getFinalAmount = () => {
-    if (isSpecialPricing) {
-      return 2; // Special pricing after 5 clicks
+    if (isSpecialPricing && specialPricingEnabled) {
+      return 2; // Special pricing after 5 clicks (only if enabled by admin)
     }
     return isEarlyBird ? currentPricing.earlyBird : currentPricing.regular;
   };
@@ -106,6 +107,18 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
       }
     };
 
+    const loadSpecialPricingSettings = async () => {
+      try {
+        const response = await fetch('/api/admin/chori/settings');
+        if (response.ok) {
+          const data = await response.json();
+          setSpecialPricingEnabled(data.specialPricingEnabled);
+        }
+      } catch (error) {
+        console.error('Error loading special pricing settings:', error);
+      }
+    };
+
     // If user name is empty, try to fetch from database
     const loadUserData = async () => {
       if (!user.firstName && !user.lastName) {
@@ -122,6 +135,7 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
     };
 
     loadSettings();
+    loadSpecialPricingSettings();
     loadUserData();
   }, []);
 
@@ -161,6 +175,12 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
   const handleRegularPriceClick = () => {
     // Clear any existing errors when user makes changes
     clearError();
+    
+    // Only allow special pricing if it's enabled by admin
+    if (!specialPricingEnabled) {
+      setIsEarlyBird(false);
+      return;
+    }
     
     // Increment click counter
     const newClickCount = regularPriceClickCount + 1;

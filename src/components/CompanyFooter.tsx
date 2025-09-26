@@ -6,21 +6,20 @@ import { Github, Twitter, Linkedin } from "lucide-react";
 import Image from "next/image";
 
 const footerLinks = {
-  company: ["Code of Conduct", "Privacy Policy", "Terms of Service", "FAQ", "Platform Status", "Twitter"],
-  platform: ["Organize a hackathon", "Student Resources", "Sponsor", "API", "College", "FAQ"],
-  support: ["Contact Us", "Bug Report", "Discord", "Instagram", "YouTube", "LinkedIn"]
+  quickLinks: ["About", "Contact", "Register"],
+  social: ["Twitter", "GitHub", "LinkedIn"]
 };
 
 export const CompanyFooter = () => {
   return (
     <footer className="bg-background/95 backdrop-blur-sm py-12 sm:py-16 px-4 sm:px-6 border-t border-border/50 relative z-10">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-8 sm:mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-8 sm:mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="col-span-1 sm:col-span-2 md:col-span-1"
+            className="lg:col-span-2"
           >
             <div className="flex items-center mb-4 sm:mb-6">
               <h1 className="text-xl sm:text-2xl font-bold" style={{ color: '#4437FB' }}>
@@ -28,13 +27,13 @@ export const CompanyFooter = () => {
               </h1>
             </div>
             <p className="text-muted-foreground mb-4 sm:mb-6 max-w-md text-sm sm:text-base">
-              We love{" "}
+              Join the ultimate hackathon experience designed to{" "}
               <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent font-semibold">
-                software
+                unleash creativity
               </span>{" "}
-              and the{" "}
+              and{" "}
               <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent font-semibold">
-                people who build them.
+                accelerate careers.
               </span>
             </p>
             <div className="flex space-x-3 sm:space-x-4">
@@ -61,49 +60,9 @@ export const CompanyFooter = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            <h4 className="font-bold mb-3 sm:mb-4 text-primary text-sm sm:text-base">COMPANY</h4>
+            <h4 className="font-bold mb-3 sm:mb-4 text-primary text-sm sm:text-base">QUICK LINKS</h4>
             <div className="space-y-1 sm:space-y-2">
-              {footerLinks.company.map((link, index) => (
-                <motion.a
-                  key={index}
-                  href="#"
-                  whileHover={{ x: 5 }}
-                  className="block text-muted-foreground hover:text-primary transition-colors text-xs sm:text-sm"
-                >
-                  {link}
-                </motion.a>
-              ))}
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <h4 className="font-bold mb-3 sm:mb-4 text-primary text-sm sm:text-base">PLATFORM</h4>
-            <div className="space-y-1 sm:space-y-2">
-              {footerLinks.platform.map((link, index) => (
-                <motion.a
-                  key={index}
-                  href="#"
-                  whileHover={{ x: 5 }}
-                  className="block text-muted-foreground hover:text-primary transition-colors text-xs sm:text-sm"
-                >
-                  {link}
-                </motion.a>
-              ))}
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
-            <h4 className="font-bold mb-3 sm:mb-4 text-primary text-sm sm:text-base">SUPPORT</h4>
-            <div className="space-y-1 sm:space-y-2">
-              {footerLinks.support.map((link, index) => (
+              {footerLinks.quickLinks.map((link, index) => (
                 <motion.a
                   key={index}
                   href="#"
@@ -129,14 +88,14 @@ export const CompanyFooter = () => {
             </p>
             <div className="flex space-x-4 sm:space-x-6">
               <motion.a
-                href="#"
+                href="/terms"
                 whileHover={{ y: -2 }}
                 className="text-muted-foreground hover:text-primary text-xs sm:text-sm transition-colors"
               >
                 Terms
               </motion.a>
               <motion.a
-                href="#"
+                href="/privacy"
                 whileHover={{ y: -2 }}
                 className="text-muted-foreground hover:text-primary text-xs sm:text-sm transition-colors"
               >

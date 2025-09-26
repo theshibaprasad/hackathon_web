@@ -122,7 +122,10 @@ export const CompanyCompanySection = () => {
           transition={{ duration: 0.8 }}
           className="text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-6 sm:mb-8"
         >
-          Novothon for companies
+          Partner with{" "}
+          <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+            Novothon
+          </span>
         </motion.h2>
         
         <motion.p 
@@ -131,7 +134,7 @@ export const CompanyCompanySection = () => {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-lg sm:text-xl md:text-2xl text-white/90 mb-8 sm:mb-12 max-w-4xl mx-auto"
         >
-          Your engineering team and developer products need a brand and a fan base. That's where we come in.
+          Connect with top-tier developers, showcase your technology, and build a passionate community around your brand.
         </motion.p>
 
         <motion.p 
@@ -140,7 +143,7 @@ export const CompanyCompanySection = () => {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="text-base sm:text-lg text-white/80 mb-8 sm:mb-12 max-w-3xl mx-auto"
         >
-          Support Open Source Bring top developers of the 100+ web3 are all really high their projects.
+          From hackathons to open source contributions, we help companies engage with the developer community and discover exceptional talent.
         </motion.p>
 
         <motion.div

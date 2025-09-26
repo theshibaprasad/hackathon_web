@@ -53,11 +53,14 @@ export const CompanyValuesSection = () => {
             className="space-y-6 sm:space-y-8 order-1 lg:order-2"
           >
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
-              We speak, we listen, we discuss, we grow.
+              Innovation through{" "}
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                collaboration
+              </span>
             </h2>
             
             <p className="text-lg sm:text-xl text-muted-foreground">
-              From ideas, feedback, content and positive vibes that the lives of 50 lakhs of our community.
+              We foster a vibrant community where developers share knowledge, build meaningful connections, and create solutions that impact millions of lives worldwide.
             </p>
 
             <motion.div

@@ -796,11 +796,11 @@ export default function RegisterPage() {
                       className="text-xs text-muted-foreground leading-relaxed cursor-pointer select-none"
                     >
                       I agree to the{' '}
-                      <a href="#" className="text-primary hover:text-primary/80 hover:underline transition-colors font-medium">
+                      <a href="/terms" target="_blank" className="text-primary hover:text-primary/80 hover:underline transition-colors font-medium">
                         Terms of Service
                       </a>{' '}
                       and{' '}
-                      <a href="#" className="text-primary hover:text-primary/80 hover:underline transition-colors font-medium">
+                      <a href="/privacy" target="_blank" className="text-primary hover:text-primary/80 hover:underline transition-colors font-medium">
                         Privacy Policy
                       </a>
                     </label>
