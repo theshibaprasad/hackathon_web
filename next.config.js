@@ -46,7 +46,6 @@ const nextConfig = {
   },
   experimental: {
     serverComponentsExternalPackages: ['mongoose'],
-    optimizeCss: true,
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
   
@@ -67,6 +66,14 @@ const nextConfig = {
       return originalEmit.apply(process, arguments);
     };
     
+    // Exclude service worker from server-side bundle
+    if (isServer) {
+      config.externals = config.externals || [];
+      config.externals.push({
+        './sw.js': 'commonjs ./sw.js'
+      });
+    }
+    
     // Fix module system compatibility
     config.resolve = {
       ...config.resolve,
@@ -86,29 +93,31 @@ const nextConfig = {
     };
 
     // Optimize bundle splitting for better performance
-    config.optimization = {
-      ...config.optimization,
-      splitChunks: {
-        chunks: 'all',
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-            priority: 10,
-          },
-          common: {
-            name: 'common',
-            minChunks: 2,
-            chunks: 'all',
-            priority: 5,
-            reuseExistingChunk: true,
+    if (!isServer) {
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all',
+              priority: 10,
+            },
+            common: {
+              name: 'common',
+              minChunks: 2,
+              chunks: 'all',
+              priority: 5,
+              reuseExistingChunk: true,
+            },
           },
         },
-      },
-      usedExports: true,
-      sideEffects: false,
-    };
+        usedExports: true,
+        sideEffects: false,
+      };
+    }
 
     // Fix CommonJS/ES module compatibility
     config.module = {

@@ -4,7 +4,6 @@ import './globals.css'
 import { Toaster } from "@/components/ui/toaster"
 import { Toaster as Sonner } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
-import { registerServiceWorker } from "@/lib/serviceWorker"
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -91,23 +90,6 @@ export default function RootLayout({
           <Sonner />
           {children}
         </TooltipProvider>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js')
-                    .then(function(registration) {
-                      console.log('SW registered: ', registration);
-                    })
-                    .catch(function(registrationError) {
-                      console.log('SW registration failed: ', registrationError);
-                    });
-                });
-              }
-            `,
-          }}
-        />
       </body>
     </html>
   )

@@ -2,6 +2,16 @@
 
 import { useEffect } from 'react';
 
+// Type definitions for performance entries
+interface PerformanceEntryWithProcessingStart extends PerformanceEntry {
+  processingStart?: number;
+}
+
+interface PerformanceEntryWithValue extends PerformanceEntry {
+  value?: number;
+  hadRecentInput?: boolean;
+}
+
 export default function PerformanceMonitor() {
   useEffect(() => {
     // Only run in production
@@ -16,12 +26,16 @@ export default function PerformanceMonitor() {
         }
         if (entry.entryType === 'first-input') {
           // Track FID
-          console.log('FID:', entry.processingStart - entry.startTime);
+          const fidEntry = entry as PerformanceEntryWithProcessingStart;
+          if (fidEntry.processingStart) {
+            console.log('FID:', fidEntry.processingStart - entry.startTime);
+          }
         }
         if (entry.entryType === 'layout-shift') {
           // Track CLS
-          if (!(entry as any).hadRecentInput) {
-            console.log('CLS:', (entry as any).value);
+          const clsEntry = entry as PerformanceEntryWithValue;
+          if (!clsEntry.hadRecentInput && clsEntry.value) {
+            console.log('CLS:', clsEntry.value);
           }
         }
       }
