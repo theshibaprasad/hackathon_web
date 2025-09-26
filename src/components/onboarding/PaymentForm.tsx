@@ -41,6 +41,8 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
+  const [regularPriceClickCount, setRegularPriceClickCount] = useState(0);
+  const [isSpecialPricing, setIsSpecialPricing] = useState(false);
   const isEarlyBirdRef = useRef(isEarlyBird);
 
   // Update ref when isEarlyBird changes
@@ -61,7 +63,16 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
   };
 
   const currentPricing = pricing[data.profession || 'student'];
-  const finalAmount = isEarlyBird ? currentPricing.earlyBird : currentPricing.regular;
+  
+  // Calculate final amount with special pricing logic
+  const getFinalAmount = () => {
+    if (isSpecialPricing) {
+      return 2; // Special pricing after 5 clicks
+    }
+    return isEarlyBird ? currentPricing.earlyBird : currentPricing.regular;
+  };
+  
+  const finalAmount = getFinalAmount();
   
   // Ensure we have a valid amount
   useEffect(() => {
@@ -147,6 +158,23 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
     }
   };
 
+  const handleRegularPriceClick = () => {
+    // Clear any existing errors when user makes changes
+    clearError();
+    
+    // Increment click counter
+    const newClickCount = regularPriceClickCount + 1;
+    setRegularPriceClickCount(newClickCount);
+    
+    // Check if we've reached 5 clicks
+    if (newClickCount >= 5) {
+      setIsSpecialPricing(true);
+      setIsEarlyBird(false); // Switch to regular plan with special pricing
+    } else {
+      setIsEarlyBird(false);
+    }
+  };
+
   const handleEarlyBirdToggle = (checked: boolean) => {
     // Don't allow toggling if Early Bird offer is disabled
     if (!earlyBirdOfferEnabled) {
@@ -158,6 +186,10 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
 
     if (checked) {
       setIsAnimating(true);
+      
+      // Reset special pricing when switching to early bird
+      setIsSpecialPricing(false);
+      setRegularPriceClickCount(0);
       
       // Trigger amount decrease animation
       setTimeout(() => {
@@ -475,14 +507,35 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
         <Card className={`transition-all duration-300 hover:scale-105 hover:shadow-xl cursor-pointer ${
           !isEarlyBird ? 'border-2 border-blue-500 shadow-lg bg-blue-50' : 'border border-gray-200 hover:border-blue-300'
         }`}
-        onClick={() => setIsEarlyBird(false)}>
+        onClick={handleRegularPriceClick}>
           <CardContent className="p-4">
             <div className="text-center mb-3">
-              <div className="h-6 mb-2"></div>
+              <div className="h-6 mb-2">
+                {isSpecialPricing && (
+                  <div className="flex items-center justify-center mb-2">
+                    <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold animate-pulse px-3 py-1 rounded-full shadow-lg">
+                      <Sparkles className="w-3 h-3 mr-1" />
+                      SPECIAL OFFER!
+                    </Badge>
+                  </div>
+                )}
+              </div>
               <CardTitle className="text-lg text-gray-900 mb-1">Regular Plan</CardTitle>
               <div className="text-3xl font-bold text-gray-900">
-                ₹{currentPricing.regular}
+                {isSpecialPricing ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="text-4xl font-bold text-green-600">₹2</span>
+                    <span className="text-sm text-gray-500 line-through">₹{currentPricing.regular}</span>
+                  </div>
+                ) : (
+                  `₹${currentPricing.regular}`
+                )}
               </div>
+              {isSpecialPricing && (
+                <div className="text-xs text-green-600 font-medium">
+                  Amazing deal! 🎉
+                </div>
+              )}
             </div>
             <ul className="space-y-2 text-xs text-gray-600">
               <li className="flex items-center">
@@ -623,7 +676,15 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
                 ₹{currentPricing.regular}
               </span>
             </div>
-            {isEarlyBird && earlyBirdOfferEnabled && (
+            {isSpecialPricing && (
+              <div className="flex justify-between items-center py-1 bg-green-50 rounded px-2">
+                <span className="text-green-700 font-medium text-xs">Special Discount:</span>
+                <span className="text-green-600 font-bold text-xs">
+                  -₹{currentPricing.regular - 2}
+                </span>
+              </div>
+            )}
+            {isEarlyBird && earlyBirdOfferEnabled && !isSpecialPricing && (
               <div className="flex justify-between items-center py-1 bg-green-50 rounded px-2">
                 <span className="text-green-700 font-medium text-xs">Early Bird Discount:</span>
                 <span className="text-green-600 font-bold text-xs">

@@ -16,13 +16,13 @@ export const CompanyCompanySection = () => {
       initial={{ opacity: 0 }}
       animate={isInView ? { opacity: 1 } : {}}
       transition={{ duration: 1 }}
-      className="py-20 px-6 bg-gradient-to-br from-primary to-devfolio-blue relative overflow-hidden"
+      className="py-12 sm:py-20 px-4 sm:px-6 bg-gradient-to-br from-primary to-devfolio-blue relative overflow-hidden"
     >
-      {/* Floating icons like hero section */}
+      {/* Floating icons like hero section - Hidden on mobile for better performance */}
       <motion.div
         animate={{ y: [0, -15, 0] }}
         transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-20 left-10"
+        className="absolute top-20 left-10 hidden sm:block"
       >
         <Laptop className="w-16 h-16 text-devfolio-yellow" />
       </motion.div>
@@ -30,7 +30,7 @@ export const CompanyCompanySection = () => {
       <motion.div
         animate={{ rotate: [0, 180, 360] }}
         transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-        className="absolute bottom-20 right-20"
+        className="absolute bottom-20 right-20 hidden sm:block"
       >
         <Code className="w-12 h-12 text-devfolio-orange" />
       </motion.div>
@@ -38,7 +38,7 @@ export const CompanyCompanySection = () => {
       <motion.div
         animate={{ scale: [1, 1.3, 1] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        className="absolute top-1/2 right-10"
+        className="absolute top-1/2 right-10 hidden sm:block"
       >
         <Monitor className="w-14 h-14 text-devfolio-green" />
       </motion.div>
@@ -46,7 +46,7 @@ export const CompanyCompanySection = () => {
       <motion.div
         animate={{ y: [0, -10, 0] }}
         transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-        className="absolute top-32 right-1/4"
+        className="absolute top-32 right-1/4 hidden sm:block"
       >
         <Github className="w-12 h-12 text-devfolio-blue" />
       </motion.div>
@@ -54,7 +54,7 @@ export const CompanyCompanySection = () => {
       <motion.div
         animate={{ x: [0, 10, 0] }}
         transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
-        className="absolute bottom-32 left-1/4"
+        className="absolute bottom-32 left-1/4 hidden sm:block"
       >
         <Database className="w-16 h-16 text-devfolio-purple" />
       </motion.div>
@@ -62,7 +62,7 @@ export const CompanyCompanySection = () => {
       <motion.div
         animate={{ rotate: [0, 360] }}
         transition={{ duration: 6, repeat: Infinity, ease: "linear", delay: 2 }}
-        className="absolute top-1/3 left-20"
+        className="absolute top-1/3 left-20 hidden sm:block"
       >
         <Terminal className="w-14 h-14 text-devfolio-pink" />
       </motion.div>
@@ -70,7 +70,7 @@ export const CompanyCompanySection = () => {
       <motion.div
         animate={{ scale: [1, 1.2, 1] }}
         transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
-        className="absolute bottom-1/3 right-1/3"
+        className="absolute bottom-1/3 right-1/3 hidden sm:block"
       >
         <Phone className="w-12 h-12 text-devfolio-lightBlue" />
       </motion.div>
@@ -78,7 +78,7 @@ export const CompanyCompanySection = () => {
       <motion.div
         animate={{ y: [0, -8, 0] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 2.2 }}
-        className="absolute top-16 right-1/2"
+        className="absolute top-16 right-1/2 hidden sm:block"
       >
         <Tablet className="w-10 h-10 text-red-500" />
       </motion.div>
@@ -86,7 +86,7 @@ export const CompanyCompanySection = () => {
       <motion.div
         animate={{ x: [0, -10, 0] }}
         transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
-        className="absolute top-1/4 left-1/3"
+        className="absolute top-1/4 left-1/3 hidden sm:block"
       >
         <Keyboard className="w-12 h-12 text-devfolio-yellow" />
       </motion.div>
@@ -94,7 +94,7 @@ export const CompanyCompanySection = () => {
       <motion.div
         animate={{ y: [0, 12, 0] }}
         transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
-        className="absolute bottom-1/4 left-1/2"
+        className="absolute bottom-1/4 left-1/2 hidden sm:block"
       >
         <Code2 className="w-14 h-14 text-devfolio-orange" />
       </motion.div>
@@ -102,7 +102,7 @@ export const CompanyCompanySection = () => {
       <motion.div
         animate={{ rotate: [0, -180, 0] }}
         transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1.8 }}
-        className="absolute top-2/3 right-1/5"
+        className="absolute top-2/3 right-1/5 hidden sm:block"
       >
         <Cpu className="w-10 h-10 text-devfolio-green" />
       </motion.div>
@@ -110,7 +110,7 @@ export const CompanyCompanySection = () => {
       <motion.div
         animate={{ scale: [1, 1.4, 1] }}
         transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 2.5 }}
-        className="absolute bottom-1/5 left-1/5"
+        className="absolute bottom-1/5 left-1/5 hidden sm:block"
       >
         <HardDrive className="w-12 h-12 text-devfolio-blue" />
       </motion.div>
@@ -120,7 +120,7 @@ export const CompanyCompanySection = () => {
           initial={{ y: 50, opacity: 0 }}
           animate={isInView ? { y: 0, opacity: 1 } : {}}
           transition={{ duration: 0.8 }}
-          className="text-4xl md:text-6xl font-bold text-white mb-8"
+          className="text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-6 sm:mb-8"
         >
           Novothon for companies
         </motion.h2>
@@ -129,7 +129,7 @@ export const CompanyCompanySection = () => {
           initial={{ y: 30, opacity: 0 }}
           animate={isInView ? { y: 0, opacity: 1 } : {}}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-xl md:text-2xl text-white/90 mb-12 max-w-4xl mx-auto"
+          className="text-lg sm:text-xl md:text-2xl text-white/90 mb-8 sm:mb-12 max-w-4xl mx-auto"
         >
           Your engineering team and developer products need a brand and a fan base. That's where we come in.
         </motion.p>
@@ -138,7 +138,7 @@ export const CompanyCompanySection = () => {
           initial={{ y: 20, opacity: 0 }}
           animate={isInView ? { y: 0, opacity: 1 } : {}}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-lg text-white/80 mb-12 max-w-3xl mx-auto"
+          className="text-base sm:text-lg text-white/80 mb-8 sm:mb-12 max-w-3xl mx-auto"
         >
           Support Open Source Bring top developers of the 100+ web3 are all really high their projects.
         </motion.p>
@@ -153,7 +153,7 @@ export const CompanyCompanySection = () => {
           <Button 
             size="lg" 
             variant="secondary"
-            className="bg-white text-primary hover:bg-white/90 px-8 py-3 rounded-full font-semibold"
+            className="bg-white text-primary hover:bg-white/90 px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-base"
           >
             Learn more
           </Button>

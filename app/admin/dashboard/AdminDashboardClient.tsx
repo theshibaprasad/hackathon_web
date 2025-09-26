@@ -99,7 +99,7 @@ interface Payment {
     phoneNumber: string;
     userType: string;
     teamId: string;
-  };
+  } | null; // Allow null for deleted users
   paymentStatus: 'pending' | 'success' | 'failed';
   isEarlyBird: boolean;
   razorpayOrderId: string;
@@ -303,15 +303,24 @@ export default function AdminDashboardClient() {
   );
 
   const filteredPayments = payments.filter(payment => {
-    const matchesSearch = 
+    // Check if payment.userId exists and has the required properties
+    const hasValidUser = payment.userId && 
+      payment.userId.firstName && 
+      payment.userId.lastName && 
+      payment.userId.email;
+    
+    const matchesSearch = hasValidUser ? (
       payment.userId.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       payment.userId.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.userId.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.razorpayOrderId.toLowerCase().includes(searchTerm.toLowerCase());
+      payment.userId.email.toLowerCase().includes(searchTerm.toLowerCase())
+    ) : false;
+    
+    // Also search in payment ID if user data is missing
+    const matchesPaymentId = payment.razorpayOrderId.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = filterStatus === "all" || payment.paymentStatus === filterStatus;
     
-    return matchesSearch && matchesStatus;
+    return (matchesSearch || matchesPaymentId) && matchesStatus;
   });
 
   const filteredUsers = users.filter(user =>
@@ -648,12 +657,24 @@ export default function AdminDashboardClient() {
                     sortable: true,
                     render: (_, payment) => (
                       <div>
-                        <p className="font-semibold">
-                          {payment.userId.firstName} {payment.userId.lastName}
-                        </p>
-                        <p className="text-sm text-gray-500">{payment.userId.email}</p>
-                        {payment.teamInfo?.teamName && (
-                          <p className="text-xs text-blue-600">Team: {payment.teamInfo.teamName}</p>
+                        {payment.userId ? (
+                          <>
+                            <p className="font-semibold">
+                              {payment.userId.firstName} {payment.userId.lastName}
+                            </p>
+                            <p className="text-sm text-gray-500">{payment.userId.email}</p>
+                            {payment.teamInfo?.teamName && (
+                              <p className="text-xs text-blue-600">Team: {payment.teamInfo.teamName}</p>
+                            )}
+                          </>
+                        ) : (
+                          <div>
+                            <p className="font-semibold text-red-500">User Deleted</p>
+                            <p className="text-sm text-gray-500">User data not available</p>
+                            {payment.teamInfo?.teamName && (
+                              <p className="text-xs text-blue-600">Team: {payment.teamInfo.teamName}</p>
+                            )}
+                          </div>
                         )}
                       </div>
                     )
@@ -710,8 +731,8 @@ export default function AdminDashboardClient() {
                   const csvContent = [
                     "User,Email,Amount,Status,Early Bird,Order ID,Payment ID,Date,Team",
                     ...payments.map(payment => [
-                      `${payment.userId.firstName} ${payment.userId.lastName}`,
-                      payment.userId.email,
+                      payment.userId ? `${payment.userId.firstName} ${payment.userId.lastName}` : "User Deleted",
+                      payment.userId ? payment.userId.email : "N/A",
                       payment.amount,
                       payment.paymentStatus,
                       payment.isEarlyBird ? "Yes" : "No",

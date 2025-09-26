@@ -50,27 +50,27 @@ const FloatingIcon = ({ iconData, index }: { iconData: any, index: number }) => 
 
 export const CompanyHero = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center px-6 py-20 bg-background overflow-hidden">
-      {/* Floating Icons */}
-      <div className="absolute inset-0 pointer-events-none">
+    <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 py-16 sm:py-20 bg-background overflow-hidden">
+      {/* Floating Icons - Hidden on mobile for better performance */}
+      <div className="absolute inset-0 pointer-events-none hidden sm:block">
         {floatingIcons.map((iconData, index) => (
           <FloatingIcon key={index} iconData={iconData} index={index} />
         ))}
       </div>
       
-      <div className="relative z-10 max-w-5xl mx-auto text-center" >
+      <div className="relative z-10 max-w-5xl mx-auto text-center">
         <motion.div 
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="mb-12"
+          className="mb-8 sm:mb-12"
         >
           <Image
             src="/novothon_blue.svg"
             alt="Novothon"
             width={600}
             height={300}
-            className="mx-auto h-48 w-auto object-contain"
+            className="mx-auto h-32 sm:h-40 md:h-48 w-auto object-contain"
           />
         </motion.div>
 
@@ -78,12 +78,12 @@ export const CompanyHero = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="flex justify-center mb-16"
+          className="flex justify-center mb-12 sm:mb-16"
         >
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button size="lg" className="rounded-full px-8 py-4 bg-primary hover:bg-primary/90 text-lg font-semibold">
+            <Button size="lg" className="rounded-full px-6 sm:px-8 py-3 sm:py-4 bg-primary hover:bg-primary/90 text-base sm:text-lg font-semibold">
               Explore More
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
             </Button>
           </motion.div>
         </motion.div>
@@ -92,17 +92,17 @@ export const CompanyHero = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.6 }}
           transition={{ duration: 0.8, delay: 1 }}
-          className="flex flex-wrap items-center justify-center gap-8"
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8"
         >
-          <div className="text-sm text-muted-foreground">Trusted by developers from</div>
-          <div className="flex items-center gap-6">
+          <div className="text-xs sm:text-sm text-muted-foreground">Trusted by developers from</div>
+          <div className="flex items-center gap-4 sm:gap-6">
             {[...Array(5)].map((_, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 1.2 + i * 0.1, duration: 0.3 }}
-                className="w-8 h-8 bg-muted rounded-lg"
+                className="w-6 h-6 sm:w-8 sm:h-8 bg-muted rounded-lg"
               />
             ))}
           </div>
