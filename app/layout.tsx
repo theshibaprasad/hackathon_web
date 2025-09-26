@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 
 const inter = Inter({ subsets: ['latin'] })
 
+
 export const metadata: Metadata = {
   title: 'Novothon - Redefining Economic Opportunities for Builders',
   description: 'Join the largest community of developers, designers, and innovators building the future through hackathons.',

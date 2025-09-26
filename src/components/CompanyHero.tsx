@@ -110,7 +110,7 @@ export const CompanyHero = () => {
           transition={{ duration: 0.8, delay: 1 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8"
         >
-          <div className="text-xs sm:text-sm text-muted-foreground">Trusted by developers from</div>
+          <div className="text-xs sm:text-sm text-muted-foreground">Trusted by developers from </div>
           <div className="flex items-center gap-4 sm:gap-6">
             {[...Array(5)].map((_, i) => (
               <motion.div
