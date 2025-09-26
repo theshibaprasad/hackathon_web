@@ -309,7 +309,7 @@ export default function AdminDashboardClient() {
       payment.userId.lastName && 
       payment.userId.email;
     
-    const matchesSearch = hasValidUser ? (
+    const matchesSearch = hasValidUser && payment.userId ? (
       payment.userId.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       payment.userId.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       payment.userId.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -486,7 +486,7 @@ export default function AdminDashboardClient() {
                   failedPayments: payments.filter(p => p.paymentStatus === 'failed').length,
                   studentUsers: users.filter(u => u.userType === 'student').length,
                   professionalUsers: users.filter(u => u.userType === 'professional').length,
-                  verifiedUsers: users.filter(u => u.otpVerified || u.isGoogleUser).length,
+                  verifiedUsers: users.filter(u => u.otpVerified || (u as any).isGoogleUser).length,
                   recentUsers: stats.recentUsers,
                   recentRegistrations: stats.recentRegistrations
                 }}
@@ -874,7 +874,7 @@ export default function AdminDashboardClient() {
                       `${user.firstName} ${user.lastName}`,
                       user.email,
                       user.userType,
-                      user.isGoogleUser ? "Google User" : (user.otpVerified ? "Verified" : "Unverified"),
+                      (user as any).isGoogleUser ? "Google User" : (user.otpVerified ? "Verified" : "Unverified"),
                       user.phoneNumber || "N/A",
                       user.education?.instituteName || user.job?.company || "N/A",
                       user.paymentInfo ? `₹${user.paymentInfo.amount}` : "Not paid",

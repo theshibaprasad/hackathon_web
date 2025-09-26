@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
           paymentInfo: {
             leaderPayment,
             memberPayments, // All null - members don't pay individually
-            totalPaid: leaderPayment?.amount || 0,
+            totalPaid: (leaderPayment as any)?.amount || 0,
             isFullyPaid: !!leaderPayment // Only team leader needs to pay
           }
         };
