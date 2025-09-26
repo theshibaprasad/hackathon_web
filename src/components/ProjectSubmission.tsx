@@ -140,48 +140,56 @@ export const ProjectSubmission = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold text-foreground">Project Submission</h2>
-          <p className="text-muted-foreground mt-2">
-            Submit your hackathon project details and files
-          </p>
+      <div className="bg-gradient-to-r from-primary/5 via-primary/3 to-background/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-primary/10 shadow-lg shadow-primary/5">
+        <div className="flex flex-col gap-4 sm:gap-6">
+          <div className="text-center sm:text-left">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent mb-2 sm:mb-3">
+              🚀 Project Submission
+            </h2>
+            <p className="text-muted-foreground/80 text-sm sm:text-base lg:text-lg leading-relaxed">
+              Submit your innovative hackathon project and showcase your work
+            </p>
+          </div>
+          <div className="flex justify-center sm:justify-start">
+            <Badge 
+              variant={submissionStatus === 'submitted' ? 'default' : 'secondary'}
+              className="text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 font-semibold shadow-sm"
+            >
+              {submissionStatus === 'submitted' ? (
+                <>
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
+                  ✅ Submitted
+                </>
+              ) : (
+                <>
+                  <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
+                  Draft
+                </>
+              )}
+            </Badge>
+          </div>
         </div>
-        <Badge 
-          variant={submissionStatus === 'submitted' ? 'default' : 'secondary'}
-          className="text-sm"
-        >
-          {submissionStatus === 'submitted' ? (
-            <>
-              <CheckCircle className="w-4 h-4 mr-1" />
-              Submitted
-            </>
-          ) : (
-            <>
-              <AlertCircle className="w-4 h-4 mr-1" />
-              Draft
-            </>
-          )}
-        </Badge>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Main Form */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
           {/* Project Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <FileText className="w-5 h-5 mr-2" />
-                Project Details
+          <Card className="bg-gradient-to-br from-card via-card to-card/90 border-border/50 shadow-lg shadow-black/5 hover:shadow-xl hover:shadow-black/10 transition-all duration-300 rounded-xl sm:rounded-2xl backdrop-blur-sm">
+            <CardHeader className="pb-3 sm:pb-4 p-4 sm:p-6">
+              <CardTitle className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl font-bold">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-400/20 to-blue-500/10 rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm">
+                  <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                </div>
+                📄 Project Details
               </CardTitle>
-              <CardDescription>
-                Provide basic information about your project
+              <CardDescription className="text-sm sm:text-base text-muted-foreground/80 mt-1 sm:mt-2">
+                Provide comprehensive information about your innovative project
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6 pt-0">
               <div className="space-y-2">
                 <Label htmlFor="projectName">Project Name *</Label>
                 <Input
@@ -189,7 +197,7 @@ export const ProjectSubmission = () => {
                   value={projectData.projectName}
                   onChange={(e) => handleInputChange('projectName', e.target.value)}
                   placeholder="Enter your project name"
-                  className="h-12"
+                  className="h-10 sm:h-12"
                 />
               </div>
 
@@ -200,7 +208,7 @@ export const ProjectSubmission = () => {
                   value={projectData.description}
                   onChange={(e) => handleInputChange('description', e.target.value)}
                   placeholder="Describe your project, technologies used, and key features..."
-                  className="min-h-[120px] resize-none"
+                  className="min-h-[100px] sm:min-h-[120px] resize-none"
                 />
               </div>
 
@@ -213,7 +221,7 @@ export const ProjectSubmission = () => {
                     value={projectData.githubRepo}
                     onChange={(e) => handleInputChange('githubRepo', e.target.value)}
                     placeholder="https://github.com/username/repository"
-                    className="pl-10 h-12"
+                    className="pl-10 h-10 sm:h-12"
                   />
                 </div>
               </div>
@@ -221,21 +229,23 @@ export const ProjectSubmission = () => {
           </Card>
 
           {/* File Uploads */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Upload className="w-5 h-5 mr-2" />
-                File Uploads
+          <Card className="bg-gradient-to-br from-card via-card to-card/90 border-border/50 shadow-lg shadow-black/5 hover:shadow-xl hover:shadow-black/10 transition-all duration-300 rounded-xl sm:rounded-2xl backdrop-blur-sm">
+            <CardHeader className="pb-3 sm:pb-4 p-4 sm:p-6">
+              <CardTitle className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl font-bold">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-green-400/20 to-green-500/10 rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm">
+                  <Upload className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
+                </div>
+                📤 File Uploads
               </CardTitle>
-              <CardDescription>
-                Upload your presentation and project files
+              <CardDescription className="text-sm sm:text-base text-muted-foreground/80 mt-1 sm:mt-2">
+                Upload your presentation slides and complete project files
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6 pt-0">
               {/* PPT Upload */}
               <div className="space-y-3">
-                <Label className="text-base font-medium">Presentation File (PPT/PDF)</Label>
-                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
+                <Label className="text-sm sm:text-base font-medium">Presentation File (PPT/PDF)</Label>
+                <div className="border-2 border-dashed border-border rounded-lg p-4 sm:p-6 text-center hover:border-primary/50 transition-colors">
                   <input
                     type="file"
                     id="ppt-upload"
@@ -247,8 +257,8 @@ export const ProjectSubmission = () => {
                     className="hidden"
                   />
                   <label htmlFor="ppt-upload" className="cursor-pointer">
-                    <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                    <p className="text-sm text-muted-foreground mb-2">
+                    <FileText className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground mx-auto mb-2 sm:mb-3" />
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-1 sm:mb-2">
                       Click to upload or drag and drop
                     </p>
                     <p className="text-xs text-muted-foreground">
@@ -282,8 +292,8 @@ export const ProjectSubmission = () => {
 
               {/* ZIP Upload */}
               <div className="space-y-3">
-                <Label className="text-base font-medium">Project Files (ZIP)</Label>
-                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
+                <Label className="text-sm sm:text-base font-medium">Project Files (ZIP)</Label>
+                <div className="border-2 border-dashed border-border rounded-lg p-4 sm:p-6 text-center hover:border-primary/50 transition-colors">
                   <input
                     type="file"
                     id="zip-upload"
@@ -295,8 +305,8 @@ export const ProjectSubmission = () => {
                     className="hidden"
                   />
                   <label htmlFor="zip-upload" className="cursor-pointer">
-                    <Archive className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                    <p className="text-sm text-muted-foreground mb-2">
+                    <Archive className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground mx-auto mb-2 sm:mb-3" />
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-1 sm:mb-2">
                       Click to upload or drag and drop
                     </p>
                     <p className="text-xs text-muted-foreground">
@@ -332,13 +342,18 @@ export const ProjectSubmission = () => {
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Submission Guidelines */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Submission Guidelines</CardTitle>
+          <Card className="bg-gradient-to-br from-card via-card to-card/90 border-border/50 shadow-lg shadow-black/5 hover:shadow-xl hover:shadow-black/10 transition-all duration-300 rounded-xl sm:rounded-2xl backdrop-blur-sm">
+            <CardHeader className="pb-3 sm:pb-4 p-4 sm:p-6">
+              <CardTitle className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl font-bold">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-400/20 to-purple-500/10 rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm">
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+                </div>
+                📋 Guidelines
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm">
+            <CardContent className="space-y-2 sm:space-y-3 text-xs sm:text-sm p-4 sm:p-6 pt-0">
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
                 <span>Project name should be descriptive and clear</span>
@@ -363,12 +378,12 @@ export const ProjectSubmission = () => {
           </Card>
 
           {/* Submit Button */}
-          <Card>
-            <CardContent className="pt-6">
+          <Card className="bg-gradient-to-br from-card via-card to-card/90 border-border/50 shadow-lg shadow-black/5 hover:shadow-xl hover:shadow-black/10 transition-all duration-300 rounded-xl sm:rounded-2xl backdrop-blur-sm">
+            <CardContent className="pt-4 sm:pt-6 p-4 sm:p-6">
               <Button
                 onClick={handleSubmit}
                 disabled={isSubmitting || !projectData.projectName || !projectData.description}
-                className="w-full h-12 text-lg font-semibold"
+                className="w-full h-12 sm:h-14 text-base sm:text-lg font-bold rounded-lg sm:rounded-xl bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary hover:shadow-xl hover:shadow-primary/25 hover:scale-105 transition-all duration-300"
               >
                 {isSubmitting ? (
                   <>

@@ -10,7 +10,7 @@ export const CompanyValuesSection = () => {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section ref={ref} className="py-12 sm:py-20 px-4 sm:px-6 bg-background relative overflow-hidden">
+    <section ref={ref} className="py-12 sm:py-20 px-4 sm:px-6 bg-background relative overflow-hidden z-10">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
           {/* Left side - Illustration */}
@@ -66,7 +66,7 @@ export const CompanyValuesSection = () => {
             >
               <Button 
                 size="lg" 
-                className="bg-primary hover:bg-primary/90 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-full text-sm sm:text-base"
+                className="glass-button liquid-glass bg-primary/90 hover:bg-primary text-white px-6 sm:px-8 py-2 sm:py-3 rounded-full text-sm sm:text-base backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 Join our Discord
               </Button>

@@ -16,7 +16,7 @@ export const CompanyCompanySection = () => {
       initial={{ opacity: 0 }}
       animate={isInView ? { opacity: 1 } : {}}
       transition={{ duration: 1 }}
-      className="py-12 sm:py-20 px-4 sm:px-6 bg-gradient-to-br from-primary to-devfolio-blue relative overflow-hidden"
+      className="py-12 sm:py-20 px-4 sm:px-6 bg-gradient-to-br from-primary to-devfolio-blue relative overflow-hidden z-10"
     >
       {/* Floating icons like hero section - Hidden on mobile for better performance */}
       <motion.div
@@ -153,7 +153,7 @@ export const CompanyCompanySection = () => {
           <Button 
             size="lg" 
             variant="secondary"
-            className="bg-white text-primary hover:bg-white/90 px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-base"
+            className="glass-button liquid-glass bg-white/90 text-primary hover:bg-white px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-base backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300"
           >
             Learn more
           </Button>

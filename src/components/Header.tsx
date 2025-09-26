@@ -98,16 +98,16 @@ export const Header = () => {
         </div>
         
         <nav className="hidden md:flex items-center space-x-8">
-          <a href="#" className="text-foreground hover:text-primary hover:scale-105 transition-all duration-200 font-medium">
+          <a href="#" className="glass-nav-link text-foreground hover:text-primary font-medium">
             Problem Statements
           </a>
-          <a href="#" className="text-foreground hover:text-primary hover:scale-105 transition-all duration-200 font-medium">
+          <a href="#" className="glass-nav-link text-foreground hover:text-primary font-medium">
             Guidelines
           </a>
-          <a href="#" className="text-foreground hover:text-primary hover:scale-105 transition-all duration-200 font-medium">
+          <a href="#" className="glass-nav-link text-foreground hover:text-primary font-medium">
             About
           </a>
-          <a href="#" className="text-foreground hover:text-primary hover:scale-105 transition-all duration-200 font-medium">
+          <a href="#" className="glass-nav-link text-foreground hover:text-primary font-medium">
             Sponsor
           </a>
         </nav>

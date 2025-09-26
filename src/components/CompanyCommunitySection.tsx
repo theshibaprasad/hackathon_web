@@ -14,7 +14,7 @@ export const CompanyCommunitySection = () => {
       initial={{ opacity: 0 }}
       animate={isInView ? { opacity: 1 } : {}}
       transition={{ duration: 1 }}
-      className="py-12 sm:py-20 px-4 sm:px-6 bg-devfolio-yellow relative overflow-hidden"
+      className="py-12 sm:py-20 px-4 sm:px-6 bg-devfolio-yellow relative overflow-hidden z-10"
     >
       {/* Floating shapes - Hidden on mobile for better performance */}
       <motion.div

@@ -635,60 +635,65 @@ export const TeamMembers = ({ user }: TeamMembersProps) => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
 
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold text-foreground">Team Members</h2>
-          <p className="text-muted-foreground mt-2">
-            Manage your team members for the hackathon
-          </p>
-        </div>
-        <div className="flex items-center space-x-4">
-          <Badge variant="secondary" className="text-sm">
-            <Users className="w-4 h-4 mr-1" />
-            {members.length}/5 Members
-          </Badge>
-          <Button
-            onClick={() => {
-              if (!registrationEnabled) {
-                toast({
-                  title: "Registration Closed",
-                  description: "Registration is currently closed. You cannot add new team members.",
-                  variant: "destructive",
-                });
-                return;
-              }
-              setShowAddForm(true);
-            }}
-            disabled={members.length >= 5 || !registrationEnabled}
-            className={`transition-all duration-200 ${
-              !registrationEnabled 
-                ? 'opacity-50 cursor-not-allowed' 
-                : 'bg-primary hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/25'
-            }`}
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            {registrationEnabled ? 'Add Member' : 'Registration Closed'}
-          </Button>
+      <div className="bg-gradient-to-r from-primary/5 via-primary/3 to-background/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-primary/10 shadow-lg shadow-primary/5">
+        <div className="flex flex-col gap-4 sm:gap-6">
+          <div className="text-center sm:text-left">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent mb-2 sm:mb-3">
+              👥 Team Members
+            </h2>
+            <p className="text-muted-foreground/80 text-sm sm:text-base lg:text-lg leading-relaxed">
+              Build your dream team and manage members for the hackathon
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+            <Badge variant="secondary" className="text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 font-semibold shadow-sm bg-muted/80">
+              <Users className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
+              {members.length}/5 Members
+            </Badge>
+            <Button
+              onClick={() => {
+                if (!registrationEnabled) {
+                  toast({
+                    title: "Registration Closed",
+                    description: "Registration is currently closed. You cannot add new team members.",
+                    variant: "destructive",
+                  });
+                  return;
+                }
+                setShowAddForm(true);
+              }}
+              disabled={members.length >= 5 || !registrationEnabled}
+              className={`w-full sm:w-auto transition-all duration-300 px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-semibold shadow-lg ${
+                !registrationEnabled 
+                  ? 'opacity-50 cursor-not-allowed' 
+                  : 'bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary hover:shadow-xl hover:shadow-primary/25 hover:scale-105'
+              }`}
+            >
+              <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 sm:mr-2" />
+              <span className="hidden sm:inline">{registrationEnabled ? 'Add Member' : '🔒 Registration Closed'}</span>
+              <span className="sm:hidden">{registrationEnabled ? 'Add' : '🔒 Closed'}</span>
+            </Button>
+          </div>
         </div>
       </div>
 
 
       {/* Team Members Section */}
-      <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-200/60 p-8">
+      <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-xl sm:rounded-2xl border border-slate-200/60 p-4 sm:p-6 lg:p-8">
         {members.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="w-20 h-20 bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
-              <Users className="w-10 h-10 text-primary/60" />
+          <div className="text-center py-8 sm:py-12 lg:py-16">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-sm">
+              <Users className="w-8 h-8 sm:w-10 sm:h-10 text-primary/60" />
             </div>
-            <h3 className="text-xl font-semibold text-slate-800 mb-3">No Team Members Yet</h3>
-            <p className="text-slate-600 mb-6 max-w-md mx-auto leading-relaxed">
+            <h3 className="text-lg sm:text-xl font-semibold text-slate-800 mb-2 sm:mb-3">No Team Members Yet</h3>
+            <p className="text-sm sm:text-base text-slate-600 mb-4 sm:mb-6 max-w-sm sm:max-w-md mx-auto leading-relaxed px-4">
               {user?.teamId ? 'Start building your team by adding talented members to collaborate on your hackathon project!' : 'You need to create a team first.'}
             </p>
             {!user?.teamId && (
-              <p className="text-sm text-slate-500 bg-slate-100 rounded-lg px-4 py-2 inline-block">
+              <p className="text-xs sm:text-sm text-slate-500 bg-slate-100 rounded-lg px-3 sm:px-4 py-1.5 sm:py-2 inline-block mx-4">
                 Complete your hackathon registration to create a team.
               </p>
             )}
@@ -723,62 +728,62 @@ export const TeamMembers = ({ user }: TeamMembersProps) => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <Card className="relative group bg-white/80 backdrop-blur-sm border-slate-200/60 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 rounded-xl overflow-hidden">
+                  <Card className="relative group bg-white/80 backdrop-blur-sm border-slate-200/60 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 rounded-lg sm:rounded-xl overflow-hidden">
                     {/* Member Header */}
-                    <div className="p-6 pb-4">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-center space-x-3">
-                          <div className="relative">
-                            <div className="w-14 h-14 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl flex items-center justify-center shadow-sm">
-                              <User className="h-7 w-7 text-primary" />
+                    <div className="p-4 sm:p-6 pb-3 sm:pb-4">
+                      <div className="flex items-start justify-between mb-3 sm:mb-4">
+                        <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
+                          <div className="relative flex-shrink-0">
+                            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm">
+                              <User className="h-5 w-5 sm:h-7 sm:w-7 text-primary" />
                             </div>
                             {member.isTeamLead && (
-                              <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center shadow-sm">
-                                <Crown className="w-3 h-3 text-yellow-800" />
+                              <div className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-5 h-5 sm:w-6 sm:h-6 bg-yellow-400 rounded-full flex items-center justify-center shadow-sm">
+                                <Crown className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-yellow-800" />
                               </div>
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="text-lg font-semibold text-slate-800 truncate">
+                            <h3 className="text-sm sm:text-lg font-semibold text-slate-800 truncate">
                               {member.firstName} {member.lastName}
                             </h3>
-                            <p className="text-sm text-slate-500 truncate flex items-center mt-1">
-                              <Mail className="w-3 h-3 mr-2 flex-shrink-0" />
-                              {member.email}
+                            <p className="text-xs sm:text-sm text-slate-500 truncate flex items-center mt-0.5 sm:mt-1">
+                              <Mail className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1.5 sm:mr-2 flex-shrink-0" />
+                              <span className="truncate">{member.email}</span>
                             </p>
                           </div>
                         </div>
                         
                         {/* Action Buttons */}
                         {!member.isTeamLead && (
-                          <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                          <div className="flex space-x-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all duration-200 flex-shrink-0">
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 w-8 p-0 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg"
+                              className="h-6 w-6 sm:h-8 sm:w-8 p-0 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-md sm:rounded-lg"
                               onClick={() => handleEditMember(member)}
                             >
-                              <Edit className="w-4 h-4" />
+                              <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 w-8 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg"
+                              className="h-6 w-6 sm:h-8 sm:w-8 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md sm:rounded-lg"
                               onClick={() => handleRemoveMember(member.id)}
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                             </Button>
                           </div>
                         )}
                       </div>
 
                       {/* Member Details */}
-                      <div className="space-y-3">
+                      <div className="space-y-2 sm:space-y-3">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-slate-500">Role</span>
+                          <span className="text-xs sm:text-sm text-slate-500">Role</span>
                           <Badge 
                             variant={member.isTeamLead ? "default" : "secondary"}
-                            className={`text-xs font-medium px-3 py-1 rounded-full ${
+                            className={`text-xs font-medium px-2 sm:px-3 py-0.5 sm:py-1 rounded-full ${
                               member.isTeamLead 
                                 ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900 border-0' 
                                 : 'bg-slate-100 text-slate-600 border-0'
@@ -790,19 +795,19 @@ export const TeamMembers = ({ user }: TeamMembersProps) => {
                         
                         {member.phone && (
                           <div className="flex items-center justify-between">
-                            <span className="text-sm text-slate-500">Phone</span>
-                            <span className="text-sm font-medium text-slate-700">{member.phone}</span>
+                            <span className="text-xs sm:text-sm text-slate-500">Phone</span>
+                            <span className="text-xs sm:text-sm font-medium text-slate-700 truncate ml-2">{member.phone}</span>
                           </div>
                         )}
                       </div>
                     </div>
 
                     {/* Card Footer */}
-                    <div className="px-6 py-3 bg-slate-50/50 border-t border-slate-100/60">
+                    <div className="px-4 sm:px-6 py-2 sm:py-3 bg-slate-50/50 border-t border-slate-100/60">
                       <div className="flex items-center justify-between text-xs text-slate-500">
                         <span>Team Member</span>
                         <div className="flex items-center space-x-1">
-                          <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-400 rounded-full"></div>
                           <span>Active</span>
                         </div>
                       </div>

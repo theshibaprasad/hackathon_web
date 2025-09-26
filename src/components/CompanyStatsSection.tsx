@@ -9,7 +9,7 @@ export const CompanyStatsSection = () => {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section ref={ref} className="py-12 sm:py-20 px-4 sm:px-6 bg-background relative overflow-hidden">
+    <section ref={ref} className="py-12 sm:py-20 px-4 sm:px-6 bg-background relative overflow-hidden z-10">
       {/* Illustration placeholder for the left image - Hidden on mobile */}
       <motion.div
         initial={{ x: -100, opacity: 0 }}
@@ -27,7 +27,7 @@ export const CompanyStatsSection = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="relative order-2 lg:order-1"
           >
-            <div className="w-full h-64 sm:h-80 lg:h-96 bg-muted rounded-2xl flex items-center justify-center text-muted-foreground text-sm sm:text-base">
+            <div className="w-full h-64 sm:h-80 lg:h-96 glass-card liquid-glass flex items-center justify-center text-muted-foreground text-sm sm:text-base">
               [Image Placeholder - Hackathon Scene]
             </div>
             {/* Floating illustrations around the image - Hidden on mobile */}
@@ -67,7 +67,7 @@ export const CompanyStatsSection = () => {
                 initial={{ scale: 0, x: 50 }}
                 animate={isInView ? { scale: 1, x: 0 } : {}}
                 transition={{ duration: 0.6, delay: 0.6 }}
-                className="inline-flex items-center bg-devfolio-green text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-lg"
+                className="inline-flex items-center glass-button liquid-glass bg-devfolio-green text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-lg backdrop-blur-sm"
               >
                 800,000+ Developers
               </motion.div>
@@ -76,7 +76,7 @@ export const CompanyStatsSection = () => {
                 initial={{ scale: 0, x: 50 }}
                 animate={isInView ? { scale: 1, x: 0 } : {}}
                 transition={{ duration: 0.6, delay: 0.8 }}
-                className="inline-flex items-center bg-devfolio-blue text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-lg ml-0 sm:ml-4"
+                className="inline-flex items-center glass-button liquid-glass bg-devfolio-blue text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-lg ml-0 sm:ml-4 backdrop-blur-sm"
               >
                 75,000+ Projects
               </motion.div>
@@ -85,7 +85,7 @@ export const CompanyStatsSection = () => {
                 initial={{ scale: 0, x: 50 }}
                 animate={isInView ? { scale: 1, x: 0 } : {}}
                 transition={{ duration: 0.6, delay: 1 }}
-                className="inline-flex items-center bg-devfolio-purple text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-lg"
+                className="inline-flex items-center glass-button liquid-glass bg-devfolio-purple text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-lg backdrop-blur-sm"
               >
                 1,300+ Hackathons
               </motion.div>

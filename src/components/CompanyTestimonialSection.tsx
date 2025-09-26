@@ -9,7 +9,7 @@ export const CompanyTestimonialSection = () => {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section ref={ref} className="py-12 sm:py-20 px-4 sm:px-6 bg-muted/30">
+    <section ref={ref} className="py-12 sm:py-20 px-4 sm:px-6 bg-muted/30 relative z-10">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
           {/* Left side - Text */}
@@ -46,7 +46,7 @@ export const CompanyTestimonialSection = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="relative order-1 lg:order-2"
           >
-            <div className="w-full h-64 sm:h-80 lg:h-96 bg-muted rounded-2xl flex items-center justify-center text-muted-foreground text-sm sm:text-base">
+            <div className="w-full h-64 sm:h-80 lg:h-96 glass-card liquid-glass flex items-center justify-center text-muted-foreground text-sm sm:text-base">
               [Image Placeholder - Testimonial Photo]
             </div>
             

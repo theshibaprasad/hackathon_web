@@ -114,30 +114,37 @@ export const HackathonDetails = () => {
   const registrationProgress = (hackathon.currentParticipants / hackathon.maxParticipants) * 100;
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-8">
+    <div className="max-w-7xl mx-auto space-y-8">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="text-center space-y-4"
+        className="text-center space-y-6 bg-gradient-to-br from-primary/5 via-primary/3 to-background/50 rounded-3xl p-8 border border-primary/10 shadow-lg shadow-primary/5"
       >
-        <div className="flex items-center justify-center gap-2 mb-4">
-          <Badge variant={hackathon.isActive ? "default" : "secondary"} className="text-sm">
-            {hackathon.isActive ? "Active" : "Upcoming"}
+        <div className="flex items-center justify-center gap-3 mb-6">
+          <Badge variant={hackathon.isActive ? "default" : "secondary"} className="text-sm px-4 py-1.5 font-semibold shadow-sm">
+            {hackathon.isActive ? "🔴 Live Now" : "📅 Upcoming"}
           </Badge>
-          <Badge variant="outline" className="text-sm">
-            {hackathon.duration}
+          <Badge variant="outline" className="text-sm px-4 py-1.5 font-semibold border-primary/20 bg-primary/5">
+            ⏱️ {hackathon.duration}
           </Badge>
         </div>
         
-        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+        <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent drop-shadow-sm">
           {hackathon.title}
         </h1>
         
-        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+        <p className="text-xl md:text-2xl text-muted-foreground/80 max-w-4xl mx-auto leading-relaxed">
           {hackathon.description}
         </p>
+        
+        {/* Decorative elements */}
+        <div className="flex items-center justify-center space-x-4 pt-4">
+          <div className="w-2 h-2 bg-primary/40 rounded-full animate-pulse"></div>
+          <div className="w-1 h-1 bg-primary/60 rounded-full animate-pulse animation-delay-150"></div>
+          <div className="w-2 h-2 bg-primary/40 rounded-full animate-pulse animation-delay-300"></div>
+        </div>
       </motion.div>
 
 
@@ -150,10 +157,12 @@ export const HackathonDetails = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
+            <Card className="bg-gradient-to-br from-card via-card to-card/90 border-border/50 shadow-lg shadow-black/5 hover:shadow-xl hover:shadow-black/10 transition-all duration-300 rounded-2xl backdrop-blur-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-3 text-xl font-bold">
+                  <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl flex items-center justify-center shadow-sm">
+                    <Calendar className="h-5 w-5 text-primary" />
+                  </div>
                   Event Details
                 </CardTitle>
               </CardHeader>
@@ -214,10 +223,12 @@ export const HackathonDetails = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Trophy className="h-5 w-5" />
+            <Card className="bg-gradient-to-br from-card via-card to-card/90 border-border/50 shadow-lg shadow-black/5 hover:shadow-xl hover:shadow-black/10 transition-all duration-300 rounded-2xl backdrop-blur-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-3 text-xl font-bold">
+                  <div className="w-10 h-10 bg-gradient-to-br from-yellow-400/20 to-yellow-500/10 rounded-xl flex items-center justify-center shadow-sm">
+                    <Trophy className="h-5 w-5 text-yellow-600" />
+                  </div>
                   Prizes & Rewards
                 </CardTitle>
               </CardHeader>
@@ -240,13 +251,15 @@ export const HackathonDetails = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5" />
+            <Card className="bg-gradient-to-br from-card via-card to-card/90 border-border/50 shadow-lg shadow-black/5 hover:shadow-xl hover:shadow-black/10 transition-all duration-300 rounded-2xl backdrop-blur-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-3 text-xl font-bold">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-400/20 to-blue-500/10 rounded-xl flex items-center justify-center shadow-sm">
+                    <Target className="h-5 w-5 text-blue-600" />
+                  </div>
                   Hackathon Themes
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-base text-muted-foreground/80 mt-2">
                   Choose from these exciting themes for your project
                 </CardDescription>
               </CardHeader>
@@ -271,17 +284,23 @@ export const HackathonDetails = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <Card className="sticky top-6">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  {hackathon.isRegistered ? (
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                  ) : (
-                    <Star className="h-5 w-5" />
-                  )}
-                  {hackathon.isRegistered ? 'Registered' : 'Registration'}
+            <Card className="sticky top-6 bg-gradient-to-br from-card via-card to-card/90 border-border/50 shadow-xl shadow-black/10 rounded-2xl backdrop-blur-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-3 text-xl font-bold">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-sm ${
+                    hackathon.isRegistered 
+                      ? 'bg-gradient-to-br from-green-400/20 to-green-500/10' 
+                      : 'bg-gradient-to-br from-primary/20 to-primary/10'
+                  }`}>
+                    {hackathon.isRegistered ? (
+                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    ) : (
+                      <Star className="h-5 w-5 text-primary" />
+                    )}
+                  </div>
+                  {hackathon.isRegistered ? '✅ Registered' : '🎯 Registration'}
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-base text-muted-foreground/80 mt-2">
                   {hackathon.isRegistered 
                     ? 'You are registered for this hackathon'
                     : 'Register now to participate'
@@ -329,9 +348,14 @@ export const HackathonDetails = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
           >
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Quick Stats</CardTitle>
+            <Card className="bg-gradient-to-br from-card via-card to-card/90 border-border/50 shadow-lg shadow-black/5 hover:shadow-xl hover:shadow-black/10 transition-all duration-300 rounded-2xl backdrop-blur-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-3 text-xl font-bold">
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-400/20 to-purple-500/10 rounded-xl flex items-center justify-center shadow-sm">
+                    <Code className="h-5 w-5 text-purple-600" />
+                  </div>
+                  📊 Quick Stats
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex justify-between items-center">

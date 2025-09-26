@@ -196,24 +196,43 @@ export default function DashboardClient({ user }: DashboardClientProps) {
     {/* Mobile sidebar overlay */}
     {sidebarOpen && (
       <div 
-        className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+        className="fixed top-20 left-0 right-0 bottom-0 bg-black/50 z-40 lg:hidden"
         onClick={() => setSidebarOpen(false)}
       />
     )}
 
     {/* Sidebar */}
-    <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border lg:relative lg:translate-x-0 ${
+    <div className={`fixed left-0 w-64 border-r shadow-xl lg:relative lg:translate-x-0 transition-transform duration-300 ease-in-out ${
       sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-    }`}
-    style={{ top: '80px', height: 'calc(100vh - 80px)' }}>
-      <div className="flex h-full flex-col">
+    } ${
+      sidebarOpen 
+        ? 'top-20 h-[calc(100vh-80px)] z-50 bg-card/95 backdrop-blur-md border-border shadow-2xl lg:z-30 lg:bg-gradient-to-b lg:from-card lg:via-card lg:to-card/95 lg:backdrop-blur-sm lg:border-border/50 lg:shadow-xl' 
+        : 'top-20 h-[calc(100vh-80px)] z-30 bg-gradient-to-b from-card via-card to-card/95 backdrop-blur-sm border-border/50'
+    }`}>
+      <div className="flex h-full flex-col relative">
+        {/* Subtle gradient overlay - more prominent on mobile when open */}
+        <div className={`absolute inset-0 pointer-events-none ${
+          sidebarOpen 
+            ? 'bg-gradient-to-br from-muted/10 via-muted/5 to-muted/15 lg:bg-gradient-to-br lg:from-muted/8 lg:via-transparent lg:to-muted/12'
+            : 'bg-gradient-to-br from-muted/8 via-transparent to-muted/12'
+        }`} />
+        
         {/* Dashboard Header */}
-        <div className="flex items-center justify-between p-6 border-b border-border">
-          <h1 className="text-xl font-bold">Dashboard</h1>
+        <div className={`relative flex items-center justify-between p-6 border-b ${
+          sidebarOpen 
+            ? 'border-border bg-muted/10 lg:border-border/50'
+            : 'border-border/50'
+        }`}>
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-muted/60 rounded-lg flex items-center justify-center shadow-sm">
+              <LayoutDashboard className="h-4 w-4 text-foreground" />
+            </div>
+            <h1 className="text-xl font-bold text-foreground">Dashboard</h1>
+          </div>
           <Button
             variant="ghost"
             size="sm"
-            className="lg:hidden"
+            className="lg:hidden hover:bg-destructive/10 hover:text-destructive"
             onClick={() => setSidebarOpen(false)}
           >
             <X className="h-4 w-4" />
@@ -221,45 +240,109 @@ export default function DashboardClient({ user }: DashboardClientProps) {
         </div>
 
         {/* Team Info */}
-        <div className="p-6 border-b border-border">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-              <User className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="font-medium">
-                {teamData?.teamName || 'No Team'}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {teamData?.isTeamLeader ? 'Team Leader' : 'Team Member'}
-              </p>
+        <div className={`relative p-6 border-b ${
+          sidebarOpen 
+            ? 'border-border/50 lg:border-border/30'
+            : 'border-border/30'
+        }`}>
+          <div className={`rounded-xl p-4 border shadow-sm ${
+            sidebarOpen 
+              ? 'bg-gradient-to-r from-muted/70 to-muted/50 border-border/30 shadow-md lg:bg-gradient-to-r lg:from-muted/50 lg:to-muted/30 lg:border-border/20 lg:shadow-sm'
+              : 'bg-gradient-to-r from-muted/50 to-muted/30 border-border/20'
+          }`}>
+            <div className="flex items-center space-x-3">
+              <div className="relative">
+                <div className="w-12 h-12 bg-muted/60 rounded-xl flex items-center justify-center shadow-sm border border-border/20">
+                  <User className="h-6 w-6 text-foreground" />
+                </div>
+                {teamData?.isTeamLeader && (
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-full flex items-center justify-center shadow-sm">
+                    <span className="text-[10px] text-white font-bold">★</span>
+                  </div>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm truncate">
+                  {teamData?.teamName || 'No Team Assigned'}
+                </p>
+                <div className="flex items-center space-x-2">
+                  <div className={`w-2 h-2 rounded-full ${teamData?.isTeamLeader ? 'bg-yellow-400' : 'bg-blue-400'} shadow-sm`} />
+                  <p className="text-xs text-muted-foreground">
+                    {teamData?.isTeamLeader ? 'Team Leader' : 'Team Member'}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2">
-          {menuItems.map((item) => {
+        <nav className="relative flex-1 p-4 space-y-2">
+          {menuItems.map((item, index) => {
             const Icon = item.icon;
+            const isActive = activeTab === item.id;
             return (
-              <Button
-                key={item.id}
-                variant={activeTab === item.id ? "default" : "ghost"}
-                className={`w-full justify-start h-12 text-left transition-all duration-200 ${
-                  item.disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary/10 hover:text-primary hover:shadow-sm'
-                }`}
-                onClick={() => handleTabClick(item.id)}
-                disabled={item.disabled}
-              >
-                <Icon className="mr-3 h-5 w-5" />
-                {item.label}
-                {item.disabled && (
-                  <span className="ml-auto text-xs text-muted-foreground">🔒</span>
-                )}
-              </Button>
+              <div key={item.id} className="relative">
+                <Button
+                  variant="ghost"
+                  className={`w-full justify-start h-12 text-left transition-all duration-200 relative group rounded-lg ${
+                    isActive 
+                      ? 'bg-blue-50 text-blue-700 font-semibold hover:bg-blue-100 hover:text-blue-700' 
+                      : item.disabled 
+                        ? 'opacity-50 cursor-not-allowed' 
+                        : 'hover:bg-muted/60 hover:text-foreground'
+                  }`}
+                  onClick={() => handleTabClick(item.id)}
+                  disabled={item.disabled}
+                >
+                  {/* Simple active indicator */}
+                  {isActive && (
+                    <div className="absolute left-0 top-1 bottom-1 w-1 bg-blue-500 rounded-r-sm" />
+                  )}
+                  
+                  {/* Clean icon */}
+                  <div className="mr-3">
+                    <Icon className={`h-5 w-5 transition-colors duration-200 ${
+                      isActive 
+                        ? 'text-blue-600 group-hover:text-blue-600' 
+                        : item.disabled 
+                          ? 'text-muted-foreground' 
+                          : 'text-muted-foreground group-hover:text-foreground'
+                    }`} />
+                  </div>
+                  
+                  <span className={`font-medium transition-colors duration-200 ${
+                    isActive 
+                      ? 'text-blue-700' 
+                      : item.disabled 
+                        ? 'text-muted-foreground' 
+                        : 'text-foreground'
+                  }`}>
+                    {item.label}
+                  </span>
+                  
+                  {item.disabled && (
+                    <div className="ml-auto">
+                      <div className="w-5 h-5 bg-muted/60 rounded flex items-center justify-center">
+                        <span className="text-xs">🔒</span>
+                      </div>
+                    </div>
+                  )}
+                </Button>
+              </div>
             );
           })}
         </nav>
+
+        {/* Bottom decoration */}
+        <div className="relative p-4">
+          <div className="h-px bg-gradient-to-r from-transparent via-border/50 to-transparent mb-4" />
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground/60">
+              {currentUser.firstName} {currentUser.lastName}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -279,23 +362,32 @@ export default function DashboardClient({ user }: DashboardClientProps) {
       </div>
 
       {/* Content */}
-      <main className="flex-1 overflow-y-auto p-6">
+      <main className="flex-1 overflow-y-auto p-6 bg-gradient-to-br from-background via-background to-muted/10">
         {/* Registration Message */}
         {showRegistrationMessage && (
-          <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-            <div className="flex items-center gap-2">
-              <div className="text-amber-600">⚠️</div>
-              <div>
-                <p className="font-medium text-amber-800">Onboarding Required</p>
-                <p className="text-sm text-amber-700">
-                  Please complete your onboarding first to access team management and project submission features.
+          <div className="mb-8 p-6 bg-gradient-to-r from-amber-50 via-amber-50/80 to-orange-50/60 border-2 border-amber-200/60 rounded-2xl shadow-lg shadow-amber-100/50 backdrop-blur-sm">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-400 rounded-xl flex items-center justify-center shadow-lg shadow-amber-200/50">
+                <span className="text-xl">⚠️</span>
+              </div>
+              <div className="flex-1">
+                <h3 className="font-bold text-lg text-amber-900 mb-2">Onboarding Required</h3>
+                <p className="text-amber-800 leading-relaxed mb-4">
+                  Complete your onboarding process to unlock team management and project submission features. This will enable you to build your team and participate in the hackathon.
                 </p>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-amber-700 font-medium">Action required</span>
+                </div>
               </div>
             </div>
           </div>
         )}
         
-        {renderContent()}
+        {/* Content Container */}
+        <div className="min-h-[calc(100vh-200px)] bg-gradient-to-br from-card/50 via-card/30 to-background/50 rounded-3xl border border-border/40 shadow-xl shadow-black/5 backdrop-blur-sm p-8">
+          {renderContent()}
+        </div>
       </main>
     </div>
   </div>

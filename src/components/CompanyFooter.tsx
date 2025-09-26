@@ -13,7 +13,7 @@ const footerLinks = {
 
 export const CompanyFooter = () => {
   return (
-    <footer className="bg-background py-12 sm:py-16 px-4 sm:px-6 border-t">
+    <footer className="bg-background/95 backdrop-blur-sm py-12 sm:py-16 px-4 sm:px-6 border-t border-border/50 relative z-10">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-8 sm:mb-12">
           <motion.div
@@ -39,17 +39,17 @@ export const CompanyFooter = () => {
             </p>
             <div className="flex space-x-3 sm:space-x-4">
               <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary h-8 w-8 sm:h-10 sm:w-10">
+                <Button variant="ghost" size="icon" className="glass-button liquid-glass text-muted-foreground hover:text-primary h-8 w-8 sm:h-10 sm:w-10 backdrop-blur-sm">
                   <Twitter className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
               </motion.div>
               <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary h-8 w-8 sm:h-10 sm:w-10">
+                <Button variant="ghost" size="icon" className="glass-button liquid-glass text-muted-foreground hover:text-primary h-8 w-8 sm:h-10 sm:w-10 backdrop-blur-sm">
                   <Github className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
               </motion.div>
               <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary h-8 w-8 sm:h-10 sm:w-10">
+                <Button variant="ghost" size="icon" className="glass-button liquid-glass text-muted-foreground hover:text-primary h-8 w-8 sm:h-10 sm:w-10 backdrop-blur-sm">
                   <Linkedin className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
               </motion.div>

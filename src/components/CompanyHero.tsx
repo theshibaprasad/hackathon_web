@@ -51,6 +51,16 @@ const FloatingIcon = ({ iconData, index }: { iconData: any, index: number }) => 
 export const CompanyHero = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 py-16 sm:py-20 bg-background overflow-hidden">
+      {/* Simple background for hero */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-50/30 via-white/50 to-gray-100/40" />
+      
+      {/* Very subtle orbs for glass contrast */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-gradient-to-br from-gray-200/10 to-gray-300/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-gradient-to-br from-slate-200/8 to-zinc-300/4 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 left-1/2 w-[500px] h-[500px] bg-gradient-to-br from-neutral-200/6 to-gray-300/3 rounded-full blur-3xl" />
+      </div>
+      
       {/* Floating Icons - Hidden on mobile for better performance */}
       <div className="absolute inset-0 pointer-events-none hidden sm:block">
         {floatingIcons.map((iconData, index) => (
@@ -58,20 +68,26 @@ export const CompanyHero = () => {
         ))}
       </div>
       
-      <div className="relative z-10 max-w-5xl mx-auto text-center">
+      <div className="relative z-10 max-w-6xl mx-auto text-center">
         <motion.div 
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="mb-8 sm:mb-12"
+          initial={{ opacity: 0, y: 50, scale: 0.8 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 1, delay: 0.2 }}
+          className="mb-12 sm:mb-16"
         >
-          <Image
-            src="/novothon_blue.svg"
-            alt="Novothon"
-            width={600}
-            height={300}
-            className="mx-auto h-32 sm:h-40 md:h-48 w-auto object-contain"
-          />
+          <div className="glass-card-enhanced p-8 sm:p-12 liquid-glass shadow-2xl">
+            <div className="relative">
+              <Image
+                src="/novothon_blue.svg"
+                alt="Novothon"
+                width={800}
+                height={400}
+                className="mx-auto h-40 sm:h-56 md:h-64 lg:h-72 w-auto object-contain drop-shadow-2xl relative z-10"
+              />
+              {/* Glow effect behind logo */}
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-full blur-xl scale-110" />
+            </div>
+          </div>
         </motion.div>
 
         <motion.div 
@@ -81,7 +97,7 @@ export const CompanyHero = () => {
           className="flex justify-center mb-12 sm:mb-16"
         >
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button size="lg" className="rounded-full px-6 sm:px-8 py-3 sm:py-4 bg-primary hover:bg-primary/90 text-base sm:text-lg font-semibold">
+            <Button size="lg" className="glass-button liquid-glass rounded-full px-8 sm:px-12 py-4 sm:py-5 bg-primary/90 hover:bg-primary text-base sm:text-lg font-semibold backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
               Explore More
               <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
             </Button>
