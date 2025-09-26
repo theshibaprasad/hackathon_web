@@ -141,11 +141,9 @@ export default function OnboardingClient({ user }: OnboardingClientProps) {
           
           setUserDataLoaded(true);
         } else {
-          console.error('Failed to load user data:', response.statusText);
           setUserDataLoaded(true); // Still set to true to avoid infinite loading
         }
       } catch (error) {
-        console.error('Error loading user data:', error);
         setUserDataLoaded(true); // Still set to true to avoid infinite loading
       }
     };
@@ -285,7 +283,6 @@ export default function OnboardingClient({ user }: OnboardingClientProps) {
             });
           }
         } catch (paymentError) {
-          console.error('Error fetching payment details:', paymentError);
           // Fallback to form data if API call fails
           setPaymentDetails({
             paymentId: formData.razorpayPaymentId || 'N/A',

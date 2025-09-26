@@ -36,7 +36,7 @@ export const Header = () => {
           setUser(data.user);
         }
       } catch (error) {
-        console.error('Error fetching user:', error);
+        // User fetch failed, continue without user data
       } finally {
         setLoading(false);
       }
@@ -50,7 +50,7 @@ export const Header = () => {
           setRegistrationEnabled(data.settings.hackathonRegistrationEnabled);
         }
       } catch (error) {
-        console.error('Error fetching registration status:', error);
+        // Registration status check failed, continue with default enabled state
       }
     };
 
@@ -77,7 +77,6 @@ export const Header = () => {
       // Force reload to clear any cached state
       window.location.href = '/';
     } catch (error) {
-      console.error('Logout error:', error);
       // Even if API call fails, clear local state and redirect
       setUser(null);
       if (typeof window !== 'undefined') {

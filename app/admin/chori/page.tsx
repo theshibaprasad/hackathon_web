@@ -71,7 +71,6 @@ export default function AdminChoriPage() {
   };
 
   const handleToggleSpecialPricing = async (enabled: boolean) => {
-    console.log('🎯 Frontend: Toggle clicked, new value:', enabled);
     try {
       const response = await fetch('/api/admin/chori/settings', {
         method: 'POST',
@@ -81,21 +80,16 @@ export default function AdminChoriPage() {
         body: JSON.stringify({ specialPricingEnabled: enabled }),
       });
 
-      console.log('🎯 Frontend: Response status:', response.status);
       const data = await response.json();
-      console.log('🎯 Frontend: Response data:', data);
 
       if (response.ok) {
         setSpecialPricingEnabled(enabled);
         setSuccess(`Special pricing ${enabled ? 'enabled' : 'disabled'} successfully!`);
         setError('');
-        console.log('🎯 Frontend: Success! Updated state to:', enabled);
       } else {
-        console.log('🎯 Frontend: Error response:', data);
         setError(data.error || 'Failed to update settings');
       }
     } catch (error) {
-      console.error('🎯 Frontend: Toggle error:', error);
       setError('Failed to update settings');
     }
   };

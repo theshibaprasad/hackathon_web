@@ -1,19 +1,32 @@
 "use client";
 
+import { Suspense, lazy } from "react";
 import { CompanyHeader } from "@/components/CompanyHeader"
 import { CompanyHero } from "@/components/CompanyHero"
-import { CompanyStatsSection } from "@/components/CompanyStatsSection"
-import { CompanyHackathonSection } from "@/components/CompanyHackathonSection"
-import { CompanyTestimonialSection } from "@/components/CompanyTestimonialSection"
-import { CompanyValuesSection } from "@/components/CompanyValuesSection"
-import { CompanyCommunitySection } from "@/components/CompanyCommunitySection"
-import { CompanyCompanySection } from "@/components/CompanyCompanySection"
-import { FAQSection } from "@/components/FAQSection"
-import { CompanyFooter } from "@/components/CompanyFooter"
+import PerformanceMonitor from "@/components/PerformanceMonitor"
+
+// Lazy load non-critical components
+const CompanyStatsSection = lazy(() => import("@/components/CompanyStatsSection").then(module => ({ default: module.CompanyStatsSection })))
+const CompanyHackathonSection = lazy(() => import("@/components/CompanyHackathonSection").then(module => ({ default: module.CompanyHackathonSection })))
+const CompanyTestimonialSection = lazy(() => import("@/components/CompanyTestimonialSection").then(module => ({ default: module.CompanyTestimonialSection })))
+const CompanyValuesSection = lazy(() => import("@/components/CompanyValuesSection").then(module => ({ default: module.CompanyValuesSection })))
+const CompanyCommunitySection = lazy(() => import("@/components/CompanyCommunitySection").then(module => ({ default: module.CompanyCommunitySection })))
+const CompanyCompanySection = lazy(() => import("@/components/CompanyCompanySection").then(module => ({ default: module.CompanyCompanySection })))
+const FAQSection = lazy(() => import("@/components/FAQSection").then(module => ({ default: module.FAQSection })))
+const CompanyFooter = lazy(() => import("@/components/CompanyFooter").then(module => ({ default: module.CompanyFooter })))
+
+// Loading component for Suspense fallback
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center py-8">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+  </div>
+);
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-background relative">
+      <PerformanceMonitor />
+      
       {/* Simple, clean background that doesn't interfere with content */}
       <div className="fixed inset-0 bg-gradient-to-br from-gray-50/40 via-white/60 to-gray-100/50" />
       <div className="fixed inset-0 bg-gradient-to-tr from-slate-50/30 via-transparent to-zinc-50/40" />
@@ -28,14 +41,38 @@ export default function Home() {
       <CompanyHeader />
       
       <CompanyHero />
-      <CompanyStatsSection />
-      <CompanyHackathonSection />
-      <CompanyTestimonialSection />
-      <CompanyValuesSection />
-      <CompanyCommunitySection />
-      <CompanyCompanySection />
-      <FAQSection />
-      <CompanyFooter />
+      
+      <Suspense fallback={<LoadingSpinner />}>
+        <CompanyStatsSection />
+      </Suspense>
+      
+      <Suspense fallback={<LoadingSpinner />}>
+        <CompanyHackathonSection />
+      </Suspense>
+      
+      <Suspense fallback={<LoadingSpinner />}>
+        <CompanyTestimonialSection />
+      </Suspense>
+      
+      <Suspense fallback={<LoadingSpinner />}>
+        <CompanyValuesSection />
+      </Suspense>
+      
+      <Suspense fallback={<LoadingSpinner />}>
+        <CompanyCommunitySection />
+      </Suspense>
+      
+      <Suspense fallback={<LoadingSpinner />}>
+        <CompanyCompanySection />
+      </Suspense>
+      
+      <Suspense fallback={<LoadingSpinner />}>
+        <FAQSection />
+      </Suspense>
+      
+      <Suspense fallback={<LoadingSpinner />}>
+        <CompanyFooter />
+      </Suspense>
     </div>
   )
 }

@@ -65,7 +65,7 @@ export default function DashboardClient({ user }: DashboardClientProps) {
           setCurrentUser(data.user);
         }
       } catch (error) {
-        console.error('Error fetching fresh user data:', error);
+        // User data fetch failed, continue with provided user data
       } finally {
         setLoading(false);
       }
@@ -83,7 +83,7 @@ export default function DashboardClient({ user }: DashboardClientProps) {
           setHackathonStatus(data.hackathonStatus);
         }
       } catch (error) {
-        console.error('Error fetching hackathon status:', error);
+        // Hackathon status fetch failed, continue with default status
       }
     };
 
@@ -110,7 +110,7 @@ export default function DashboardClient({ user }: DashboardClientProps) {
             });
           }
         } catch (error) {
-          console.error('Error fetching team data:', error);
+          // Team data fetch failed, continue without team data
         }
       }
     };

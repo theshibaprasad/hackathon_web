@@ -4,6 +4,7 @@ import './globals.css'
 import { Toaster } from "@/components/ui/toaster"
 import { Toaster as Sonner } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import { registerServiceWorker } from "@/lib/serviceWorker"
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -51,6 +52,21 @@ export const metadata: Metadata = {
     description: 'Join the largest community of developers, designers, and innovators building the future through hackathons.',
     images: ['https://your-domain.com/og-image.jpg'],
   },
+  // Performance optimizations
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: 'your-google-verification-code',
+  },
 }
 
 export default function RootLayout({
@@ -62,6 +78,12 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="manifest" href="/site.webmanifest" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://checkout.razorpay.com" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+        <meta name="theme-color" content="#4437FB" />
+        <meta name="color-scheme" content="light" />
       </head>
       <body className={inter.className}>
         <TooltipProvider>
@@ -69,6 +91,23 @@ export default function RootLayout({
           <Sonner />
           {children}
         </TooltipProvider>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                      console.log('SW registered: ', registration);
+                    })
+                    .catch(function(registrationError) {
+                      console.log('SW registration failed: ', registrationError);
+                    });
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   )

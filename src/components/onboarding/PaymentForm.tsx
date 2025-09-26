@@ -78,7 +78,6 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
   // Ensure we have a valid amount
   useEffect(() => {
     if (!finalAmount || finalAmount <= 0) {
-      console.error('Invalid amount calculated:', finalAmount, 'Using fallback amount');
       const fallbackAmount = 999; // Default to student regular price
       setPaymentAmount(fallbackAmount);
       updateData({ paymentAmount: fallbackAmount });
@@ -101,7 +100,7 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
           }
         }
       } catch (error) {
-        console.error('Error loading settings:', error);
+        // Settings load failed, continue with default values
       } finally {
         setLoadingOfferStatus(false);
       }
@@ -115,7 +114,7 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
           setSpecialPricingEnabled(data.specialPricingEnabled);
         }
       } catch (error) {
-        console.error('Error loading special pricing settings:', error);
+        // Special pricing settings load failed, continue with default values
       }
     };
 
@@ -129,7 +128,7 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
             setUserData(userData.user);
           }
         } catch (error) {
-          console.error('Error loading user data:', error);
+          // User data load failed, continue with provided user data
         }
       }
     };
@@ -165,10 +164,10 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
       const data = await response.json();
       
       if (!response.ok) {
-        console.error('Failed to record payment failure:', data.error);
+        // Payment failure recording failed, continue
       }
     } catch (error) {
-      console.error('Error recording payment failure:', error);
+      // Payment failure recording failed, continue
     }
   };
 
@@ -269,7 +268,6 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
 
       return data.order; // Return the order object, not the entire response
     } catch (error) {
-      console.error('Error creating order:', error);
       throw error;
     }
   };
@@ -385,7 +383,6 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
               throw new Error(verifyData.error || 'Payment verification failed');
             }
           } catch (error) {
-            console.error('Payment verification error:', error);
             const errorMessage = error instanceof Error ? error.message : 'Please try again.';
             alert(`Payment verification failed: ${errorMessage}`);
             setIsProcessing(false);

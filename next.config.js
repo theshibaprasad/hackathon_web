@@ -12,6 +12,10 @@ if (typeof process !== 'undefined') {
 }
 
 const nextConfig = {
+  // Enable compression
+  compress: true,
+  
+  // Optimize images
   images: {
     remotePatterns: [
       {
@@ -27,7 +31,13 @@ const nextConfig = {
         pathname: '/**',
       },
     ],
+    formats: ['image/webp', 'image/avif'],
+    minimumCacheTTL: 60,
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
+  
+  // Performance optimizations
   typescript: {
     ignoreBuildErrors: false,
   },
@@ -36,6 +46,16 @@ const nextConfig = {
   },
   experimental: {
     serverComponentsExternalPackages: ['mongoose'],
+    optimizeCss: true,
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
+  },
+  
+  // Enable SWC minification
+  swcMinify: true,
+  
+  // Optimize bundle
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
   },
   webpack: (config, { dev, isServer }) => {
     // Suppress deprecation warnings
@@ -65,10 +85,29 @@ const nextConfig = {
       },
     };
 
-    // Fix exports issue by disabling problematic optimizations
+    // Optimize bundle splitting for better performance
     config.optimization = {
       ...config.optimization,
-      splitChunks: false, // Disable code splitting to avoid vendors.js issues
+      splitChunks: {
+        chunks: 'all',
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+            priority: 10,
+          },
+          common: {
+            name: 'common',
+            minChunks: 2,
+            chunks: 'all',
+            priority: 5,
+            reuseExistingChunk: true,
+          },
+        },
+      },
+      usedExports: true,
+      sideEffects: false,
     };
 
     // Fix CommonJS/ES module compatibility

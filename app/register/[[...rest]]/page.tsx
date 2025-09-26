@@ -68,7 +68,7 @@ export default function RegisterPage() {
           setRegistrationEnabled(data.settings.hackathonRegistrationEnabled);
         }
       } catch (error) {
-        console.error('Error checking registration status:', error);
+        // Registration status check failed, continue with default enabled state
       } finally {
         setCheckingRegistration(false);
       }
