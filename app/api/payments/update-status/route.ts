@@ -59,8 +59,15 @@ export async function PUT(request: NextRequest) {
       { new: true }
     );
 
-    // If payment is successful, update user's payment status
+    // If payment is successful, update user's payment status and clean up pending payments
     if (paymentStatus === 'success') {
+      // Remove all other pending payments for this user when payment is successful
+      await Payment.deleteMany({
+        userId: payment.userId,
+        paymentStatus: 'pending',
+        _id: { $ne: payment._id } // Exclude the current successful payment
+      });
+
       await User.findByIdAndUpdate(payment.userId, {
         isBoarding: true // Set to true after successful payment
       });

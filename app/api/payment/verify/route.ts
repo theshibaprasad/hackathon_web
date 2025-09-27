@@ -76,6 +76,13 @@ export async function POST(request: NextRequest) {
       { new: true }
     );
 
+    // Remove all other pending payments for this user when payment is successful
+    await Payment.deleteMany({
+      userId: decoded.userId,
+      paymentStatus: 'pending',
+      _id: { $ne: payment._id } // Exclude the current successful payment
+    });
+
     // Update user to set isBoarding to true after successful payment
     const updatedUser = await User.findByIdAndUpdate(
       decoded.userId,

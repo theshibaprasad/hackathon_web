@@ -6,7 +6,12 @@ import { Github, Twitter, Linkedin } from "lucide-react";
 import Image from "next/image";
 
 const footerLinks = {
-  quickLinks: ["About", "Contact", "Register"],
+  quickLinks: [
+    { name: "Problem Statements", href: "/problem-statements" },
+    { name: "Guidelines", href: "/guidelines" },
+    { name: "About", href: "/about" },
+    { name: "Sponsor", href: "/sponsor" }
+  ],
   social: ["Twitter", "GitHub", "LinkedIn"]
 };
 
@@ -65,11 +70,11 @@ export const CompanyFooter = () => {
               {footerLinks.quickLinks.map((link, index) => (
                 <motion.a
                   key={index}
-                  href="#"
+                  href={link.href}
                   whileHover={{ x: 5 }}
                   className="block text-muted-foreground hover:text-primary transition-colors text-xs sm:text-sm"
                 >
-                  {link}
+                  {link.name}
                 </motion.a>
               ))}
             </div>

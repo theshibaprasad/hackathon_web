@@ -3,7 +3,14 @@ import { Github, Twitter, Linkedin } from "lucide-react";
 import Image from "next/image";
 
 const footerLinks = {
-  company: ["Code of Conduct", "Privacy Policy", "Terms of Service", "FAQ", "Platform Status", "Twitter"],
+  company: [
+    { name: "About", href: "/about" },
+    { name: "Problem Statements", href: "/problem-statements" },
+    { name: "Guidelines", href: "/guidelines" },
+    { name: "Sponsor", href: "/sponsor" },
+    { name: "Privacy Policy", href: "/privacy" },
+    { name: "Terms of Service", href: "/terms" }
+  ],
   platform: ["Organize a hackathon", "Student Resources", "Sponsor", "API", "College", "FAQ"],
   support: ["Contact Us", "Bug Report", "Discord", "Instagram", "YouTube", "LinkedIn"]
 };
@@ -48,10 +55,10 @@ export const Footer = () => {
               {footerLinks.company.map((link, index) => (
                 <a
                   key={index}
-                  href="#"
+                  href={link.href}
                   className="block text-muted-foreground hover:text-primary transition-colors text-sm"
                 >
-                  {link}
+                  {link.name}
                 </a>
               ))}
             </div>

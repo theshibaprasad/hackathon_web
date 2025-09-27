@@ -52,7 +52,7 @@ export const CompanyHeader = () => {
         <nav className="hidden md:flex items-center space-x-8 relative z-10">
           <motion.a 
             whileHover={{ y: -2 }}
-            href="#" 
+            href="/problem-statements" 
             className="text-foreground hover:text-primary transition-colors cursor-pointer relative z-10"
             style={{ pointerEvents: 'auto' }}
           >
@@ -60,7 +60,7 @@ export const CompanyHeader = () => {
           </motion.a>
           <motion.a 
             whileHover={{ y: -2 }}
-            href="#" 
+            href="/guidelines" 
             className="text-foreground hover:text-primary transition-colors cursor-pointer relative z-10"
             style={{ pointerEvents: 'auto' }}
           >
@@ -68,7 +68,7 @@ export const CompanyHeader = () => {
           </motion.a>
           <motion.a 
             whileHover={{ y: -2 }}
-            href="#" 
+            href="/about" 
             className="text-foreground hover:text-primary transition-colors cursor-pointer relative z-10"
             style={{ pointerEvents: 'auto' }}
           >
@@ -76,7 +76,7 @@ export const CompanyHeader = () => {
           </motion.a>
           <motion.a 
             whileHover={{ y: -2 }}
-            href="#" 
+            href="/sponsor" 
             className="text-foreground hover:text-primary transition-colors cursor-pointer relative z-10"
             style={{ pointerEvents: 'auto' }}
           >
@@ -135,7 +135,7 @@ export const CompanyHeader = () => {
             <nav className="space-y-3 relative z-10">
               <motion.a 
                 whileHover={{ x: 5 }}
-                href="#" 
+                href="/problem-statements" 
                 className="block text-foreground hover:text-primary transition-colors py-2 cursor-pointer relative z-10"
                 onClick={() => setIsMobileMenuOpen(false)}
                 style={{ pointerEvents: 'auto' }}
@@ -144,7 +144,7 @@ export const CompanyHeader = () => {
               </motion.a>
               <motion.a 
                 whileHover={{ x: 5 }}
-                href="#" 
+                href="/guidelines" 
                 className="block text-foreground hover:text-primary transition-colors py-2 cursor-pointer relative z-10"
                 onClick={() => setIsMobileMenuOpen(false)}
                 style={{ pointerEvents: 'auto' }}
@@ -153,7 +153,7 @@ export const CompanyHeader = () => {
               </motion.a>
               <motion.a 
                 whileHover={{ x: 5 }}
-                href="#" 
+                href="/about" 
                 className="block text-foreground hover:text-primary transition-colors py-2 cursor-pointer relative z-10"
                 onClick={() => setIsMobileMenuOpen(false)}
                 style={{ pointerEvents: 'auto' }}
@@ -162,7 +162,7 @@ export const CompanyHeader = () => {
               </motion.a>
               <motion.a 
                 whileHover={{ x: 5 }}
-                href="#" 
+                href="/sponsor" 
                 className="block text-foreground hover:text-primary transition-colors py-2 cursor-pointer relative z-10"
                 onClick={() => setIsMobileMenuOpen(false)}
                 style={{ pointerEvents: 'auto' }}
