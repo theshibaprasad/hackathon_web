@@ -51,50 +51,48 @@ export default function DashboardClient({ user }: DashboardClientProps) {
   // Use isBoarding status instead of hackathon registration
   const isHackathonRegistered = currentUser.isBoarding;
 
-  // Fetch fresh user data and hackathon status on component mount
+  // Optimize loading by making parallel requests and reducing API calls
   useEffect(() => {
-    const fetchFreshUserData = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const response = await fetch('/api/auth/me', {
-          method: 'GET',
-          credentials: 'include',
-        });
+        // Make parallel requests for better performance
+        const [userResponse, hackathonResponse] = await Promise.all([
+          fetch('/api/auth/me', {
+            method: 'GET',
+            credentials: 'include',
+          }),
+          fetch('/api/settings/hackathon-status', {
+            method: 'GET',
+            credentials: 'include',
+          })
+        ]);
 
-        if (response.ok) {
-          const data = await response.json();
-          setCurrentUser(data.user);
+        // Update user data if successful
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          setCurrentUser(userData.user);
+        }
+
+        // Update hackathon status if successful
+        if (hackathonResponse.ok) {
+          const hackathonData = await hackathonResponse.json();
+          setHackathonStatus(hackathonData.hackathonStatus);
         }
       } catch (error) {
-        // User data fetch failed, continue with provided user data
+        // Continue with provided user data if API calls fail
+        console.log('Dashboard data fetch failed, using provided user data');
       } finally {
         setLoading(false);
       }
     };
 
-    const fetchHackathonStatus = async () => {
-      try {
-        const response = await fetch('/api/settings/hackathon-status', {
-          method: 'GET',
-          credentials: 'include',
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setHackathonStatus(data.hackathonStatus);
-        }
-      } catch (error) {
-        // Hackathon status fetch failed, continue with default status
-      }
-    };
-
-    fetchFreshUserData();
-    fetchHackathonStatus();
+    fetchDashboardData();
   }, []);
 
-  // Fetch team data if user has a teamId
+  // Fetch team data only when user has a teamId and loading is complete
   useEffect(() => {
     const fetchTeamData = async () => {
-      if (currentUser.teamId) {
+      if (!loading && currentUser.teamId) {
         try {
           const response = await fetch(`/api/teams/${currentUser.teamId}`, {
             method: 'GET',
@@ -111,13 +109,12 @@ export default function DashboardClient({ user }: DashboardClientProps) {
           }
         } catch (error) {
           // Team data fetch failed, continue without team data
+          console.log('Team data fetch failed');
         }
       }
     };
 
-    if (!loading && currentUser.teamId) {
-      fetchTeamData();
-    }
+    fetchTeamData();
   }, [currentUser.teamId, currentUser._id, loading]);
 
   const menuItems = [

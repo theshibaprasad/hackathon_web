@@ -1,6 +1,5 @@
 "use client";
 
-import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -448,13 +447,10 @@ export default function RegisterPage() {
             animate={{ x: 0, opacity: 1, scale: 1 }}
             transition={{ duration: 1.2, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <Image
+            <img
               src="/Register_pic.svg"
               alt="Register Illustration"
-              width={600}
-              height={400}
               className="w-full h-auto"
-              priority
             />
           </motion.div>
         </motion.div>
@@ -581,13 +577,10 @@ export default function RegisterPage() {
             animate={{ x: 0, opacity: 1, scale: 1 }}
             transition={{ duration: 1.2, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <Image
+            <img
               src="/Register_pic.svg"
               alt="Register Illustration"
-              width={600}
-              height={400}
               className="w-full h-auto"
-              priority
             />
           </motion.div>
         </motion.div>
@@ -867,13 +860,10 @@ export default function RegisterPage() {
           animate={{ x: 0, opacity: 1, scale: 1 }}
           transition={{ duration: 1.2, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          <Image
+          <img
             src="/Register_pic.svg"
             alt="Register Illustration"
-            width={600}
-            height={400}
             className="w-full h-auto"
-            priority
           />
         </motion.div>
       </motion.div>

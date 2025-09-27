@@ -160,12 +160,12 @@ export default function StudentForm({ data, updateData, onNext, onPrev, user }: 
   const studyYears = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year', 'Final Year'];
 
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-3">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="text-center mb-6 sm:mb-8">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-3">
           Student Information
         </h2>
-        <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+        <p className="text-gray-600 text-base sm:text-lg max-w-2xl mx-auto px-4">
           Tell us about your educational background and personal details
         </p>
       </div>
@@ -182,7 +182,7 @@ export default function StudentForm({ data, updateData, onNext, onPrev, user }: 
             </h3>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div className="space-y-2">
               <Label htmlFor="firstName" className="text-sm font-medium">First Name *</Label>
               <Input
@@ -234,30 +234,30 @@ export default function StudentForm({ data, updateData, onNext, onPrev, user }: 
           </h3>
         </div>
         
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           {/* Gender Selection */}
-          <div className="space-y-3">
+          <div className="space-y-3 sm:col-span-2">
             <Label className="text-sm font-medium">Gender *</Label>
             <RadioGroup
               value={data.gender}
               onValueChange={(value) => handleInputChange('gender', value)}
-              className="flex space-x-6"
+              className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6"
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="male" id="male" />
-                <Label htmlFor="male">Male</Label>
+                <Label htmlFor="male" className="text-sm">Male</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="female" id="female" />
-                <Label htmlFor="female">Female</Label>
+                <Label htmlFor="female" className="text-sm">Female</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="other" id="other" />
-                <Label htmlFor="other">Other</Label>
+                <Label htmlFor="other" className="text-sm">Other</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="prefer_not_to_say" id="prefer_not_to_say" />
-                <Label htmlFor="prefer_not_to_say">Prefer not to say</Label>
+                <Label htmlFor="prefer_not_to_say" className="text-sm">Prefer not to say</Label>
               </div>
             </RadioGroup>
             {errors.gender && <p className="text-sm text-red-500">{errors.gender}</p>}
@@ -276,7 +276,7 @@ export default function StudentForm({ data, updateData, onNext, onPrev, user }: 
           </h3>
         </div>
         
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <div className="space-y-2">
             <Label htmlFor="instituteName" className="text-sm font-medium">Institute Name *</Label>
             <Input
@@ -476,11 +476,11 @@ export default function StudentForm({ data, updateData, onNext, onPrev, user }: 
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between pt-8 border-t border-gray-200">
+      <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 pt-6 sm:pt-8 border-t border-gray-200">
         <Button
           variant="outline"
           onClick={onPrev}
-          className="flex items-center px-6 py-3 text-base font-medium border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-100 hover:shadow-md transition-all duration-200 text-gray-700 hover:text-gray-900"
+          className="flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-medium border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-100 hover:shadow-md transition-all duration-200 text-gray-700 hover:text-gray-900"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Previous
@@ -488,7 +488,7 @@ export default function StudentForm({ data, updateData, onNext, onPrev, user }: 
         
         <Button
           onClick={handleNext}
-          className="flex items-center px-6 py-3 text-base font-medium bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+          className="flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-medium bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-xl transition-all duration-200"
         >
           Next
           <ArrowRight className="w-4 h-4 ml-2" />

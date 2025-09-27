@@ -1,18 +1,14 @@
 import Link from 'next/link'
-import Image from 'next/image'
 
 export default function NotFound() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="text-center max-w-md w-full">
         <div className="mb-8">
-          <Image
+          <img
             src="/not-found.svg"
             alt="404 Not Found"
-            width={400}
-            height={300}
             className="w-full h-auto max-w-sm mx-auto"
-            priority
           />
         </div>
         <h1 className="text-4xl font-bold text-foreground mb-4">404</h1>

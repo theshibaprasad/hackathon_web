@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FloatingShapes } from "./FloatingShapes";
 import { ArrowRight } from "lucide-react";
-import Image from "next/image";
 
 export const HeroSection = () => {
   return (
@@ -11,11 +10,9 @@ export const HeroSection = () => {
       
       <div className="relative z-10 max-w-5xl mx-auto text-center">
         <div className="mb-12">
-          <Image
-            src="/novothon_blue.png"
+          <img
+            src="/novothon_blue.svg"
             alt="Novothon"
-            width={400}
-            height={200}
             className="mx-auto h-32 w-auto object-contain"
           />
         </div>

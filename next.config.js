@@ -114,7 +114,7 @@ const nextConfig = {
             },
           },
         },
-        usedExports: true,
+        // Remove usedExports to avoid conflict with cache
         sideEffects: false,
       };
     }
@@ -137,10 +137,8 @@ const nextConfig = {
     // Optimize webpack cache for better performance
     if (dev) {
       config.cache = {
-        type: 'filesystem',
-        buildDependencies: {
-          config: [__filename],
-        },
+        type: 'memory',
+        // Use memory cache for development to avoid filesystem issues
       };
     }
     

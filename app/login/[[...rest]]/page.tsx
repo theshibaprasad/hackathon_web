@@ -1,6 +1,5 @@
 "use client";
 
-import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -79,13 +78,10 @@ export default function LoginPage() {
           animate={{ x: 0, opacity: 1, scale: 1 }}
           transition={{ duration: 1.2, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          <Image
+          <img
             src="/Login_pic.svg"
             alt="Login Illustration"
-            width={600}
-            height={400}
             className="w-full h-auto"
-            priority
           />
         </motion.div>
       </motion.div>

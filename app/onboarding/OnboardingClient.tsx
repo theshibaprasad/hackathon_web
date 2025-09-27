@@ -378,39 +378,70 @@ export default function OnboardingClient({ user }: OnboardingClientProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-4 sm:py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            {steps.map((step, index) => (
-              <div key={step.id} className="flex items-center">
-                <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
-                  index <= currentStep 
-                    ? 'bg-primary border-primary text-white' 
-                    : 'bg-white border-gray-300 text-gray-500'
-                }`}>
-                  {index < currentStep ? (
-                    <CheckCircle className="w-5 h-5" />
-                  ) : (
-                    <span className="text-sm font-medium">{index + 1}</span>
+        <div className="mb-6 sm:mb-8">
+          {/* Mobile Progress Bar */}
+          <div className="block sm:hidden">
+            <div className="flex items-center justify-between mb-4">
+              {steps.map((step, index) => (
+                <div key={step.id} className="flex flex-col items-center flex-1">
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 mb-2 ${
+                    index <= currentStep 
+                      ? 'bg-primary border-primary text-white' 
+                      : 'bg-white border-gray-300 text-gray-500'
+                  }`}>
+                    {index < currentStep ? (
+                      <CheckCircle className="w-4 h-4" />
+                    ) : (
+                      <span className="text-xs font-medium">{index + 1}</span>
+                    )}
+                  </div>
+                  <div className="text-center">
+                    <p className={`text-xs font-medium ${
+                      index <= currentStep ? 'text-primary' : 'text-gray-500'
+                    }`}>
+                      {step.title}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Desktop Progress Bar */}
+          <div className="hidden sm:block">
+            <div className="flex items-center justify-between mb-4">
+              {steps.map((step, index) => (
+                <div key={step.id} className="flex items-center">
+                  <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
+                    index <= currentStep 
+                      ? 'bg-primary border-primary text-white' 
+                      : 'bg-white border-gray-300 text-gray-500'
+                  }`}>
+                    {index < currentStep ? (
+                      <CheckCircle className="w-5 h-5" />
+                    ) : (
+                      <span className="text-sm font-medium">{index + 1}</span>
+                    )}
+                  </div>
+                  <div className="ml-3">
+                    <p className={`text-sm font-medium ${
+                      index <= currentStep ? 'text-primary' : 'text-gray-500'
+                    }`}>
+                      {step.title}
+                    </p>
+                    <p className="text-xs text-gray-500">{step.description}</p>
+                  </div>
+                  {index < steps.length - 1 && (
+                    <div className={`w-16 h-0.5 mx-4 ${
+                      index < currentStep ? 'bg-primary' : 'bg-gray-300'
+                    }`} />
                   )}
                 </div>
-                <div className="ml-3">
-                  <p className={`text-sm font-medium ${
-                    index <= currentStep ? 'text-primary' : 'text-gray-500'
-                  }`}>
-                    {step.title}
-                  </p>
-                  <p className="text-xs text-gray-500">{step.description}</p>
-                </div>
-                {index < steps.length - 1 && (
-                  <div className={`w-16 h-0.5 mx-4 ${
-                    index < currentStep ? 'bg-primary' : 'bg-gray-300'
-                  }`} />
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 
@@ -423,15 +454,15 @@ export default function OnboardingClient({ user }: OnboardingClientProps) {
           transition={{ duration: 0.3 }}
         >
           <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-            <CardHeader className="text-center pb-6">
-              <CardTitle className="text-2xl font-bold text-gray-900">
+            <CardHeader className="text-center pb-4 sm:pb-6 px-4 sm:px-6">
+              <CardTitle className="text-xl sm:text-2xl font-bold text-gray-900">
                 Complete Your Profile
               </CardTitle>
-              <CardDescription className="text-gray-600">
+              <CardDescription className="text-sm sm:text-base text-gray-600">
                 Step {currentStep + 1} of {steps.length}: {steps[currentStep].title}
               </CardDescription>
             </CardHeader>
-            <CardContent className="px-6 pb-8">
+            <CardContent className="px-4 sm:px-6 pb-6 sm:pb-8">
               <AnimatePresence mode="wait">
                 {renderCurrentStep()}
               </AnimatePresence>

@@ -182,12 +182,12 @@ export default function ThemeSelection({ data, updateData, onNext, onPrev }: The
   };
 
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="text-center mb-4 sm:mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
           Choose Your Interest
         </h2>
-        <p className="text-gray-600">
+        <p className="text-gray-600 text-sm sm:text-base px-4">
           Select a hackathon theme and problem statement that interests you
         </p>
       </div>
@@ -237,7 +237,7 @@ export default function ThemeSelection({ data, updateData, onNext, onPrev }: The
       {/* Theme Selection */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-900">Select a Theme *</h3>
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {hackathonThemes.map((theme) => {
             const Icon = theme.icon;
             const isSelected = selectedTheme === theme.id;
@@ -252,15 +252,15 @@ export default function ThemeSelection({ data, updateData, onNext, onPrev }: The
                 }`}
                 onClick={() => handleThemeToggle(theme.id)}
               >
-                <CardContent className="p-4">
-                  <div className="flex items-start space-x-3">
-                    <div className={`p-2 rounded-lg ${theme.bgColor}`}>
-                      <Icon className={`w-5 h-5 ${isSelected ? 'text-primary' : 'text-gray-600'}`} />
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-start space-x-2 sm:space-x-3">
+                    <div className={`p-1.5 sm:p-2 rounded-lg ${theme.bgColor}`}>
+                      <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${isSelected ? 'text-primary' : 'text-gray-600'}`} />
                     </div>
                     
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-semibold text-gray-900 text-sm">
+                        <h4 className="font-semibold text-gray-900 text-xs sm:text-sm">
                           {theme.title}
                         </h4>
                         <Checkbox
@@ -350,11 +350,11 @@ export default function ThemeSelection({ data, updateData, onNext, onPrev }: The
       )}
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between pt-6">
+      <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 pt-4 sm:pt-6">
         <Button
           variant="outline"
           onClick={onPrev}
-          className="flex items-center px-6 py-3 text-base font-medium border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-100 hover:shadow-md transition-all duration-200 text-gray-700 hover:text-gray-900"
+          className="flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-medium border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-100 hover:shadow-md transition-all duration-200 text-gray-700 hover:text-gray-900"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Previous
@@ -362,7 +362,7 @@ export default function ThemeSelection({ data, updateData, onNext, onPrev }: The
         
         <Button
           onClick={handleNext}
-          className="flex items-center px-6 py-3 text-base font-medium bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+          className="flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-medium bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-xl transition-all duration-200"
         >
           Next
           <ArrowRight className="w-4 h-4 ml-2" />

@@ -508,41 +508,41 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
 
 
   return (
-    <div className="space-y-4">
-      <div className="text-center mb-4">
-        <h2 className="text-xl font-bold text-gray-900 mb-1">
+    <div className="space-y-3 sm:space-y-4">
+      <div className="text-center mb-3 sm:mb-4">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">
           Complete Your Registration
         </h2>
-        <p className="text-gray-600 text-sm">
+        <p className="text-gray-600 text-xs sm:text-sm px-4">
           Choose your plan and complete the payment to join the hackathon
         </p>
       </div>
 
       {/* Pricing Cards */}
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         {/* Regular Plan */}
         <Card className={`transition-all duration-300 hover:scale-105 hover:shadow-xl cursor-pointer ${
           !isEarlyBird ? 'border-2 border-blue-500 shadow-lg bg-blue-50' : 'border border-gray-200 hover:border-blue-300'
         }`}
         onClick={handleRegularPriceClick}>
-          <CardContent className="p-4">
-            <div className="text-center mb-3">
-              <div className="h-6 mb-2">
+          <CardContent className="p-3 sm:p-4">
+            <div className="text-center mb-2 sm:mb-3">
+              <div className="h-5 sm:h-6 mb-1 sm:mb-2">
                 {isSpecialPricing && (
-                  <div className="flex items-center justify-center mb-2">
-                    <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold animate-pulse px-3 py-1 rounded-full shadow-lg">
-                      <Sparkles className="w-3 h-3 mr-1" />
+                  <div className="flex items-center justify-center mb-1 sm:mb-2">
+                    <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold animate-pulse px-2 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-lg">
+                      <Sparkles className="w-2 h-2 sm:w-3 sm:h-3 mr-1" />
                       SPECIAL OFFER!
                     </Badge>
                   </div>
                 )}
               </div>
-              <CardTitle className="text-lg text-gray-900 mb-1">Regular Plan</CardTitle>
-              <div className="text-3xl font-bold text-gray-900">
+              <CardTitle className="text-base sm:text-lg text-gray-900 mb-1">Regular Plan</CardTitle>
+              <div className="text-2xl sm:text-3xl font-bold text-gray-900">
                 {isSpecialPricing ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <span className="text-4xl font-bold text-green-600">₹2</span>
-                    <span className="text-sm text-gray-500 line-through">₹{currentPricing.regular}</span>
+                  <div className="flex items-center justify-center gap-1 sm:gap-2">
+                    <span className="text-3xl sm:text-4xl font-bold text-green-600">₹2</span>
+                    <span className="text-xs sm:text-sm text-gray-500 line-through">₹{currentPricing.regular}</span>
                   </div>
                 ) : (
                   `₹${currentPricing.regular}`
@@ -554,22 +554,22 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
                 </div>
               )}
             </div>
-            <ul className="space-y-2 text-xs text-gray-600">
+            <ul className="space-y-1 sm:space-y-2 text-xs text-gray-600">
               <li className="flex items-center">
-                <CheckCircle className="w-3 h-3 text-green-500 mr-2" />
-                All hackathon themes
+                <CheckCircle className="w-3 h-3 text-green-500 mr-2 flex-shrink-0" />
+                <span className="text-xs">All hackathon themes</span>
               </li>
               <li className="flex items-center">
-                <CheckCircle className="w-3 h-3 text-green-500 mr-2" />
-                Problem statements
+                <CheckCircle className="w-3 h-3 text-green-500 mr-2 flex-shrink-0" />
+                <span className="text-xs">Problem statements</span>
               </li>
               <li className="flex items-center">
-                <CheckCircle className="w-3 h-3 text-green-500 mr-2" />
-                Community access
+                <CheckCircle className="w-3 h-3 text-green-500 mr-2 flex-shrink-0" />
+                <span className="text-xs">Community access</span>
               </li>
               <li className="flex items-center">
-                <CheckCircle className="w-3 h-3 text-green-500 mr-2" />
-                Certificate
+                <CheckCircle className="w-3 h-3 text-green-500 mr-2 flex-shrink-0" />
+                <span className="text-xs">Certificate</span>
               </li>
             </ul>
           </CardContent>
@@ -590,20 +590,20 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
               isEarlyBird ? 'border-2 border-orange-500 shadow-lg bg-orange-50' : 'border border-gray-200 hover:border-orange-300'
             }`}
             onClick={() => handleEarlyBirdToggle(true)}>
-              <CardContent className="p-4">
-                <div className="text-center mb-3">
-                  <div className="flex items-center justify-center mb-2">
-                    <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold animate-pulse px-3 py-1 rounded-full shadow-lg">
-                      <Star className="w-3 h-3 mr-1" />
+              <CardContent className="p-3 sm:p-4">
+                <div className="text-center mb-2 sm:mb-3">
+                  <div className="flex items-center justify-center mb-1 sm:mb-2">
+                    <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold animate-pulse px-2 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-lg">
+                      <Star className="w-2 h-2 sm:w-3 sm:h-3 mr-1" />
                       LIMITED TIME OFFER
                     </Badge>
                   </div>
-                  <CardTitle className="text-lg text-gray-900 mb-1">Novothon Early Bird</CardTitle>
-                  <div className="flex items-center justify-center gap-2 mb-1">
-                    <div className="text-3xl font-bold text-gray-900">
+                  <CardTitle className="text-base sm:text-lg text-gray-900 mb-1">Novothon Early Bird</CardTitle>
+                  <div className="flex items-center justify-center gap-1 sm:gap-2 mb-1">
+                    <div className="text-2xl sm:text-3xl font-bold text-gray-900">
                       ₹{currentPricing.earlyBird}
                     </div>
-                    <div className="text-sm text-gray-500 line-through">
+                    <div className="text-xs sm:text-sm text-gray-500 line-through">
                       ₹{currentPricing.regular}
                     </div>
                   </div>
@@ -611,22 +611,22 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
                     Save ₹{currentPricing.regular - currentPricing.earlyBird}!
                   </div>
                 </div>
-                <ul className="space-y-2 text-xs text-gray-600">
+                <ul className="space-y-1 sm:space-y-2 text-xs text-gray-600">
                   <li className="flex items-center">
-                    <CheckCircle className="w-3 h-3 text-green-500 mr-2" />
-                    Everything in Regular
+                    <CheckCircle className="w-3 h-3 text-green-500 mr-2 flex-shrink-0" />
+                    <span className="text-xs">Everything in Regular</span>
                   </li>
                   <li className="flex items-center">
-                    <CheckCircle className="w-3 h-3 text-green-500 mr-2" />
-                    Priority support
+                    <CheckCircle className="w-3 h-3 text-green-500 mr-2 flex-shrink-0" />
+                    <span className="text-xs">Priority support</span>
                   </li>
                   <li className="flex items-center">
-                    <CheckCircle className="w-3 h-3 text-green-500 mr-2" />
-                    Early access
+                    <CheckCircle className="w-3 h-3 text-green-500 mr-2 flex-shrink-0" />
+                    <span className="text-xs">Early access</span>
                   </li>
                   <li className="flex items-center">
-                    <CheckCircle className="w-3 h-3 text-green-500 mr-2" />
-                    Bonus swag
+                    <CheckCircle className="w-3 h-3 text-green-500 mr-2 flex-shrink-0" />
+                    <span className="text-xs">Bonus swag</span>
                   </li>
                 </ul>
               </CardContent>
@@ -789,11 +789,11 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
       )}
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between pt-8 border-t border-gray-200">
+      <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 pt-6 sm:pt-8 border-t border-gray-200">
         <Button
           variant="outline"
           onClick={onPrev}
-          className="flex items-center px-6 py-3 text-base font-medium border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-100 hover:shadow-md transition-all duration-200 text-gray-700 hover:text-gray-900"
+          className="flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-medium border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-100 hover:shadow-md transition-all duration-200 text-gray-700 hover:text-gray-900"
           disabled={isProcessing || isLoading}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -803,7 +803,7 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
         <Button
           onClick={handlePayment}
           disabled={isProcessing || isLoading || retryCount >= 3}
-          className={`flex items-center font-semibold px-8 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 ${
+          className={`flex items-center justify-center font-semibold px-4 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 ${
             retryCount >= 3 
               ? 'bg-gray-400 hover:bg-gray-400 cursor-not-allowed' 
               : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800'
@@ -811,23 +811,23 @@ export default function PaymentForm({ data, updateData, onSubmit, onPrev, isLoad
         >
           {isProcessing ? (
             <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-              Processing Payment...
+              <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white mr-2" />
+              <span className="text-xs sm:text-sm">Processing Payment...</span>
             </>
           ) : retryCount >= 3 ? (
             <>
-              <CreditCard className="w-4 h-4 mr-2" />
-              Max Retries Reached
+              <CreditCard className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+              <span className="text-xs sm:text-sm">Max Retries Reached</span>
             </>
           ) : retryCount > 0 ? (
             <>
-              <CreditCard className="w-4 h-4 mr-2" />
-              Retry Payment - ₹{finalAmount}
+              <CreditCard className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+              <span className="text-xs sm:text-sm">Retry Payment - ₹{finalAmount}</span>
             </>
           ) : (
             <>
-              <CreditCard className="w-4 h-4 mr-2" />
-              Complete Payment - ₹{finalAmount}
+              <CreditCard className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+              <span className="text-xs sm:text-sm">Complete Payment - ₹{finalAmount}</span>
             </>
           )}
         </Button>

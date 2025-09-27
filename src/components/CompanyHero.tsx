@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowRight, Laptop, Code, Github, Cpu, Database, Zap, Terminal, Smartphone, Globe, Monitor, Keyboard, Mouse, Wifi, HardDrive, Layers, FileText, GitBranch, Code2, Smartphone as Phone, Tablet, Headphones, Camera, Mic, Wrench, Settings } from "lucide-react";
-import Image from "next/image";
 
 // Optimized floating icons configuration - reduced size for better webpack performance
 const iconComponents = [Laptop, Code, Code2, Monitor, Keyboard, Github, Database, Terminal, GitBranch, Phone, Tablet, Cpu, HardDrive, Zap, Wifi, Layers, FileText, Headphones, Camera, Mic, Wrench, Settings, Globe, Mouse, Smartphone];
@@ -77,11 +76,9 @@ export const CompanyHero = () => {
         >
           <div className="glass-card-enhanced p-8 sm:p-12 liquid-glass shadow-2xl">
             <div className="relative">
-              <Image
+              <img
                 src="/novothon_blue.svg"
                 alt="Novothon"
-                width={800}
-                height={400}
                 className="mx-auto h-40 sm:h-56 md:h-64 lg:h-72 w-auto object-contain drop-shadow-2xl relative z-10"
               />
               {/* Glow effect behind logo */}

@@ -37,13 +37,11 @@ const PaymentSchema: Schema = new Schema({
   razorpayOrderId: {
     type: String,
     required: true,
-    trim: true,
-    unique: true
+    trim: true
   },
   razorpayPaymentId: {
     type: String,
-    trim: true,
-    sparse: true // Allow multiple null values
+    trim: true
   },
   razorpaySignature: {
     type: String,
@@ -78,7 +76,7 @@ const PaymentSchema: Schema = new Schema({
 // Indexes for better query performance
 PaymentSchema.index({ userId: 1 });
 PaymentSchema.index({ paymentStatus: 1 });
-PaymentSchema.index({ razorpayPaymentId: 1 });
+PaymentSchema.index({ razorpayPaymentId: 1 }, { sparse: true }); // Sparse index for optional field
 PaymentSchema.index({ createdAt: -1 });
 
 // Ensure razorpayOrderId is unique
