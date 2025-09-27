@@ -73,6 +73,16 @@ export async function PUT(request: NextRequest) {
       });
     }
 
+    // If payment fails, also clean up other pending payments to prevent accumulation
+    if (paymentStatus === 'failed') {
+      // Remove all other pending payments for this user when payment fails
+      await Payment.deleteMany({
+        userId: payment.userId,
+        paymentStatus: 'pending',
+        _id: { $ne: payment._id } // Exclude the current failed payment
+      });
+    }
+
     return NextResponse.json({
       success: true,
       payment: {

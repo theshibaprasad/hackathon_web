@@ -73,6 +73,14 @@ export async function POST(request: NextRequest) {
       { new: true }
     );
 
+    // Clean up all other pending payments for this user when payment fails
+    // This prevents accumulation of multiple pending payments
+    await Payment.deleteMany({
+      userId: decoded.userId,
+      paymentStatus: 'pending',
+      _id: { $ne: payment._id } // Exclude the current failed payment
+    });
+
 
     return NextResponse.json({
       success: true,
