@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+// import { motion } from "framer-motion";
 
 interface ToggleSwitchProps {
   enabled: boolean;
@@ -92,7 +92,7 @@ export default function ToggleSwitch({
 
       {/* Toggle Switch */}
       <div className="flex-shrink-0">
-        <motion.button
+        <button
           onClick={onToggle}
           disabled={disabled || loading}
           onMouseDown={() => setIsPressed(true)}
@@ -104,20 +104,14 @@ export default function ToggleSwitch({
             ${disabled || loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
             ${isPressed ? 'scale-95' : 'scale-100'}
           `}
-          whileTap={{ scale: 0.95 }}
         >
-          <motion.span
+          <span
             className="inline-block h-4 w-4 transform rounded-full bg-white shadow-lg transition-transform duration-200"
-            animate={{
-              x: enabled ? 20 : 4,
-            }}
-            transition={{
-              type: "spring",
-              stiffness: 500,
-              damping: 30
+            style={{
+              transform: `translateX(${enabled ? '20px' : '4px'})`
             }}
           />
-        </motion.button>
+        </button>
       </div>
     </div>
   );

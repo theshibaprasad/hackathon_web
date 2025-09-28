@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+// import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -41,12 +41,7 @@ function StatCard({
   delay = 0 
 }: StatCardProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay }}
-      className="h-full"
-    >
+    <div className="h-full">
       <Card className="hover:shadow-lg transition-shadow h-full">
         <CardContent className="p-6 h-full flex flex-col">
           <div className="flex items-center justify-between flex-1">
@@ -81,7 +76,7 @@ function StatCard({
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
 }
 

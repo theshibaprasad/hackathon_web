@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+// import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +12,8 @@ import StatsCards from "./components/StatsCards";
 import DataTable from "./components/DataTable";
 import TeamDetailsModal from "./components/TeamDetailsModal";
 import ToggleSwitch from "./components/ToggleSwitch";
+import ThemeManagement from "./components/ThemeManagement";
+import ProblemStatementManagement from "./components/ProblemStatementManagement";
 import { 
   Users, 
   Mail, 
@@ -46,7 +48,9 @@ import {
   AlertCircle,
   TrendingUp,
   TrendingDown,
-  Activity
+  Activity,
+  Target,
+  Lightbulb
 } from "lucide-react";
 
 interface AdminStats {
@@ -146,6 +150,8 @@ export default function AdminDashboardClient() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [themes, setThemes] = useState<any[]>([]);
+  const [problemStatements, setProblemStatements] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [settings, setSettings] = useState({
@@ -186,11 +192,13 @@ export default function AdminDashboardClient() {
         setRefreshing(true);
       }
 
-      const [statsResponse, teamsResponse, paymentsResponse, usersResponse] = await Promise.all([
+      const [statsResponse, teamsResponse, paymentsResponse, usersResponse, themesResponse, problemStatementsResponse] = await Promise.all([
         fetch('/api/admin/dashboard/stats'),
         fetch('/api/admin/teams'),
         fetch('/api/admin/payments'),
-        fetch('/api/admin/users')
+        fetch('/api/admin/users'),
+        fetch('/api/admin/themes'),
+        fetch('/api/admin/problem-statements')
       ]);
 
       if (statsResponse.ok) {
@@ -211,6 +219,16 @@ export default function AdminDashboardClient() {
       if (usersResponse.ok) {
         const usersData = await usersResponse.json();
         setUsers(usersData.users);
+      }
+
+      if (themesResponse.ok) {
+        const themesData = await themesResponse.json();
+        setThemes(themesData.themes);
+      }
+
+      if (problemStatementsResponse.ok) {
+        const problemStatementsData = await problemStatementsResponse.json();
+        setProblemStatements(problemStatementsData.problemStatements);
       }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
@@ -293,6 +311,8 @@ export default function AdminDashboardClient() {
     { id: "teams", label: "Teams", icon: Users },
     { id: "payments", label: "Payments", icon: DollarSign },
     { id: "users", label: "Users", icon: UserPlus },
+    { id: "themes", label: "Themes", icon: Target },
+    { id: "problem-statements", label: "Problem Statements", icon: Lightbulb },
     { id: "settings", label: "Settings", icon: Settings },
   ];
 
@@ -343,7 +363,7 @@ export default function AdminDashboardClient() {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 overflow-hidden flex flex-col ${
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         {/* Header */}
@@ -364,8 +384,8 @@ export default function AdminDashboardClient() {
           </Button>
         </div>
 
-        {/* Navigation - Takes remaining space */}
-        <nav className="flex-1 px-3 py-6 overflow-y-auto">
+        {/* Navigation - Fixed height, no scroll */}
+        <nav className="flex-1 px-3 py-6">
           {sidebarItems.map((item) => (
             <button
               key={item.id}
@@ -399,7 +419,7 @@ export default function AdminDashboardClient() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col lg:ml-0">
+      <div className="flex-1 flex flex-col lg:ml-0 h-screen">
         {/* Header */}
         <header className="bg-white shadow-sm border-b lg:hidden">
           <div className="flex items-center justify-between h-16 px-4">
@@ -416,7 +436,7 @@ export default function AdminDashboardClient() {
         </header>
 
         {/* Content */}
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 overflow-y-auto max-h-screen">
           {/* Header with Refresh Button */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
             <h2 className="text-2xl font-bold text-gray-900 capitalize">
@@ -891,6 +911,23 @@ export default function AdminDashboardClient() {
                   a.click();
                   window.URL.revokeObjectURL(url);
                 }}
+              />
+            </TabsContent>
+
+            {/* Themes Tab */}
+            <TabsContent value="themes" className="space-y-6">
+              <ThemeManagement 
+                themes={themes} 
+                onRefresh={() => loadDashboardData(true)} 
+              />
+            </TabsContent>
+
+            {/* Problem Statements Tab */}
+            <TabsContent value="problem-statements" className="space-y-6">
+              <ProblemStatementManagement 
+                problemStatements={problemStatements} 
+                themes={themes}
+                onRefresh={() => loadDashboardData(true)} 
               />
             </TabsContent>
 
