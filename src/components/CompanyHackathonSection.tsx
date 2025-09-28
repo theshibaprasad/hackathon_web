@@ -5,6 +5,7 @@ import { useInView } from "framer-motion";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, Users, Trophy, Clock, Code } from "lucide-react";
+import Link from "next/link";
 
 const hackathons = [
   {
@@ -143,12 +144,14 @@ export const CompanyHackathonSection = () => {
                     whileTap={{ scale: 0.95 }}
                     className="inline-block"
                   >
-                    <Button 
-                      variant="secondary" 
-                      className="glass-button liquid-glass bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0 text-lg sm:text-xl lg:text-2xl py-3 sm:py-4 lg:py-5 px-6 sm:px-8 lg:px-10 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 font-semibold backdrop-blur-sm"
-                    >
-                      {hackathon.isActive ? "Register now" : "View details"}
-                    </Button>
+                    <Link href="/register">
+                      <Button 
+                        variant="secondary" 
+                        className="glass-button liquid-glass bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0 text-lg sm:text-xl lg:text-2xl py-3 sm:py-4 lg:py-5 px-6 sm:px-8 lg:px-10 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 font-semibold backdrop-blur-sm"
+                      >
+                        {hackathon.isActive ? "Register now" : "View details"}
+                      </Button>
+                    </Link>
                   </motion.div>
                 </div>
               </motion.div>

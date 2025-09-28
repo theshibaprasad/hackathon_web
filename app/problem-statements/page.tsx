@@ -222,13 +222,17 @@ export default function ProblemStatementsPage() {
                 solutions that will shape the future of technology.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3">
-                  Register Now
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-                <Button variant="outline" size="lg" className="border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-3">
-                  View Guidelines
-                </Button>
+                <Link href="/register">
+                  <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 transition-all duration-200 hover:shadow-lg">
+                    Register Now
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+                <Link href="/guidelines">
+                  <Button variant="outline" size="lg" className="border-blue-600 text-blue-600 hover:bg-blue-50 hover:text-blue-700 px-8 py-3 transition-all duration-200 hover:shadow-md">
+                    View Guidelines
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>

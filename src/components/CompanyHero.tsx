@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowRight, Laptop, Code, Github, Cpu, Database, Zap, Terminal, Smartphone, Globe, Monitor, Keyboard, Mouse, Wifi, HardDrive, Layers, FileText, GitBranch, Code2, Smartphone as Phone, Tablet, Headphones, Camera, Mic, Wrench, Settings } from "lucide-react";
+import Link from "next/link";
 
 // Optimized floating icons configuration - reduced size for better webpack performance
 const iconComponents = [Laptop, Code, Code2, Monitor, Keyboard, Github, Database, Terminal, GitBranch, Phone, Tablet, Cpu, HardDrive, Zap, Wifi, Layers, FileText, Headphones, Camera, Mic, Wrench, Settings, Globe, Mouse, Smartphone];
@@ -94,10 +95,12 @@ export const CompanyHero = () => {
           className="flex justify-center mb-12 sm:mb-16"
         >
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button size="lg" className="glass-button liquid-glass rounded-full px-8 sm:px-12 py-4 sm:py-5 bg-primary/90 hover:bg-primary text-base sm:text-lg font-semibold backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
-              Explore More
-              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
-            </Button>
+            <Link href="/problem-statements">
+              <Button size="lg" className="glass-button liquid-glass rounded-full px-8 sm:px-12 py-4 sm:py-5 bg-primary/90 hover:bg-primary text-base sm:text-lg font-semibold backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
+                Explore More
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
+              </Button>
+            </Link>
           </motion.div>
         </motion.div>
 

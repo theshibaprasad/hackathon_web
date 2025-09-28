@@ -307,10 +307,10 @@ export default function GuidelinesPage() {
                 about the guidelines, technical issues, or general support.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3">
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 transition-all duration-200 hover:shadow-lg">
                   Contact Support
                 </Button>
-                <Button variant="outline" size="lg" className="border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-3">
+                <Button variant="outline" size="lg" className="border-blue-600 text-blue-600 hover:bg-blue-50 hover:text-blue-700 px-8 py-3 transition-all duration-200 hover:shadow-md">
                   Join Discord
                 </Button>
               </div>
