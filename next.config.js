@@ -47,6 +47,10 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['mongoose'],
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
+    // Enable modern bundling optimizations
+    // optimizeCss: true, // Disabled due to critters module issue
+    // Note: ppr is canary-only; disabled to avoid dev error
+    // serverActions require specific Next.js versions; keep default
   },
   
   // Enable SWC minification
@@ -55,6 +59,15 @@ const nextConfig = {
   // Optimize bundle
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
+    // Enable React compiler optimizations
+    reactRemoveProperties: process.env.NODE_ENV === 'production',
+  },
+  
+  // Enable modern bundling features
+  modularizeImports: {
+    'lucide-react': {
+      transform: 'lucide-react/dist/esm/icons/{{member}}',
+    },
   },
   webpack: (config, { dev, isServer }) => {
     // Suppress deprecation warnings

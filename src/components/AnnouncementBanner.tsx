@@ -14,7 +14,6 @@ import {
   Calendar,
   ExternalLink,
   Pin,
-  Sparkles,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
@@ -189,12 +188,12 @@ export default function AnnouncementBanner() {
   const styles = typeStyles[currentAnnouncement.type];
 
   return (
-    <div className="fixed top-20 right-4 z-50 max-w-sm w-full">
+    <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-xl md:max-w-2xl">
       <Card 
-        className={`${styles.bg} ${styles.border} shadow-2xl border-2 overflow-hidden relative transform transition-all duration-300 ease-out ${
+        className={`${styles.bg} ${styles.border} shadow-xl border overflow-hidden relative transform transition-all duration-300 ease-out ${
           isVisible && !isAnimating 
-            ? 'translate-x-0 opacity-100' 
-            : 'translate-x-full opacity-0'
+            ? 'translate-y-0 opacity-100' 
+            : '-translate-y-4 opacity-0'
         }`}
       >
         {/* Animated background pattern */}
@@ -202,12 +201,12 @@ export default function AnnouncementBanner() {
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-transparent via-white to-transparent animate-pulse" />
         </div>
         
-        <CardContent className="p-4 relative">
+        <CardContent className="p-4 md:p-5 relative">
           <div className="flex items-start justify-between">
-            <div className="flex items-start space-x-3 flex-1">
+            <div className="flex items-start space-x-3 md:space-x-4 flex-1">
               {/* Icon with glow effect */}
-              <div className={`p-2 rounded-full ${styles.bg} shadow-lg relative flex-shrink-0`}>
-                <TypeIcon className={`w-5 h-5 ${styles.icon}`} />
+              <div className={`p-2 md:p-2.5 rounded-full ${styles.bg} shadow relative flex-shrink-0`}>
+                <TypeIcon className={`w-5 h-5 md:w-6 md:h-6 ${styles.icon}`} />
                 {currentAnnouncement.isPinned && (
                   <Pin className="w-3 h-3 text-blue-600 absolute -top-1 -right-1" />
                 )}
@@ -219,26 +218,26 @@ export default function AnnouncementBanner() {
               <div className="flex-1 min-w-0">
                 {/* Title and badges */}
                 <div className="flex items-start gap-2 mb-2">
-                  <h3 className="text-sm font-bold text-gray-900 leading-tight line-clamp-2">
+                  <h3 className="text-base md:text-lg font-semibold text-gray-900 leading-tight line-clamp-2">
                     {currentAnnouncement.title}
                   </h3>
                 </div>
 
                 {/* Content */}
-                <p className="text-xs text-gray-700 mb-3 leading-relaxed line-clamp-3">
+                <p className="text-sm md:text-[15px] text-gray-700 mb-3 leading-relaxed line-clamp-3">
                   {currentAnnouncement.content}
                 </p>
 
                 {/* Badges */}
                 <div className="flex items-center gap-1 mb-3 flex-wrap">
-                  <Badge className={`${styles.badge} text-xs px-2 py-0.5`}>
+                  <Badge className={`${styles.badge} text-[11px] md:text-xs px-2 py-0.5`}>
                     {currentAnnouncement.type}
                   </Badge>
-                  <Badge className={`${priorityStyles[currentAnnouncement.priority]} text-xs px-2 py-0.5`}>
+                  <Badge className={`${priorityStyles[currentAnnouncement.priority]} text-[11px] md:text-xs px-2 py-0.5`}>
                     {currentAnnouncement.priority}
                   </Badge>
                   {currentAnnouncement.isPinned && (
-                    <Badge className="bg-blue-100 text-blue-800 border-blue-200 text-xs px-2 py-0.5">
+                    <Badge className="bg-blue-100 text-blue-800 border-blue-200 text-[11px] md:text-xs px-2 py-0.5">
                       <Pin className="w-2 h-2 mr-1" />
                       Pinned
                     </Badge>
@@ -255,11 +254,11 @@ export default function AnnouncementBanner() {
                         : currentAnnouncement.actionButton.style === 'secondary'
                         ? 'bg-gray-600 hover:bg-gray-700 text-white'
                         : 'border-blue-600 text-blue-600 hover:bg-blue-50'
-                    } transition-all duration-200 hover:shadow-md text-xs px-3 py-1 h-7`}
+                    } transition-all duration-200 hover:shadow-md text-xs md:text-sm px-3 md:px-4 py-1 h-8`}
                     size="sm"
                   >
                     {currentAnnouncement.actionButton.text}
-                    <ExternalLink className="w-3 h-3 ml-1" />
+                    <ExternalLink className="w-3.5 h-3.5 ml-1" />
                   </Button>
                 )}
               </div>
@@ -270,9 +269,9 @@ export default function AnnouncementBanner() {
               variant="ghost"
               size="sm"
               onClick={handleClose}
-              className="text-gray-400 hover:text-gray-600 hover:bg-white/50 rounded-full p-1 h-6 w-6 flex-shrink-0"
+              className="text-gray-400 hover:text-gray-600 hover:bg-white/50 rounded-full p-1 h-7 w-7 flex-shrink-0"
             >
-              <X className="w-3 h-3" />
+              <X className="w-3.5 h-3.5" />
             </Button>
           </div>
 
@@ -284,17 +283,17 @@ export default function AnnouncementBanner() {
                   variant="ghost"
                   size="sm"
                   onClick={prevAnnouncement}
-                  className="h-6 w-6 p-0 text-gray-500 hover:text-gray-700"
+                  className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700"
                 >
-                  <ChevronLeft className="w-3 h-3" />
+                  <ChevronLeft className="w-3.5 h-3.5" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={nextAnnouncement}
-                  className="h-6 w-6 p-0 text-gray-500 hover:text-gray-700"
+                  className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700"
                 >
-                  <ChevronRight className="w-3 h-3" />
+                  <ChevronRight className="w-3.5 h-3.5" />
                 </Button>
               </div>
               <div className="flex items-center space-x-1">
@@ -302,9 +301,9 @@ export default function AnnouncementBanner() {
                   <button
                     key={index}
                     onClick={() => setCurrentIndex(index)}
-                    className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${
+                    className={`w-1.5 h-1.5 md:w-2 md:h-2 rounded-full transition-all duration-200 ${
                       index === currentIndex
-                        ? 'bg-blue-600 w-4'
+                        ? 'bg-blue-600 w-4 md:w-6'
                         : 'bg-white/40 hover:bg-white/60'
                     }`}
                   />
@@ -313,13 +312,6 @@ export default function AnnouncementBanner() {
             </div>
           )}
         </CardContent>
-
-        {/* Sparkle effects for special announcements */}
-        {currentAnnouncement.priority === 'critical' && (
-          <div className="absolute top-2 right-2">
-            <Sparkles className="w-4 h-4 text-yellow-500 animate-pulse" />
-          </div>
-        )}
       </Card>
     </div>
   );

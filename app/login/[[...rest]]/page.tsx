@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -78,10 +79,14 @@ export default function LoginPage() {
           animate={{ x: 0, opacity: 1, scale: 1 }}
           transition={{ duration: 1.2, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          <img
+          <Image
             src="/Login_pic.svg"
             alt="Login Illustration"
+            width={500}
+            height={400}
             className="w-full h-auto"
+            priority
+            loading="eager"
           />
         </motion.div>
       </motion.div>

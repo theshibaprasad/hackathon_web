@@ -15,13 +15,19 @@ export async function GET(request: NextRequest) {
     const filter: any = {
       isActive: true,
       visibility: 'public',
-      $or: [
-        { startDate: { $exists: false } },
-        { startDate: { $lte: new Date() } }
-      ],
-      $or: [
-        { endDate: { $exists: false } },
-        { endDate: { $gte: new Date() } }
+      $and: [
+        {
+          $or: [
+            { startDate: { $exists: false } },
+            { startDate: { $lte: new Date() } }
+          ]
+        },
+        {
+          $or: [
+            { endDate: { $exists: false } },
+            { endDate: { $gte: new Date() } }
+          ]
+        }
       ]
     };
 

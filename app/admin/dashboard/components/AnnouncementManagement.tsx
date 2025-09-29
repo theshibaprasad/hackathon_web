@@ -84,18 +84,18 @@ export default function AnnouncementManagement() {
   const [formData, setFormData] = useState({
     title: '',
     content: '',
-    type: 'info' as const,
-    priority: 'medium' as const,
+    type: 'info' as 'info' | 'warning' | 'success' | 'urgent' | 'event',
+    priority: 'medium' as 'low' | 'medium' | 'high' | 'critical',
     isActive: true,
     isPinned: false,
-    visibility: 'public' as const,
+    visibility: 'public' as 'public' | 'registered' | 'admin',
     startDate: '',
     endDate: '',
     tags: '',
     imageUrl: '',
     actionButtonText: '',
     actionButtonUrl: '',
-    actionButtonStyle: 'primary' as const
+    actionButtonStyle: 'primary' as 'primary' | 'secondary' | 'outline'
   });
 
   useEffect(() => {
@@ -195,18 +195,18 @@ export default function AnnouncementManagement() {
     setFormData({
       title: '',
       content: '',
-      type: 'info',
-      priority: 'medium',
+      type: 'info' as 'info' | 'warning' | 'success' | 'urgent' | 'event',
+      priority: 'medium' as 'low' | 'medium' | 'high' | 'critical',
       isActive: true,
       isPinned: false,
-      visibility: 'public',
+      visibility: 'public' as 'public' | 'registered' | 'admin',
       startDate: '',
       endDate: '',
       tags: '',
       imageUrl: '',
       actionButtonText: '',
       actionButtonUrl: '',
-      actionButtonStyle: 'primary'
+      actionButtonStyle: 'primary' as 'primary' | 'secondary' | 'outline'
     });
     setEditingAnnouncement(null);
   };

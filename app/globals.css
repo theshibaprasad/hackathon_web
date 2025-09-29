@@ -4,6 +4,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ContentEditable placeholder styles */
+[contenteditable]:empty:before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  pointer-events: none;
+}
+
 /* Crackers explosion animations */
 @keyframes explodeUp {
   0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }

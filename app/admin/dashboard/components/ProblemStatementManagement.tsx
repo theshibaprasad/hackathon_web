@@ -328,7 +328,7 @@ export default function ProblemStatementManagement({
                     onInput={handleEditorChange}
                     className="min-h-[200px] p-3 focus:outline-none"
                     style={{ minHeight: '200px' }}
-                    placeholder="Write your problem statement description here..."
+                    data-placeholder="Write your problem statement description here..."
                   />
                 </div>
               </div>
@@ -533,7 +533,7 @@ export default function ProblemStatementManagement({
                   onInput={handleEditorChange}
                   className="min-h-[200px] p-3 focus:outline-none"
                   style={{ minHeight: '200px' }}
-                  placeholder="Write your problem statement description here..."
+                  data-placeholder="Write your problem statement description here..."
                 />
               </div>
             </div>

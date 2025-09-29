@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ theme }, { status: 201 });
   } catch (error) {
     console.error('Error creating theme:', error);
-    if (error.code === 11000) {
+    if (error instanceof Error && 'code' in error && (error as any).code === 11000) {
       return NextResponse.json(
         { error: 'Theme with this name already exists' },
         { status: 400 }

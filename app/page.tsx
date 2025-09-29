@@ -1,27 +1,18 @@
 "use client";
 
-import { Suspense, lazy } from "react";
 import { CompanyHeader } from "@/components/CompanyHeader"
 import { CompanyHero } from "@/components/CompanyHero"
 import PerformanceMonitor from "@/components/PerformanceMonitor"
+import { LazyComponent } from "@/components/LazyWrapper"
 import AnnouncementBanner from "@/components/AnnouncementBanner"
-
-// Lazy load non-critical components
-const CompanyStatsSection = lazy(() => import("@/components/CompanyStatsSection").then(module => ({ default: module.CompanyStatsSection })))
-const CompanyHackathonSection = lazy(() => import("@/components/CompanyHackathonSection").then(module => ({ default: module.CompanyHackathonSection })))
-const CompanyTestimonialSection = lazy(() => import("@/components/CompanyTestimonialSection").then(module => ({ default: module.CompanyTestimonialSection })))
-const CompanyValuesSection = lazy(() => import("@/components/CompanyValuesSection").then(module => ({ default: module.CompanyValuesSection })))
-const CompanyCommunitySection = lazy(() => import("@/components/CompanyCommunitySection").then(module => ({ default: module.CompanyCommunitySection })))
-const CompanyCompanySection = lazy(() => import("@/components/CompanyCompanySection").then(module => ({ default: module.CompanyCompanySection })))
-const FAQSection = lazy(() => import("@/components/FAQSection").then(module => ({ default: module.FAQSection })))
-const CompanyFooter = lazy(() => import("@/components/CompanyFooter").then(module => ({ default: module.CompanyFooter })))
-
-// Loading component for Suspense fallback
-const LoadingSpinner = () => (
-  <div className="flex items-center justify-center py-8">
-    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-  </div>
-);
+import { CompanyStatsSection } from "@/components/CompanyStatsSection"
+import { CompanyHackathonSection } from "@/components/CompanyHackathonSection"
+import { CompanyTestimonialSection } from "@/components/CompanyTestimonialSection"
+import { CompanyValuesSection } from "@/components/CompanyValuesSection"
+import { CompanyCommunitySection } from "@/components/CompanyCommunitySection"
+import { CompanyCompanySection } from "@/components/CompanyCompanySection"
+import { FAQSection } from "@/components/FAQSection"
+import { CompanyFooter } from "@/components/CompanyFooter"
 
 export default function Home() {
   return (
@@ -43,42 +34,48 @@ export default function Home() {
       
       <CompanyHero />
       
-      {/* Announcements Banner */}
-      <Suspense fallback={<LoadingSpinner />}>
-        <AnnouncementBanner />
-      </Suspense>
+      {/* Announcements Banner - Critical, load immediately */}
+      <AnnouncementBanner />
       
-      <Suspense fallback={<LoadingSpinner />}>
+      {/* Stats Section - Lazy load with intersection observer */}
+      <LazyComponent type="section">
         <CompanyStatsSection />
-      </Suspense>
+      </LazyComponent>
       
-      <Suspense fallback={<LoadingSpinner />}>
+      {/* Hackathon Section - Lazy load with intersection observer */}
+      <LazyComponent type="section">
         <CompanyHackathonSection />
-      </Suspense>
+      </LazyComponent>
       
-      <Suspense fallback={<LoadingSpinner />}>
+      {/* Testimonials - Lazy load with intersection observer */}
+      <LazyComponent type="section">
         <CompanyTestimonialSection />
-      </Suspense>
+      </LazyComponent>
       
-      <Suspense fallback={<LoadingSpinner />}>
+      {/* Values Section - Lazy load with intersection observer */}
+      <LazyComponent type="section">
         <CompanyValuesSection />
-      </Suspense>
+      </LazyComponent>
       
-      <Suspense fallback={<LoadingSpinner />}>
+      {/* Community Section - Lazy load with intersection observer */}
+      <LazyComponent type="section">
         <CompanyCommunitySection />
-      </Suspense>
+      </LazyComponent>
       
-      <Suspense fallback={<LoadingSpinner />}>
+      {/* Company Section - Lazy load with intersection observer */}
+      <LazyComponent type="section">
         <CompanyCompanySection />
-      </Suspense>
+      </LazyComponent>
       
-      <Suspense fallback={<LoadingSpinner />}>
+      {/* FAQ Section - Lazy load with intersection observer */}
+      <LazyComponent type="section">
         <FAQSection />
-      </Suspense>
+      </LazyComponent>
       
-      <Suspense fallback={<LoadingSpinner />}>
+      {/* Footer - Lazy load with intersection observer */}
+      <LazyComponent type="section">
         <CompanyFooter />
-      </Suspense>
+      </LazyComponent>
     </div>
   )
 }

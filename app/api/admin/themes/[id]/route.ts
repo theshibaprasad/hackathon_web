@@ -29,7 +29,7 @@ export async function PUT(
     return NextResponse.json({ theme });
   } catch (error) {
     console.error('Error updating theme:', error);
-    if (error.code === 11000) {
+    if (error instanceof Error && 'code' in error && (error as any).code === 11000) {
       return NextResponse.json(
         { error: 'Theme with this name already exists' },
         { status: 400 }

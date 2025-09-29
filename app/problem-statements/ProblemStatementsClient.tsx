@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, Suspense, lazy } from 'react';
 import { Brain, Code, Zap, Shield, Globe, Heart, ArrowRight, CheckCircle, Lightbulb, Target, Users, Clock, ArrowLeft, Eye, X } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import Link from 'next/link';
+import { LazyWrapper, LazyComponent } from '@/components/LazyWrapper';
+import { SectionSkeleton, ProblemStatementSkeleton, CardSkeleton } from '@/components/ui/skeleton';
 
 interface ProblemStatement {
   _id: string;

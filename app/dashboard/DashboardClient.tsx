@@ -3,11 +3,14 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { LazyWrapper } from "@/components/LazyWrapper";
+import { PageSkeleton, CardSkeleton, StatsSkeleton } from "@/components/ui/skeleton";
+import { useApiLoading } from "@/hooks/useApiLoading";
 import { TeamMembers } from "@/components/TeamMembers";
 import { ProjectSubmission } from "@/components/ProjectSubmission";
 import { Header } from "@/components/Header";
 import { HackathonDetails } from "@/components/HackathonDetails";
-import { useToast } from "@/hooks/use-toast";
 import { 
   LayoutDashboard, 
   Users, 
@@ -53,12 +56,12 @@ interface DashboardClientProps {
 
 export default function DashboardClient({ user }: DashboardClientProps) {
   const { toast } = useToast();
+  const { loading, error, execute } = useApiLoading();
   const [activeTab, setActiveTab] = useState('hackathon');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [teamData, setTeamData] = useState<TeamData | null>(null);
   const [showRegistrationMessage, setShowRegistrationMessage] = useState(false);
   const [currentUser, setCurrentUser] = useState<DashboardUser>(user);
-  const [loading, setLoading] = useState(true);
   const [hackathonStatus, setHackathonStatus] = useState<'live' | 'stop'>('live');
 
   // Use isBoarding status instead of hackathon registration
@@ -67,7 +70,7 @@ export default function DashboardClient({ user }: DashboardClientProps) {
   // Optimize loading by making parallel requests and reducing API calls
   useEffect(() => {
     const fetchDashboardData = async () => {
-      try {
+      await execute(async () => {
         // Make parallel requests for better performance
         const [userResponse, hackathonResponse] = await Promise.all([
           fetch('/api/auth/me', {
@@ -91,16 +94,11 @@ export default function DashboardClient({ user }: DashboardClientProps) {
           const hackathonData = await hackathonResponse.json();
           setHackathonStatus(hackathonData.hackathonStatus);
         }
-      } catch (error) {
-        // Continue with provided user data if API calls fail
-        console.log('Dashboard data fetch failed, using provided user data');
-      } finally {
-        setLoading(false);
-      }
+      });
     };
 
     fetchDashboardData();
-  }, []);
+  }, [execute]);
 
   // Fetch team data only when user has a teamId and loading is complete
   useEffect(() => {
@@ -179,25 +177,34 @@ export default function DashboardClient({ user }: DashboardClientProps) {
   const renderContent = () => {
     switch (activeTab) {
       case 'hackathon':
-        return <HackathonDetails />;
+        return (
+          <LazyWrapper type="section">
+            <HackathonDetails />
+          </LazyWrapper>
+        );
       case 'team-members':
-        return <TeamMembers user={currentUser} teamData={teamData} />;
+        return (
+          <LazyWrapper type="section">
+            <TeamMembers user={currentUser} teamData={teamData} />
+          </LazyWrapper>
+        );
       case 'project-submission':
-        return <ProjectSubmission />;
+        return (
+          <LazyWrapper type="section">
+            <ProjectSubmission />
+          </LazyWrapper>
+        );
       default:
-        return <HackathonDetails />;
+        return (
+          <LazyWrapper type="section">
+            <HackathonDetails />
+          </LazyWrapper>
+        );
     }
   };
 
   if (loading) {
-    return (
-      <div className="h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading dashboard...</p>
-        </div>
-      </div>
-    );
+    return <PageSkeleton />;
   }
 
   return (

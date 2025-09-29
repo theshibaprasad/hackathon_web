@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { HeroImage } from '@/components/OptimizedImage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -447,9 +448,11 @@ export default function RegisterPage() {
             animate={{ x: 0, opacity: 1, scale: 1 }}
             transition={{ duration: 1.2, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <img
+            <HeroImage
               src="/Register_pic.svg"
               alt="Register Illustration"
+              width={500}
+              height={400}
               className="w-full h-auto"
             />
           </motion.div>
@@ -577,9 +580,11 @@ export default function RegisterPage() {
             animate={{ x: 0, opacity: 1, scale: 1 }}
             transition={{ duration: 1.2, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <img
+            <HeroImage
               src="/Register_pic.svg"
               alt="Register Illustration"
+              width={500}
+              height={400}
               className="w-full h-auto"
             />
           </motion.div>
