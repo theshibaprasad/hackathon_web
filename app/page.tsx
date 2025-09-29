@@ -4,6 +4,7 @@ import { Suspense, lazy } from "react";
 import { CompanyHeader } from "@/components/CompanyHeader"
 import { CompanyHero } from "@/components/CompanyHero"
 import PerformanceMonitor from "@/components/PerformanceMonitor"
+import AnnouncementBanner from "@/components/AnnouncementBanner"
 
 // Lazy load non-critical components
 const CompanyStatsSection = lazy(() => import("@/components/CompanyStatsSection").then(module => ({ default: module.CompanyStatsSection })))
@@ -41,6 +42,11 @@ export default function Home() {
       <CompanyHeader />
       
       <CompanyHero />
+      
+      {/* Announcements Banner */}
+      <Suspense fallback={<LoadingSpinner />}>
+        <AnnouncementBanner />
+      </Suspense>
       
       <Suspense fallback={<LoadingSpinner />}>
         <CompanyStatsSection />

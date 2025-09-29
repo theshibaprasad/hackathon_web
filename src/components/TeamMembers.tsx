@@ -19,18 +19,18 @@ interface TeamMembersUser {
   updatedAt: string;
 }
 import { useToast } from "@/hooks/use-toast";
-import { 
-  Plus, 
-  X, 
-  User, 
-  Mail, 
-  Crown,
-  Users,
-  Trash2,
-  Send,
-  Edit,
-  AlertTriangle
-} from "lucide-react";
+import { Plus } from "lucide-react";
+import { X } from "lucide-react";
+import { User } from "lucide-react";
+import { Mail } from "lucide-react";
+import { Crown } from "lucide-react";
+import { Users } from "lucide-react";
+import { Trash2 } from "lucide-react";
+import { Send } from "lucide-react";
+import { Edit } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Lightbulb, Target, ArrowRight } from "lucide-react";
 
 interface TeamMember {
   id: string;
@@ -41,11 +41,31 @@ interface TeamMember {
   isTeamLead?: boolean;
 }
 
-interface TeamMembersProps {
-  user: TeamMembersUser | null;
+interface TeamData {
+  _id: string;
+  teamName: string;
+  isTeamLeader: boolean;
+  themeDetails?: {
+    _id: string;
+    name: string;
+    description: string;
+    isActive: boolean;
+  } | null;
+  problemStatementDetails?: {
+    _id: string;
+    title: string;
+    description: string;
+    themeId: string;
+    isActive: boolean;
+  } | null;
 }
 
-export const TeamMembers = ({ user }: TeamMembersProps) => {
+interface TeamMembersProps {
+  user: TeamMembersUser | null;
+  teamData?: TeamData | null;
+}
+
+export const TeamMembers = ({ user, teamData }: TeamMembersProps) => {
   const { toast } = useToast();
   
   // Initialize members state
@@ -73,6 +93,7 @@ export const TeamMembers = ({ user }: TeamMembersProps) => {
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [isUpdatingMember, setIsUpdatingMember] = useState(false);
   const [isRemovingMember, setIsRemovingMember] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   // Fetch team members from database and check registration status
   useEffect(() => {
@@ -680,6 +701,28 @@ export const TeamMembers = ({ user }: TeamMembersProps) => {
         </div>
       </div>
 
+      {/* Project Details Section */}
+      {(teamData?.themeDetails || teamData?.problemStatementDetails) && (
+        <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-xl sm:rounded-2xl border border-slate-200/60 p-4 sm:p-6 lg:p-8">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-slate-800 mb-1">
+                {teamData.problemStatementDetails?.title || 'Project Details'}
+              </h3>
+              <p className="text-sm text-slate-600">
+                Theme: {teamData.themeDetails?.name || 'Not selected'}
+              </p>
+            </div>
+            <Button 
+              onClick={() => setIsDetailsModalOpen(true)}
+              variant="outline"
+              className="ml-4"
+            >
+              View Details
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Team Members Section */}
       <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-xl sm:rounded-2xl border border-slate-200/60 p-4 sm:p-6 lg:p-8">
@@ -1251,6 +1294,79 @@ export const TeamMembers = ({ user }: TeamMembersProps) => {
         </AnimatePresence>,
         document.body
       )}
+
+      {/* Project Details Modal */}
+      <Dialog open={isDetailsModalOpen} onOpenChange={setIsDetailsModalOpen}>
+        <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader className="flex-shrink-0 pb-4 border-b">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center space-x-2 mb-2">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <Lightbulb className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50">
+                    {teamData?.themeDetails?.name || 'Theme'}
+                  </Badge>
+                </div>
+                <DialogTitle className="text-2xl font-bold text-gray-900 leading-tight">
+                  {teamData?.problemStatementDetails?.title || 'Project Details'}
+                </DialogTitle>
+                <DialogDescription className="text-gray-600 mt-2">
+                  Detailed information about your team's selected theme and problem statement
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+          
+          <div className="flex-1 overflow-y-auto py-6">
+            <div className="space-y-6">
+              {/* Theme Details */}
+              {teamData?.themeDetails && (
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <Target className="w-5 h-5 mr-2 text-blue-600" />
+                    Selected Theme
+                  </h3>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Theme Name</label>
+                      <p className="mt-1 text-lg font-semibold text-gray-900">{teamData.themeDetails.name}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Description</label>
+                      <p className="mt-1 text-gray-700">{teamData.themeDetails.description}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Problem Statement Details */}
+              {teamData?.problemStatementDetails && (
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <Target className="w-5 h-5 mr-2 text-green-600" />
+                    Problem Statement
+                  </h3>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Title</label>
+                      <p className="mt-1 text-lg font-semibold text-gray-900">{teamData.problemStatementDetails.title}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Description</label>
+                      <div 
+                        className="mt-1 prose prose-green max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-strong:text-gray-900 prose-ul:text-gray-700 prose-li:text-gray-700"
+                        dangerouslySetInnerHTML={{ __html: teamData.problemStatementDetails.description }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

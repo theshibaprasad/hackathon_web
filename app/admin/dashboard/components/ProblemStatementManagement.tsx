@@ -218,7 +218,7 @@ export default function ProblemStatementManagement({
               Create Problem Statement
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px]">
+          <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Create New Problem Statement</DialogTitle>
               <DialogDescription>
@@ -423,7 +423,7 @@ export default function ProblemStatementManagement({
 
       {/* Edit Dialog */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Problem Statement</DialogTitle>
             <DialogDescription>

@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, ArrowRight, Code, Brain, Heart, Zap, Shield, Globe, Users, Crown } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Code, Brain, Heart, Zap, Shield, Globe, Users, Crown, Loader2 } from 'lucide-react';
 import { OnboardingFormData } from '@/types/onboarding';
 
 interface ThemeSelectionProps {
@@ -17,110 +17,92 @@ interface ThemeSelectionProps {
   onPrev: () => void;
 }
 
-const hackathonThemes = [
-  {
-    id: 'ai-ml',
-    title: 'Artificial Intelligence & Machine Learning',
-    description: 'Build intelligent solutions using AI/ML technologies',
-    icon: Brain,
-    color: 'from-purple-500 to-pink-500',
-    bgColor: 'bg-purple-50',
-    borderColor: 'border-purple-200',
-    problemStatements: [
-      'Develop an AI-powered healthcare diagnostic tool',
-      'Create a smart recommendation system for e-commerce',
-      'Build a natural language processing chatbot',
-      'Design a computer vision solution for agriculture',
-      'Develop a predictive analytics dashboard'
-    ]
-  },
-  {
-    id: 'web-development',
-    title: 'Web Development',
-    description: 'Create innovative web applications and solutions',
-    icon: Code,
-    color: 'from-blue-500 to-cyan-500',
-    bgColor: 'bg-blue-50',
-    borderColor: 'border-blue-200',
-    problemStatements: [
-      'Build a real-time collaboration platform',
-      'Create a progressive web app for education',
-      'Develop a social media analytics dashboard',
-      'Design a e-commerce platform with advanced features',
-      'Build a project management tool'
-    ]
-  },
-  {
-    id: 'mobile-development',
-    title: 'Mobile Development',
-    description: 'Develop mobile applications for iOS and Android',
-    icon: Zap,
-    color: 'from-green-500 to-emerald-500',
-    bgColor: 'bg-green-50',
-    borderColor: 'border-green-200',
-    problemStatements: [
-      'Create a fitness tracking mobile app',
-      'Build a food delivery application',
-      'Develop a social networking mobile app',
-      'Design a productivity and task management app',
-      'Create a mobile banking solution'
-    ]
-  },
-  {
-    id: 'blockchain',
-    title: 'Blockchain & Web3',
-    description: 'Explore decentralized applications and blockchain solutions',
-    icon: Shield,
-    color: 'from-orange-500 to-red-500',
-    bgColor: 'bg-orange-50',
-    borderColor: 'border-orange-200',
-    problemStatements: [
-      'Develop a DeFi (Decentralized Finance) platform',
-      'Create a NFT marketplace',
-      'Build a supply chain tracking system',
-      'Design a voting system using blockchain',
-      'Develop a cryptocurrency wallet'
-    ]
-  },
-  {
-    id: 'iot',
-    title: 'Internet of Things (IoT)',
-    description: 'Connect devices and create smart solutions',
-    icon: Globe,
-    color: 'from-indigo-500 to-purple-500',
-    bgColor: 'bg-indigo-50',
-    borderColor: 'border-indigo-200',
-    problemStatements: [
-      'Build a smart home automation system',
-      'Create an environmental monitoring solution',
-      'Develop a smart agriculture system',
-      'Design a wearable health monitoring device',
-      'Build a smart city traffic management system'
-    ]
-  },
-  {
-    id: 'fintech',
-    title: 'FinTech',
-    description: 'Innovate in financial technology and digital banking',
-    icon: Heart,
-    color: 'from-pink-500 to-rose-500',
-    bgColor: 'bg-pink-50',
-    borderColor: 'border-pink-200',
-    problemStatements: [
-      'Create a personal finance management app',
-      'Build a peer-to-peer lending platform',
-      'Develop a digital payment solution',
-      'Design a investment portfolio tracker',
-      'Create a budgeting and expense tracking tool'
-    ]
+interface DynamicTheme {
+  _id: string;
+  name: string;
+  description: string;
+  problemStatements: {
+    _id: string;
+    title: string;
+    description: string;
+  }[];
+}
+
+interface DynamicProblemStatement {
+  _id: string;
+  title: string;
+  description: string;
+}
+
+// Icon mapping for different theme types
+const getThemeIcon = (themeName: string) => {
+  const name = themeName.toLowerCase();
+  if (name.includes('ai') || name.includes('machine learning') || name.includes('artificial intelligence')) return Brain;
+  if (name.includes('web') || name.includes('frontend') || name.includes('backend')) return Code;
+  if (name.includes('mobile') || name.includes('app')) return Zap;
+  if (name.includes('blockchain') || name.includes('web3') || name.includes('crypto')) return Shield;
+  if (name.includes('iot') || name.includes('internet of things') || name.includes('smart')) return Globe;
+  if (name.includes('fintech') || name.includes('finance') || name.includes('payment')) return Heart;
+  return Code; // Default icon
+};
+
+// Color mapping for different theme types
+const getThemeColors = (themeName: string) => {
+  const name = themeName.toLowerCase();
+  if (name.includes('ai') || name.includes('machine learning') || name.includes('artificial intelligence')) {
+    return { color: 'from-purple-500 to-pink-500', bgColor: 'bg-purple-50', borderColor: 'border-purple-200' };
   }
-];
+  if (name.includes('web') || name.includes('frontend') || name.includes('backend')) {
+    return { color: 'from-blue-500 to-cyan-500', bgColor: 'bg-blue-50', borderColor: 'border-blue-200' };
+  }
+  if (name.includes('mobile') || name.includes('app')) {
+    return { color: 'from-green-500 to-emerald-500', bgColor: 'bg-green-50', borderColor: 'border-green-200' };
+  }
+  if (name.includes('blockchain') || name.includes('web3') || name.includes('crypto')) {
+    return { color: 'from-orange-500 to-red-500', bgColor: 'bg-orange-50', borderColor: 'border-orange-200' };
+  }
+  if (name.includes('iot') || name.includes('internet of things') || name.includes('smart')) {
+    return { color: 'from-indigo-500 to-purple-500', bgColor: 'bg-indigo-50', borderColor: 'border-indigo-200' };
+  }
+  if (name.includes('fintech') || name.includes('finance') || name.includes('payment')) {
+    return { color: 'from-pink-500 to-rose-500', bgColor: 'bg-pink-50', borderColor: 'border-pink-200' };
+  }
+  return { color: 'from-gray-500 to-slate-500', bgColor: 'bg-gray-50', borderColor: 'border-gray-200' };
+};
 
 export default function ThemeSelection({ data, updateData, onNext, onPrev }: ThemeSelectionProps) {
   const [selectedTheme, setSelectedTheme] = useState<string>(data.themeId || '');
   const [selectedProblemStatement, setSelectedProblemStatement] = useState<string>(data.problemId || '');
   const [teamName, setTeamName] = useState<string>(data.teamName || '');
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  // Dynamic data state
+  const [themes, setThemes] = useState<DynamicTheme[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch themes from API
+  useEffect(() => {
+    const fetchThemes = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch('/api/themes');
+        if (!response.ok) {
+          throw new Error('Failed to fetch themes');
+        }
+        const data = await response.json();
+        setThemes(data.themes || []);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching themes:', err);
+        setError('Failed to load themes. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchThemes();
+  }, []);
 
   const handleThemeToggle = (themeId: string) => {
     // Allow only one theme selection
@@ -176,10 +158,53 @@ export default function ThemeSelection({ data, updateData, onNext, onPrev }: The
   };
 
   const getAvailableProblemStatements = () => {
-    return hackathonThemes
-      .filter(theme => theme.id === selectedTheme)
-      .flatMap(theme => theme.problemStatements);
+    const selectedThemeData = themes.find(theme => theme._id === selectedTheme);
+    return selectedThemeData?.problemStatements || [];
   };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        <div className="text-center mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+            Choose Your Interest
+          </h2>
+          <p className="text-gray-600 text-sm sm:text-base px-4">
+            Loading themes and problem statements...
+          </p>
+        </div>
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        <div className="text-center mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+            Choose Your Interest
+          </h2>
+          <p className="text-red-600 text-sm sm:text-base px-4">
+            {error}
+          </p>
+        </div>
+        <div className="text-center py-12">
+          <Button 
+            onClick={() => window.location.reload()} 
+            variant="outline"
+            className="mt-4"
+          >
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -237,51 +262,55 @@ export default function ThemeSelection({ data, updateData, onNext, onPrev }: The
       {/* Theme Selection */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-900">Select a Theme *</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          {hackathonThemes.map((theme) => {
-            const Icon = theme.icon;
-            const isSelected = selectedTheme === theme.id;
-            
-            return (
-              <Card
-                key={theme.id}
-                className={`cursor-pointer transition-all duration-200 ${
-                  isSelected
-                    ? `border-2 border-primary ${theme.bgColor} shadow-lg`
-                    : `border-2 ${theme.borderColor} hover:shadow-md`
-                }`}
-                onClick={() => handleThemeToggle(theme.id)}
-              >
-                <CardContent className="p-3 sm:p-4">
-                  <div className="flex items-start space-x-2 sm:space-x-3">
-                    <div className={`p-1.5 sm:p-2 rounded-lg ${theme.bgColor}`}>
-                      <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${isSelected ? 'text-primary' : 'text-gray-600'}`} />
-                    </div>
-                    
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-semibold text-gray-900 text-xs sm:text-sm">
-                          {theme.title}
-                        </h4>
-                        <Checkbox
-                          checked={isSelected}
-                          onChange={() => handleThemeToggle(theme.id)}
-                          className="ml-2"
-                        />
+        {themes.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500">No themes available at the moment.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            {themes.map((theme) => {
+              const Icon = getThemeIcon(theme.name);
+              const colors = getThemeColors(theme.name);
+              const isSelected = selectedTheme === theme._id;
+              
+              return (
+                <Card
+                  key={theme._id}
+                  className={`cursor-pointer transition-all duration-200 ${
+                    isSelected
+                      ? `border-2 border-primary ${colors.bgColor} shadow-lg`
+                      : `border-2 ${colors.borderColor} hover:shadow-md`
+                  }`}
+                  onClick={() => handleThemeToggle(theme._id)}
+                >
+                  <CardContent className="p-3 sm:p-4">
+                    <div className="flex items-start space-x-2 sm:space-x-3">
+                      <div className={`p-1.5 sm:p-2 rounded-lg ${colors.bgColor}`}>
+                        <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${isSelected ? 'text-primary' : 'text-gray-600'}`} />
                       </div>
-                      <p className="text-xs text-gray-600 mb-2">
-                        {theme.description}
-                      </p>
-                      <Badge variant="secondary" className="text-xs">
-                        {theme.problemStatements.length} problems
-                      </Badge>
+                      
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-semibold text-gray-900 text-xs sm:text-sm">
+                            {theme.name.replace(/<[^>]*>/g, '')}
+                          </h4>
+                          <Checkbox
+                            checked={isSelected}
+                            onChange={() => handleThemeToggle(theme._id)}
+                            className="ml-2"
+                          />
+                        </div>
+                        <Badge variant="secondary" className="text-xs mt-2">
+                          {theme.problemStatements.length} problems
+                        </Badge>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
         {errors.themes && <p className="text-sm text-red-500">{errors.themes}</p>}
       </div>
 
@@ -293,26 +322,28 @@ export default function ThemeSelection({ data, updateData, onNext, onPrev }: The
             Select the problem statement you'd like to work on
           </p>
           <div className="space-y-3">
-            {getAvailableProblemStatements().map((statement, index) => (
+            {getAvailableProblemStatements().map((statement) => (
               <Card
-                key={index}
+                key={statement._id}
                 className={`cursor-pointer transition-all duration-200 ${
-                  selectedProblemStatement === statement
+                  selectedProblemStatement === statement._id
                     ? 'border-2 border-primary bg-primary/5'
                     : 'border border-gray-200 hover:border-gray-300'
                 }`}
-                onClick={() => handleProblemStatementToggle(statement)}
+                onClick={() => handleProblemStatementToggle(statement._id)}
               >
                 <CardContent className="p-4">
                   <div className="flex items-start space-x-3">
                     <Checkbox
-                      checked={selectedProblemStatement === statement}
-                      onChange={() => handleProblemStatementToggle(statement)}
+                      checked={selectedProblemStatement === statement._id}
+                      onChange={() => handleProblemStatementToggle(statement._id)}
                       className="mt-0.5"
                     />
-                    <p className="text-sm text-gray-700 flex-1">
-                      {statement}
-                    </p>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-900">
+                        {statement.title.replace(/<[^>]*>/g, '')}
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -336,13 +367,15 @@ export default function ThemeSelection({ data, updateData, onNext, onPrev }: The
             <div>
               <span className="text-sm font-medium text-gray-700">Theme: </span>
               <span className="text-sm text-gray-600">
-                {selectedTheme ? 'Selected' : 'Not selected'}
+                {selectedTheme ? (themes.find(t => t._id === selectedTheme)?.name || 'Selected').replace(/<[^>]*>/g, '') : 'Not selected'}
               </span>
             </div>
             <div>
               <span className="text-sm font-medium text-gray-700">Problem Statement: </span>
               <span className="text-sm text-gray-600">
-                {selectedProblemStatement ? 'Selected' : 'Not selected'}
+                {selectedProblemStatement ? 
+                  (getAvailableProblemStatements().find(ps => ps._id === selectedProblemStatement)?.title || 'Selected').replace(/<[^>]*>/g, '')
+                  : 'Not selected'}
               </span>
             </div>
           </div>

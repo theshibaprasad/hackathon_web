@@ -66,14 +66,6 @@ const nextConfig = {
       return originalEmit.apply(process, arguments);
     };
     
-    // Exclude service worker from server-side bundle
-    if (isServer) {
-      config.externals = config.externals || [];
-      config.externals.push({
-        './sw.js': 'commonjs ./sw.js'
-      });
-    }
-    
     // Fix module system compatibility
     config.resolve = {
       ...config.resolve,
@@ -87,60 +79,9 @@ const nextConfig = {
       alias: {
         ...config.resolve.alias,
         '@emotion/is-prop-valid': require.resolve('@emotion/is-prop-valid'),
-        // Additional alias to prevent punycode deprecation warnings
         punycode: require.resolve('punycode.js'),
       },
     };
-
-    // Optimize bundle splitting for better performance
-    if (!isServer) {
-      config.optimization = {
-        ...config.optimization,
-        splitChunks: {
-          chunks: 'all',
-          cacheGroups: {
-            vendor: {
-              test: /[\\/]node_modules[\\/]/,
-              name: 'vendors',
-              chunks: 'all',
-              priority: 10,
-            },
-            common: {
-              name: 'common',
-              minChunks: 2,
-              chunks: 'all',
-              priority: 5,
-              reuseExistingChunk: true,
-            },
-          },
-        },
-        // Remove usedExports to avoid conflict with cache
-        sideEffects: false,
-      };
-    }
-
-    // Fix CommonJS/ES module compatibility
-    config.module = {
-      ...config.module,
-      rules: [
-        ...config.module.rules,
-        {
-          test: /\.m?js$/,
-          type: 'javascript/auto',
-          resolve: {
-            fullySpecified: false,
-          },
-        },
-      ],
-    };
-
-    // Optimize webpack cache for better performance
-    if (dev) {
-      config.cache = {
-        type: 'memory',
-        // Use memory cache for development to avoid filesystem issues
-      };
-    }
     
     return config;
   },

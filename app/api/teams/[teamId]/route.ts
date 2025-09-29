@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Team from '@/models/Team';
+import Theme from '@/models/Theme';
+import ProblemStatement from '@/models/ProblemStatement';
 import jwt from 'jsonwebtoken';
 
 export async function GET(
@@ -48,6 +50,26 @@ export async function GET(
       );
     }
 
+    // Fetch theme and problem statement details if they exist
+    let themeDetails = null;
+    let problemStatementDetails = null;
+
+    if (team.themeId) {
+      try {
+        themeDetails = await Theme.findById(team.themeId);
+      } catch (error) {
+        console.log('Error fetching theme:', error);
+      }
+    }
+
+    if (team.problemId) {
+      try {
+        problemStatementDetails = await ProblemStatement.findById(team.problemId);
+      } catch (error) {
+        console.log('Error fetching problem statement:', error);
+      }
+    }
+
     // Check if user is part of this team
     const isLeader = team.leader.userId.toString() === decoded.userId;
     const isMember = team.members.some((member: any) => member.userId.toString() === decoded.userId);
@@ -69,6 +91,19 @@ export async function GET(
         members: team.members,
         themeId: team.themeId,
         problemId: team.problemId,
+        themeDetails: themeDetails ? {
+          _id: themeDetails._id,
+          name: themeDetails.name,
+          description: themeDetails.description,
+          isActive: themeDetails.isActive
+        } : null,
+        problemStatementDetails: problemStatementDetails ? {
+          _id: problemStatementDetails._id,
+          title: problemStatementDetails.title,
+          description: problemStatementDetails.description,
+          themeId: problemStatementDetails.themeId,
+          isActive: problemStatementDetails.isActive
+        } : null,
         createdAt: team.createdAt,
         updatedAt: team.updatedAt
       }

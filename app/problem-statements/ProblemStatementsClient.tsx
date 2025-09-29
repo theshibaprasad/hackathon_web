@@ -158,7 +158,7 @@ export default function ProblemStatementsClient() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
         {/* Header Skeleton */}
         <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-5 h-5 bg-gray-300 rounded animate-pulse" />
@@ -171,7 +171,7 @@ export default function ProblemStatementsClient() {
 
         {/* Hero Section Skeleton */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-16 sm:py-24">
-          <div className="container mx-auto px-4 max-w-6xl">
+          <div className="container mx-auto px-4 max-w-7xl">
             <div className="text-center">
               <div className="flex items-center justify-center mb-6">
                 <div className="w-12 h-12 bg-white/20 rounded-lg animate-pulse mr-3" />
@@ -188,16 +188,16 @@ export default function ProblemStatementsClient() {
         </div>
 
         {/* Content Skeleton */}
-        <div className="container mx-auto px-4 max-w-6xl py-12 sm:py-16">
+        <div className="container mx-auto px-4 max-w-7xl py-12 sm:py-16">
           <div className="text-center mb-12 sm:mb-16">
             <div className="w-64 h-8 bg-gray-300 rounded animate-pulse mx-auto mb-4" />
             <div className="w-96 h-4 bg-gray-300 rounded animate-pulse mx-auto" />
           </div>
 
           {/* Themes Grid Skeleton */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10">
             {[...Array(6)].map((_, index) => (
-              <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden animate-pulse">
+              <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden animate-pulse min-h-[600px]">
                 <div className="h-2 bg-gray-300" />
                 <div className="p-6">
                   <div className="flex items-start space-x-4">
@@ -236,7 +236,7 @@ export default function ProblemStatementsClient() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             <Link 
               href="/" 
@@ -252,7 +252,7 @@ export default function ProblemStatementsClient() {
 
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-16 sm:py-24">
-        <div className="container mx-auto px-4 max-w-6xl">
+        <div className="container mx-auto px-4 max-w-7xl">
           <div className="text-center">
             <div className="flex items-center justify-center mb-6">
               <Lightbulb className="w-8 h-8 sm:w-12 sm:h-12 mr-3" />
@@ -281,7 +281,7 @@ export default function ProblemStatementsClient() {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 max-w-6xl py-12 sm:py-16">
+      <div className="container mx-auto px-4 max-w-7xl py-12 sm:py-16">
         {/* Introduction */}
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
@@ -294,54 +294,54 @@ export default function ProblemStatementsClient() {
         </div>
 
         {/* Themes Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10">
           {visibleThemes.map((theme) => {
             const Icon = getThemeIcon(theme.name);
             const colors = getThemeColors(theme.name);
             
             return (
-              <Card key={theme._id} className="overflow-hidden hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
-                <div className={`h-2 bg-gradient-to-r ${colors.color}`}></div>
-                <CardHeader className="pb-4">
+              <Card key={theme._id} className="overflow-hidden hover:shadow-xl transition-all duration-300 border-0 shadow-lg min-h-[400px] bg-white">
+                <div className={`h-1 bg-gradient-to-r ${colors.color}`}></div>
+                <CardHeader className="pb-4 px-6 pt-6">
                   <div className="flex items-start space-x-4">
-                    <div className={`p-3 rounded-lg ${colors.bgColor} flex-shrink-0`}>
+                    <div className={`p-3 rounded-lg ${colors.bgColor} flex-shrink-0 shadow-sm`}>
                       <Icon className={`w-6 h-6 ${colors.textColor}`} />
                     </div>
                     <div className="flex-1">
-                      <CardTitle className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+                      <CardTitle className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 leading-tight">
                         {theme.name}
                       </CardTitle>
-                      <CardDescription className="text-gray-600 text-base">
+                      <CardDescription className="text-gray-600 text-sm leading-relaxed">
                         {theme.description}
                       </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="pt-0">
+                <CardContent className="pt-0 px-6 pb-6">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-gray-900">Problem Statements</h3>
-                      <Badge variant="secondary" className="bg-gray-100 text-gray-700">
+                      <h3 className="font-semibold text-gray-900 text-lg">Problem Statements</h3>
+                      <Badge variant="secondary" className="bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full">
                         {theme.problemStatements.length} challenges
                       </Badge>
                     </div>
                     <div className="space-y-3">
                       {theme.problemStatements.map((problemStatement) => (
-                        <div key={problemStatement._id} className="group p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 border border-gray-200 hover:border-blue-200">
+                        <div key={problemStatement._id} className="group p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg hover:from-blue-50 hover:to-indigo-50 transition-all duration-300 border border-gray-200 hover:border-blue-200 hover:shadow-md">
                           <div className="flex items-start justify-between">
                             <div className="flex items-start space-x-3 flex-1">
-                              <div className="p-1.5 bg-green-100 rounded-full flex-shrink-0 mt-0.5">
-                                <CheckCircle className="w-3.5 h-3.5 text-green-600" />
+                              <div className="p-2 bg-green-100 rounded-full flex-shrink-0 mt-0.5 shadow-sm">
+                                <CheckCircle className="w-4 h-4 text-green-600" />
                               </div>
                               <div className="flex-1">
-                                <h4 className="text-sm font-semibold text-gray-900 leading-tight mb-1">
+                                <h4 className="text-base font-semibold text-gray-900 leading-tight mb-2">
                                   {problemStatement.title}
                                 </h4>
                                 <p className="text-xs text-gray-500 mb-2">
                                   Theme: <span className="font-medium text-blue-600">{theme.name}</span>
                                 </p>
                                 <div className="flex items-center space-x-2">
-                                  <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                                  <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200 px-2 py-0.5 rounded-full">
                                     Problem Statement
                                   </Badge>
                                   <span className="text-xs text-gray-400">•</span>
@@ -353,7 +353,7 @@ export default function ProblemStatementsClient() {
                               variant="ghost"
                               size="sm"
                               onClick={() => openProblemStatementModal(problemStatement)}
-                              className="ml-3 h-9 w-9 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100"
+                              className="ml-2 h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100 shadow-sm"
                             >
                               <Eye className="w-4 h-4" />
                             </Button>
@@ -454,7 +454,7 @@ export default function ProblemStatementsClient() {
 
       {/* Problem Statement Details Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-[700px] max-h-[85vh] overflow-hidden flex flex-col">
+        <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader className="flex-shrink-0 pb-4 border-b">
             <div className="flex items-start justify-between">
               <div className="flex-1">
@@ -492,7 +492,6 @@ export default function ProblemStatementsClient() {
                     dangerouslySetInnerHTML={{ __html: selectedProblemStatement.description }}
                   />
                 </div>
-
 
                 {/* Call to Action */}
                 <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">

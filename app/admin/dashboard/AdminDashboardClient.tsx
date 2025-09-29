@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs-simple";
 import { Input } from "@/components/ui/input";
 import StatsCards from "./components/StatsCards";
 import DataTable from "./components/DataTable";
@@ -14,6 +14,7 @@ import TeamDetailsModal from "./components/TeamDetailsModal";
 import ToggleSwitch from "./components/ToggleSwitch";
 import ThemeManagement from "./components/ThemeManagement";
 import ProblemStatementManagement from "./components/ProblemStatementManagement";
+import AnnouncementManagement from "./components/AnnouncementManagement";
 import { 
   Users, 
   Mail, 
@@ -313,6 +314,7 @@ export default function AdminDashboardClient() {
     { id: "users", label: "Users", icon: UserPlus },
     { id: "themes", label: "Themes", icon: Target },
     { id: "problem-statements", label: "Problem Statements", icon: Lightbulb },
+    { id: "announcements", label: "Announcements", icon: Bell },
     { id: "settings", label: "Settings", icon: Settings },
   ];
 
@@ -929,6 +931,11 @@ export default function AdminDashboardClient() {
                 themes={themes}
                 onRefresh={() => loadDashboardData(true)} 
               />
+            </TabsContent>
+
+            {/* Announcements Tab */}
+            <TabsContent value="announcements" className="space-y-6">
+              <AnnouncementManagement />
             </TabsContent>
 
             {/* Settings Tab */}

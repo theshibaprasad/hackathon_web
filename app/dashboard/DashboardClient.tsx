@@ -32,6 +32,19 @@ interface TeamData {
   _id: string;
   teamName: string;
   isTeamLeader: boolean;
+  themeDetails?: {
+    _id: string;
+    name: string;
+    description: string;
+    isActive: boolean;
+  } | null;
+  problemStatementDetails?: {
+    _id: string;
+    title: string;
+    description: string;
+    themeId: string;
+    isActive: boolean;
+  } | null;
 }
 
 interface DashboardClientProps {
@@ -104,7 +117,9 @@ export default function DashboardClient({ user }: DashboardClientProps) {
             setTeamData({
               _id: data.team._id,
               teamName: data.team.teamName,
-              isTeamLeader: data.team.leader.userId === currentUser._id
+              isTeamLeader: data.team.leader.userId === currentUser._id,
+              themeDetails: data.team.themeDetails,
+              problemStatementDetails: data.team.problemStatementDetails
             });
           }
         } catch (error) {
@@ -166,7 +181,7 @@ export default function DashboardClient({ user }: DashboardClientProps) {
       case 'hackathon':
         return <HackathonDetails />;
       case 'team-members':
-        return <TeamMembers user={currentUser} />;
+        return <TeamMembers user={currentUser} teamData={teamData} />;
       case 'project-submission':
         return <ProjectSubmission />;
       default:
@@ -271,6 +286,7 @@ export default function DashboardClient({ user }: DashboardClientProps) {
               </div>
             </div>
           </div>
+
         </div>
 
         {/* Navigation */}
