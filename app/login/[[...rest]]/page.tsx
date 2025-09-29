@@ -79,13 +79,14 @@ export default function LoginPage() {
           animate={{ x: 0, opacity: 1, scale: 1 }}
           transition={{ duration: 1.2, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          <Image
+          {/* Use native img for SVG to avoid Next/Image validation issues */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/Login_pic.svg"
             alt="Login Illustration"
             width={500}
             height={400}
             className="w-full h-auto"
-            priority
             loading="eager"
           />
         </motion.div>

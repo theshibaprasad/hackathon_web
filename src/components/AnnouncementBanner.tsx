@@ -268,7 +268,7 @@ export default function AnnouncementBanner() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={handleClose}
+              onClick={() => handleDismiss(currentAnnouncement._id)}
               className="text-gray-400 hover:text-gray-600 hover:bg-white/50 rounded-full p-1 h-7 w-7 flex-shrink-0"
             >
               <X className="w-3.5 h-3.5" />

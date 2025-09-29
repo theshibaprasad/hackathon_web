@@ -41,6 +41,34 @@ export function OptimizedImage({
   // Generate a simple blur placeholder if none provided
   const defaultBlurDataURL = blurDataURL || 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=';
 
+  // Fallback for SVGs: use native <img> to avoid Next/Image validation issues
+  const isSvg = typeof src === 'string' && src.toLowerCase().endsWith('.svg');
+  if (isSvg) {
+    return (
+      <div className={`relative ${className}`}>
+        {isLoading && (
+          <Skeleton className="absolute inset-0" />
+        )}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={src}
+          alt={alt}
+          width={fill ? undefined as any : width}
+          height={fill ? undefined as any : height}
+          className={`transition-opacity duration-300 ${
+            isLoading ? 'opacity-0' : 'opacity-100'
+          }`}
+          onLoad={() => setIsLoading(false)}
+          onError={() => {
+            setIsLoading(false);
+            setHasError(true);
+          }}
+          {...props}
+        />
+      </div>
+    );
+  }
+
   if (hasError) {
     return (
       <div className={`flex items-center justify-center bg-muted text-muted-foreground ${className}`}>
