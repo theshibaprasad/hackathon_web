@@ -6,6 +6,7 @@ import Payment from '@/models/Payment';
 import Team from '@/models/Team';
 import jwt from 'jsonwebtoken';
 import { refreshUserToken } from '@/lib/auth';
+import { sendPaymentConfirmationEmail } from '@/lib/emailService';
 
 export async function POST(request: NextRequest) {
   try {
@@ -102,6 +103,22 @@ export async function POST(request: NextRequest) {
     // Refresh JWT token with updated isBoarding status
     const newToken = await refreshUserToken(decoded.userId);
 
+    // Send payment confirmation email
+    try {
+      await sendPaymentConfirmationEmail(
+        updatedUser.email,
+        `${updatedUser.firstName} ${updatedUser.lastName}`,
+        {
+          amount: updatedPayment.amount,
+          paymentId: razorpay_payment_id,
+          orderId: razorpay_order_id,
+          isEarlyBird: updatedPayment.isEarlyBird,
+          timestamp: new Date().toISOString()
+        }
+      );
+    } catch (emailError) {
+      // Email sending failed, but payment verification should still succeed
+    }
 
     const response = NextResponse.json({
       success: true,
@@ -113,6 +130,17 @@ export async function POST(request: NextRequest) {
         status: updatedPayment.paymentStatus,
         amount: updatedPayment.amount,
         isEarlyBird: updatedPayment.isEarlyBird
+      },
+      confirmation: {
+        message: `Payment of ₹${updatedPayment.amount} has been successfully processed!`,
+        details: {
+          paymentId: razorpay_payment_id,
+          orderId: razorpay_order_id,
+          amount: updatedPayment.amount,
+          currency: 'INR',
+          isEarlyBird: updatedPayment.isEarlyBird,
+          timestamp: new Date().toISOString()
+        }
       }
     });
 
@@ -128,7 +156,6 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error('Payment verification error:', error);
     return NextResponse.json(
       { error: 'Payment verification failed' },
       { status: 500 }

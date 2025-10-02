@@ -15,6 +15,7 @@ import ToggleSwitch from "./components/ToggleSwitch";
 import ThemeManagement from "./components/ThemeManagement";
 import ProblemStatementManagement from "./components/ProblemStatementManagement";
 import AnnouncementManagement from "./components/AnnouncementManagement";
+import ProjectSubmissionManagement from "./components/ProjectSubmissionManagement";
 import { 
   Users, 
   Mail, 
@@ -51,7 +52,8 @@ import {
   TrendingDown,
   Activity,
   Target,
-  Lightbulb
+  Lightbulb,
+  FileText
 } from "lucide-react";
 
 interface AdminStats {
@@ -312,6 +314,7 @@ export default function AdminDashboardClient() {
     { id: "teams", label: "Teams", icon: Users },
     { id: "payments", label: "Payments", icon: DollarSign },
     { id: "users", label: "Users", icon: UserPlus },
+    { id: "project-submissions", label: "Project Submissions", icon: FileText },
     { id: "themes", label: "Themes", icon: Target },
     { id: "problem-statements", label: "Problem Statements", icon: Lightbulb },
     { id: "announcements", label: "Announcements", icon: Bell },
@@ -914,6 +917,11 @@ export default function AdminDashboardClient() {
                   window.URL.revokeObjectURL(url);
                 }}
               />
+            </TabsContent>
+
+            {/* Project Submissions Tab */}
+            <TabsContent value="project-submissions" className="space-y-6">
+              <ProjectSubmissionManagement />
             </TabsContent>
 
             {/* Themes Tab */}

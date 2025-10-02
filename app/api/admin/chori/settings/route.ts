@@ -15,7 +15,6 @@ export async function GET(request: NextRequest) {
       specialPricingEnabled
     });
   } catch (error) {
-    console.error('Error getting special pricing settings:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -28,11 +27,9 @@ export async function POST(request: NextRequest) {
   try {
     const { specialPricingEnabled } = await request.json();
     
-    console.log('🔧 API: Received request to update special pricing:', specialPricingEnabled);
 
     // Validate input
     if (typeof specialPricingEnabled !== 'boolean') {
-      console.log('❌ API: Validation failed - not a boolean');
       return NextResponse.json(
         { error: 'Invalid specialPricingEnabled value. Must be boolean.' },
         { status: 400 }
@@ -40,7 +37,6 @@ export async function POST(request: NextRequest) {
     }
 
     await connectDB();
-    console.log('🔧 API: Connected to database');
 
     // Update special pricing setting in database
     const result = await (Settings as ISettingsModel).setSetting(
@@ -49,7 +45,6 @@ export async function POST(request: NextRequest) {
       'Controls whether the special 2 rupees pricing feature is enabled for users'
     );
     
-    console.log('🔧 API: Database update result:', result);
 
     return NextResponse.json({
       success: true,
@@ -57,7 +52,6 @@ export async function POST(request: NextRequest) {
       specialPricingEnabled
     });
   } catch (error) {
-    console.error('❌ API: Error updating special pricing settings:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

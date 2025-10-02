@@ -58,7 +58,6 @@ export async function GET(
       try {
         themeDetails = await Theme.findById(team.themeId);
       } catch (error) {
-        console.log('Error fetching theme:', error);
       }
     }
 
@@ -66,7 +65,6 @@ export async function GET(
       try {
         problemStatementDetails = await ProblemStatement.findById(team.problemId);
       } catch (error) {
-        console.log('Error fetching problem statement:', error);
       }
     }
 
@@ -110,7 +108,6 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('Error fetching team:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

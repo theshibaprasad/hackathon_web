@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Payment from '@/models/Payment';
 import User from '@/models/User';
+import { sendPaymentConfirmationEmail } from '@/lib/emailService';
 
 export async function PUT(request: NextRequest) {
   try {
@@ -83,7 +84,7 @@ export async function PUT(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({
+    const responseData: any = {
       success: true,
       payment: {
         id: updatedPayment._id,
@@ -98,10 +99,46 @@ export async function PUT(request: NextRequest) {
         currency: updatedPayment.currency,
         updatedAt: updatedPayment.updatedAt
       }
-    });
+    };
+
+    // Add confirmation message for successful payments
+    if (paymentStatus === 'success') {
+      responseData.confirmation = {
+        message: `Payment of ₹${updatedPayment.amount} has been successfully processed!`,
+        details: {
+          paymentId: razorpayPaymentId,
+          orderId: razorpayOrderId,
+          amount: updatedPayment.amount,
+          currency: updatedPayment.currency,
+          isEarlyBird: updatedPayment.isEarlyBird,
+          timestamp: new Date().toISOString()
+        }
+      };
+
+      // Send payment confirmation email
+      try {
+        const user = await User.findById(updatedPayment.userId);
+        if (user) {
+          await sendPaymentConfirmationEmail(
+            user.email,
+            `${user.firstName} ${user.lastName}`,
+            {
+              amount: updatedPayment.amount,
+              paymentId: razorpayPaymentId || 'N/A',
+              orderId: razorpayOrderId,
+              isEarlyBird: updatedPayment.isEarlyBird,
+              timestamp: new Date().toISOString()
+            }
+          );
+        }
+      } catch (emailError) {
+        // Email sending failed, but payment update should still succeed
+      }
+    }
+
+    return NextResponse.json(responseData);
 
   } catch (error) {
-    console.error('Error updating payment status:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

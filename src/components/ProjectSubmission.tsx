@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,50 +10,87 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { 
-  Upload, 
   Github, 
-  FileText, 
-  Archive,
   CheckCircle,
   AlertCircle,
   ExternalLink,
-  X,
-  Clock
+  Clock,
+  Users,
+  FileText,
+  Upload
 } from "lucide-react";
+
+interface SubmissionStatus {
+  id: string;
+  status: string;
+  submittedAt: string;
+  projectName: string;
+  githubRepo: string;
+  githubValidation: {
+    isPublic: boolean;
+    hasSetupMd: boolean;
+    hasTeamNamePdf: boolean;
+    validatedAt: string;
+  };
+  reviewNotes?: string;
+  reviewedAt?: string;
+}
+
+interface TeamStatus {
+  hasTeam: boolean;
+  teamName?: string;
+  isTeamLeader?: boolean;
+  submissionStatus?: SubmissionStatus | null;
+}
 
 export const ProjectSubmission = () => {
   const { toast } = useToast();
   const [projectData, setProjectData] = useState({
+    teamName: '',
     projectName: '',
     description: '',
     githubRepo: '',
-    pptFile: null as File | null,
-    zipFile: null as File | null,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submissionStatus, setSubmissionStatus] = useState<'draft' | 'submitted'>('draft');
+  const [teamStatus, setTeamStatus] = useState<TeamStatus | null>(null);
   const [hackathonStatus, setHackathonStatus] = useState<'live' | 'stop'>('live');
 
-  // Fetch hackathon status
+  // Fetch hackathon status and team status
   useEffect(() => {
-    const fetchHackathonStatus = async () => {
+    const fetchStatus = async () => {
       try {
-        const response = await fetch('/api/settings/hackathon-status', {
-          method: 'GET',
-          credentials: 'include',
-        });
+        const [hackathonResponse, submissionResponse] = await Promise.all([
+          fetch('/api/settings/hackathon-status', {
+            method: 'GET',
+            credentials: 'include',
+          }),
+          fetch('/api/project-submission/status', {
+            method: 'GET',
+            credentials: 'include',
+          })
+        ]);
 
-        if (response.ok) {
-          const data = await response.json();
-          setHackathonStatus(data.hackathonStatus);
+        if (hackathonResponse.ok) {
+          const hackathonData = await hackathonResponse.json();
+          setHackathonStatus(hackathonData.hackathonStatus);
+        }
+
+        if (submissionResponse.ok) {
+          const submissionData = await submissionResponse.json();
+          setTeamStatus(submissionData);
+          
+          // Set team name if available
+          if (submissionData.teamName) {
+            setProjectData(prev => ({ ...prev, teamName: submissionData.teamName }));
+          }
         }
       } catch (error) {
-        console.error('Error fetching hackathon status:', error);
+        console.error('Error fetching status:', error);
       }
     };
 
-    fetchHackathonStatus();
+    fetchStatus();
   }, []);
 
   const handleInputChange = (field: string, value: string) => {
@@ -63,44 +100,114 @@ export const ProjectSubmission = () => {
     }));
   };
 
-  const handleFileUpload = (field: 'pptFile' | 'zipFile', file: File) => {
-    setProjectData(prev => ({
-      ...prev,
-      [field]: file
-    }));
+  const validateGitHubRepo = async (repoUrl: string) => {
+    if (!repoUrl) return { isValid: true };
+
+    try {
+      const response = await fetch('/api/project-submission/validate-github', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          githubRepo: repoUrl,
+          teamName: projectData.teamName
+        }),
+        credentials: 'include',
+      });
+
+      const result = await response.json();
+      
+      if (response.ok) {
+        return { isValid: true, validation: result.validation };
+      } else {
+        return { isValid: false, error: result.error };
+      }
+    } catch (error) {
+      return { isValid: false, error: 'Failed to validate repository' };
+    }
   };
 
   const handleSubmit = async () => {
-    if (!projectData.projectName || !projectData.description) {
+    // Validate required fields
+    if (!projectData.teamName || !projectData.projectName || !projectData.description || !projectData.githubRepo) {
       toast({
         title: "Missing Information",
-        description: "Please fill in project name and description!",
+        description: "Please fill in all required fields including GitHub repository!",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if user is team leader
+    if (!teamStatus?.isTeamLeader) {
+      toast({
+        title: "Access Denied",
+        description: "Only team leaders can submit projects!",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if already submitted
+    if (teamStatus?.submissionStatus) {
+      toast({
+        title: "Already Submitted",
+        description: "Your team has already submitted a project!",
         variant: "destructive",
       });
       return;
     }
 
     setIsSubmitting(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setSubmissionStatus('submitted');
-    setIsSubmitting(false);
-    
-    toast({
-      title: "Project Submitted!",
-      description: "Your project has been submitted successfully.",
-    });
+
+    try {
+      const response = await fetch('/api/project-submission/upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(projectData),
+        credentials: 'include',
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: "Project Submitted!",
+          description: "Your project has been submitted successfully with GitHub repository validation.",
+        });
+        
+        // Refresh team status
+        const statusResponse = await fetch('/api/project-submission/status', {
+          method: 'GET',
+          credentials: 'include',
+        });
+        
+        if (statusResponse.ok) {
+          const statusData = await statusResponse.json();
+          setTeamStatus(statusData);
+        }
+      } else {
+        toast({
+          title: "Submission Failed",
+          description: result.error || "Failed to submit project. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      toast({
+        title: "Submission Failed",
+        description: "An error occurred while submitting your project. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
 
   // Show simple message when hackathon is not live
   if (hackathonStatus === 'stop') {
@@ -139,6 +246,72 @@ export const ProjectSubmission = () => {
     );
   }
 
+  // Show message if user doesn't have a team
+  if (teamStatus && !teamStatus.hasTeam) {
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold text-foreground">Project Submission</h2>
+            <p className="text-muted-foreground mt-2">
+              Submit your hackathon project details and files
+            </p>
+          </div>
+        </div>
+
+        {/* No Team Message */}
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center p-8">
+            <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              No Team Found
+            </h3>
+            <p className="text-gray-600 mb-4">
+              You need to be part of a team to submit a project. Please join or create a team first.
+            </p>
+            <Badge variant="outline" className="text-sm">
+              Team membership required
+            </Badge>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show message if user is not team leader
+  if (teamStatus && teamStatus.hasTeam && !teamStatus.isTeamLeader) {
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold text-foreground">Project Submission</h2>
+            <p className="text-muted-foreground mt-2">
+              Submit your hackathon project details and files
+            </p>
+          </div>
+        </div>
+
+        {/* Not Team Leader Message */}
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center p-8">
+            <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Access Restricted
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Only team leaders can submit projects. Please contact your team leader to submit the project.
+            </p>
+            <Badge variant="outline" className="text-sm">
+              Team leader access required
+            </Badge>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -151,21 +324,29 @@ export const ProjectSubmission = () => {
             <p className="text-muted-foreground/80 text-sm sm:text-base lg:text-lg leading-relaxed">
               Submit your innovative hackathon project and showcase your work
             </p>
+            {teamStatus?.teamName && (
+              <div className="mt-3 flex items-center justify-center sm:justify-start gap-2">
+                <Users className="w-4 h-4 text-primary" />
+                <span className="text-sm font-medium text-primary">
+                  Team: {teamStatus.teamName}
+                </span>
+              </div>
+            )}
           </div>
           <div className="flex justify-center sm:justify-start">
             <Badge 
-              variant={submissionStatus === 'submitted' ? 'default' : 'secondary'}
+              variant={teamStatus?.submissionStatus ? 'default' : 'secondary'}
               className="text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 font-semibold shadow-sm"
             >
-              {submissionStatus === 'submitted' ? (
+              {teamStatus?.submissionStatus ? (
                 <>
                   <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-                  ✅ Submitted
+                  ✅ Submitted ({teamStatus.submissionStatus.status})
                 </>
               ) : (
                 <>
                   <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-                  Draft
+                  Ready to Submit
                 </>
               )}
             </Badge>
@@ -191,6 +372,23 @@ export const ProjectSubmission = () => {
             </CardHeader>
             <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6 pt-0">
               <div className="space-y-2">
+                <Label htmlFor="teamName">Team Name *</Label>
+                <Input
+                  id="teamName"
+                  value={projectData.teamName}
+                  onChange={(e) => handleInputChange('teamName', e.target.value)}
+                  placeholder="Enter your team name"
+                  className="h-10 sm:h-12"
+                  disabled={!!teamStatus?.teamName}
+                />
+                {teamStatus?.teamName && (
+                  <p className="text-xs text-muted-foreground">
+                    Team name is automatically filled from your team information
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="projectName">Project Name *</Label>
                 <Input
                   id="projectName"
@@ -213,7 +411,7 @@ export const ProjectSubmission = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="githubRepo">GitHub Repository Link</Label>
+                <Label htmlFor="githubRepo">GitHub Repository Link *</Label>
                 <div className="relative">
                   <Github className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                   <Input
@@ -222,120 +420,52 @@ export const ProjectSubmission = () => {
                     onChange={(e) => handleInputChange('githubRepo', e.target.value)}
                     placeholder="https://github.com/username/repository"
                     className="pl-10 h-10 sm:h-12"
+                    required
                   />
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  Repository must be public and contain setup.md and {projectData.teamName || 'teamname'}.pdf files
+                </p>
               </div>
             </CardContent>
           </Card>
 
-          {/* File Uploads */}
+          {/* GitHub Repository Requirements */}
           <Card className="bg-gradient-to-br from-card via-card to-card/90 border-border/50 shadow-lg shadow-black/5 hover:shadow-xl hover:shadow-black/10 transition-all duration-300 rounded-xl sm:rounded-2xl backdrop-blur-sm">
             <CardHeader className="pb-3 sm:pb-4 p-4 sm:p-6">
               <CardTitle className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl font-bold">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-green-400/20 to-green-500/10 rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm">
-                  <Upload className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
+                  <Github className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
                 </div>
-                📤 File Uploads
+                📋 Repository Requirements
               </CardTitle>
               <CardDescription className="text-sm sm:text-base text-muted-foreground/80 mt-1 sm:mt-2">
-                Upload your presentation slides and complete project files
+                Your GitHub repository must meet the following requirements
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6 pt-0">
-              {/* PPT Upload */}
               <div className="space-y-3">
-                <Label className="text-sm sm:text-base font-medium">Presentation File (PPT/PDF)</Label>
-                <div className="border-2 border-dashed border-border rounded-lg p-4 sm:p-6 text-center hover:border-primary/50 transition-colors">
-                  <input
-                    type="file"
-                    id="ppt-upload"
-                    accept=".ppt,.pptx,.pdf"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleFileUpload('pptFile', file);
-                    }}
-                    className="hidden"
-                  />
-                  <label htmlFor="ppt-upload" className="cursor-pointer">
-                    <FileText className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground mx-auto mb-2 sm:mb-3" />
-                    <p className="text-xs sm:text-sm text-muted-foreground mb-1 sm:mb-2">
-                      Click to upload or drag and drop
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      PPT, PPTX, PDF (Max 50MB)
-                    </p>
-                  </label>
+                <div className="flex items-start space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium text-sm">Public Repository</p>
+                    <p className="text-xs text-muted-foreground">Repository must be publicly accessible</p>
+                  </div>
                 </div>
-                {projectData.pptFile && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex items-center justify-between p-3 bg-muted rounded-lg"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <FileText className="w-4 h-4 text-primary" />
-                      <span className="text-sm font-medium">{projectData.pptFile.name}</span>
-                      <span className="text-xs text-muted-foreground">
-                        ({formatFileSize(projectData.pptFile.size)})
-                      </span>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setProjectData(prev => ({ ...prev, pptFile: null }))}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </motion.div>
-                )}
-              </div>
-
-              {/* ZIP Upload */}
-              <div className="space-y-3">
-                <Label className="text-sm sm:text-base font-medium">Project Files (ZIP)</Label>
-                <div className="border-2 border-dashed border-border rounded-lg p-4 sm:p-6 text-center hover:border-primary/50 transition-colors">
-                  <input
-                    type="file"
-                    id="zip-upload"
-                    accept=".zip"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleFileUpload('zipFile', file);
-                    }}
-                    className="hidden"
-                  />
-                  <label htmlFor="zip-upload" className="cursor-pointer">
-                    <Archive className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground mx-auto mb-2 sm:mb-3" />
-                    <p className="text-xs sm:text-sm text-muted-foreground mb-1 sm:mb-2">
-                      Click to upload or drag and drop
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      ZIP file (Max 100MB)
-                    </p>
-                  </label>
+                <div className="flex items-start space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium text-sm">setup.md File</p>
+                    <p className="text-xs text-muted-foreground">Must contain a setup.md file with project setup instructions</p>
+                  </div>
                 </div>
-                {projectData.zipFile && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex items-center justify-between p-3 bg-muted rounded-lg"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <Archive className="w-4 h-4 text-primary" />
-                      <span className="text-sm font-medium">{projectData.zipFile.name}</span>
-                      <span className="text-xs text-muted-foreground">
-                        ({formatFileSize(projectData.zipFile.size)})
-                      </span>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setProjectData(prev => ({ ...prev, zipFile: null }))}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </motion.div>
-                )}
+                <div className="flex items-start space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium text-sm">{projectData.teamName || 'TeamName'}.pdf File</p>
+                    <p className="text-xs text-muted-foreground">Must contain a PDF file named after your team</p>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -364,15 +494,15 @@ export const ProjectSubmission = () => {
               </div>
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <span>GitHub repository should be public and accessible</span>
+                <span>GitHub repository must be public and accessible</span>
               </div>
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <span>Presentation should showcase your project effectively</span>
+                <span>Include setup.md with project setup instructions</span>
               </div>
               <div className="flex items-start space-x-2">
                 <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <span>ZIP file should contain all source code and assets</span>
+                <span>Include {projectData.teamName || 'teamname'}.pdf with project documentation</span>
               </div>
             </CardContent>
           </Card>
@@ -382,7 +512,14 @@ export const ProjectSubmission = () => {
             <CardContent className="pt-4 sm:pt-6 p-4 sm:p-6">
               <Button
                 onClick={handleSubmit}
-                disabled={isSubmitting || !projectData.projectName || !projectData.description}
+                disabled={
+                  isSubmitting || 
+                  !projectData.teamName || 
+                  !projectData.projectName || 
+                  !projectData.description ||
+                  !projectData.githubRepo ||
+                  !!teamStatus?.submissionStatus
+                }
                 className="w-full h-12 sm:h-14 text-base sm:text-lg font-bold rounded-lg sm:rounded-xl bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary hover:shadow-xl hover:shadow-primary/25 hover:scale-105 transition-all duration-300"
               >
                 {isSubmitting ? (
@@ -392,16 +529,21 @@ export const ProjectSubmission = () => {
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                       className="w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"
                     />
-                    Submitting...
+                    Validating GitHub Repository...
+                  </>
+                ) : teamStatus?.submissionStatus ? (
+                  <>
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Already Submitted
                   </>
                 ) : (
                   <>
-                    <CheckCircle className="w-4 h-4 mr-2" />
+                    <Upload className="w-4 h-4 mr-2" />
                     Submit Project
                   </>
                 )}
               </Button>
-              {submissionStatus === 'submitted' && (
+              {teamStatus?.submissionStatus && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -411,6 +553,22 @@ export const ProjectSubmission = () => {
                   <p className="text-sm text-green-800 font-medium">
                     Project submitted successfully!
                   </p>
+                  <p className="text-xs text-green-600 mt-1">
+                    Submitted on {new Date(teamStatus.submissionStatus.submittedAt).toLocaleDateString()}
+                  </p>
+                  {teamStatus.submissionStatus.githubRepo && (
+                    <div className="mt-2">
+                      <a
+                        href={teamStatus.submissionStatus.githubRepo}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-green-600 hover:text-green-800 underline"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        View GitHub Repository
+                      </a>
+                    </div>
+                  )}
                 </motion.div>
               )}
             </CardContent>

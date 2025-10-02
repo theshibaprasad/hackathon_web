@@ -135,6 +135,105 @@ export const sendWelcomeEmail = async (userEmail: string, userName: string) => {
   });
 };
 
+// Payment confirmation email template
+export const sendPaymentConfirmationEmail = async (
+  userEmail: string, 
+  userName: string, 
+  paymentDetails: {
+    amount: number;
+    paymentId: string;
+    orderId: string;
+    isEarlyBird: boolean;
+    timestamp: string;
+  }
+) => {
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="color: #10B981; margin-bottom: 10px;">🎉 Payment Successful!</h1>
+        <p style="color: #666; font-size: 16px;">Hello ${userName},</p>
+      </div>
+      
+      <div style="background: #f0fdf4; border: 2px solid #10B981; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <h2 style="color: #10B981; margin-bottom: 15px;">✅ Payment Confirmed</h2>
+        <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
+          Your payment has been successfully processed and your account has been activated!
+        </p>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <h3 style="color: #333; margin-bottom: 15px;">Payment Details</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; color: #666;">Amount Paid:</td>
+            <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; font-weight: bold; color: #333;">₹${paymentDetails.amount}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; color: #666;">Payment ID:</td>
+            <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; font-family: monospace; color: #333;">${paymentDetails.paymentId}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; color: #666;">Order ID:</td>
+            <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; font-family: monospace; color: #333;">${paymentDetails.orderId}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; color: #666;">Payment Type:</td>
+            <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; color: #333;">
+              ${paymentDetails.isEarlyBird ? '🎯 Early Bird Registration' : '📝 Regular Registration'}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; color: #666;">Transaction Date:</td>
+            <td style="padding: 8px 0; color: #333;">${new Date(paymentDetails.timestamp).toLocaleString('en-IN', { 
+              timeZone: 'Asia/Kolkata',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}</td>
+          </tr>
+        </table>
+      </div>
+      
+      <div style="margin: 30px 0;">
+        <h3 style="color: #333; margin-bottom: 15px;">What's Next?</h3>
+        <ul style="color: #666; line-height: 1.6; padding-left: 20px;">
+          <li>Complete your profile setup to get started</li>
+          <li>Join or create teams for hackathons</li>
+          <li>Participate in exciting coding competitions</li>
+          <li>Submit your innovative projects</li>
+        </ul>
+      </div>
+      
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${process.env.NEXT_PUBLIC_BASE_URL}/dashboard" 
+           style="background: #10B981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+          Go to Dashboard
+        </a>
+      </div>
+      
+      <div style="background: #fef3c7; border: 1px solid #f59e0b; padding: 15px; border-radius: 6px; margin: 20px 0;">
+        <p style="color: #92400e; margin: 0; font-size: 14px;">
+          <strong>📧 Keep this email as your payment receipt.</strong> You can use the Payment ID for any future reference or support requests.
+        </p>
+      </div>
+      
+      <div style="text-align: center; margin: 30px 0;">
+        <p style="color: #666; font-size: 14px;">
+          Need help? Contact us at support@novothonplatform.com
+        </p>
+      </div>
+    </div>
+  `;
+
+  return await sendEmail({
+    to: userEmail,
+    subject: `Payment Confirmation - ₹${paymentDetails.amount} | Novothon Platform`,
+    html,
+  });
+};
+
 // Team invitation email template
 export const sendTeamInvitationEmail = async (
   inviteeEmail: string, 

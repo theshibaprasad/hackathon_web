@@ -122,7 +122,6 @@ export default function DashboardClient({ user }: DashboardClientProps) {
           }
         } catch (error) {
           // Team data fetch failed, continue without team data
-          console.log('Team data fetch failed');
         }
       }
     };
